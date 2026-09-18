@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="aca68115-294f-4293-b560-f0f15f4eb284"></script>
+
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("866825ae-4fe8-41aa-99e7-261e27e9f0fa") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("74a28687-2337-401e-a70b-d59fb0c7dfbe") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("b06c543a-bf20-4fd6-bd2a-693f52b1463a") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("87ee7535-d3da-4ad6-864a-e872f1042c07") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("80e4fbb9-1a60-4b3c-96b9-2103a2bed5ab") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e9d944de-1700-4701-85dc-cbe124ffc66c") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("84c88fe1-7767-4628-9788-1f4d94cab813") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("09fdceb4-84b1-47e3-b697-e6a64684a0e5") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("68a6636f-dc47-4849-9a90-655b8639039e") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("325d425e-d4c8-48d7-aa31-aa3e63366a8e") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3e03d397-fbce-41a6-9a36-839fa50aa983") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e9d944de-1700-4701-85dc-cbe124ffc66c") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("84c88fe1-7767-4628-9788-1f4d94cab813") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("09fdceb4-84b1-47e3-b697-e6a64684a0e5") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("68a6636f-dc47-4849-9a90-655b8639039e") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("325d425e-d4c8-48d7-aa31-aa3e63366a8e") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("3e03d397-fbce-41a6-9a36-839fa50aa983") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+  body { margin: 0; background: #2A2440; }
+  a { color: #D9BE55; text-decoration: none; }
+  a:hover { color: #E5CC6C; text-decoration: underline; }
+</style>
+</helmet>
+
+<div style="font-family: 'Geist', system-ui, -apple-system, sans-serif; background: #2A2440; color: #EFECF7; min-height: 100vh; padding: 0 0 120px">
+
+  <div style="max-width: 1180px; margin: 0 auto; padding: 0 48px">
+
+    <header style="padding: 88px 0 56px; border-bottom: 1px solid rgba(255,255,255,0.10); display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 26px; height: 26px; border-radius: 7px; background: #D9BE55; display: flex; align-items: center; justify-content: center; color: #241F38; font-weight: 800; font-size: 15px; letter-spacing: -0.04em">D</div>
+        <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dryft</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); padding: 3px 8px; border-radius: 5px">Satin Slate v0.1</span>
+      </div>
+      <h1 style="margin: 0; font-size: 56px; font-weight: 700; line-height: 1.02; letter-spacing: -0.035em; max-width: 20ch">The Dryft design system</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #B7B0CC; max-width: 62ch; text-wrap: pretty">Satin Slate: a lifted purple base with a matte gold accent and one warm secondary. Geist throughout, Geist Mono for anything the machine wrote. Everything below is the actual component, not a picture of one.</p>
+    </header>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">01 — Colour</div>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em">Tokens</h2>
+        <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 58ch">Four surfaces, one accent, one warm secondary, three semantic hues. Nothing else gets added without removing something.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Surfaces</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #2A2440; border: 1px solid rgba(255,255,255,0.16)"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Base</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#2A2440</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Page background. Never on a card.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #342D4E; border: 1px solid rgba(255,255,255,0.06)"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Raised</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#342D4E</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Cards, panels, nav bar.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #3F3760"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Inset</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#3F3760</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Nested cards, table headers, chips.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #4A4270"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Hover</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#4A4270</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Interactive state only.</div></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Accent &amp; text</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #D9BE55"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Gold</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#D9BE55</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Primary action, links, eyebrows. One per view.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #C56A4E"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Coral</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#C56A4E</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Section eyebrows, illustration warmth. Not buttons.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; border-radius: 10px; background: #EFECF7"></div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Chalk</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#EFECF7</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Body and headings. 12.4:1 on base.</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 96px; display: flex; flex-direction: column">
+              <div style="height: 48px; border-radius: 10px 10px 0 0; background: #B7B0CC"></div>
+              <div style="height: 48px; border-radius: 0 0 10px 10px; background: #948CAE"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <div style="font-size: 13.5px; font-weight: 600">Muted / Dim</div>
+              <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">#B7B0CC · #948CAE</div></sc-if>
+              <sc-if value="{{ showUsage }}" hint-placeholder-val="{{ true }}"><div style="font-size: 12px; line-height: 1.45; color: #948CAE">Secondary copy; captions and metadata.</div></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Semantic</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 72px; border-radius: 10px; background: #6E9E6A"></div>
+            <div style="font-size: 13.5px; font-weight: 600">Pass</div>
+            <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; margin-top: -7px">#6E9E6A</div></sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 72px; border-radius: 10px; background: #D9BE55"></div>
+            <div style="font-size: 13.5px; font-weight: 600">Warn</div>
+            <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; margin-top: -7px">#D9BE55</div></sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 72px; border-radius: 10px; background: #B8503C"></div>
+            <div style="font-size: 13.5px; font-weight: 600">Refused</div>
+            <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; margin-top: -7px">#B8503C</div></sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 72px; border-radius: 10px; background: #5A88AC"></div>
+            <div style="font-size: 13.5px; font-weight: 600">Info</div>
+            <sc-if value="{{ showHex }}" hint-placeholder-val="{{ true }}"><div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; margin-top: -7px">#5A88AC</div></sc-if>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">02 — Type</div>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em">Geist, two weights of work</h2>
+        <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 58ch">Display sizes get 700 and tight tracking. Body stays 400 at 16.5 on 1.62. Geist Mono is reserved for paths, commands, and anything the system emitted.</p>
+      </div>
+
+      <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 34px; display: flex; flex-direction: column; gap: 26px">
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">Display / 700 / -3.5%</div>
+          <div style="font-size: 56px; font-weight: 700; line-height: 1.02; letter-spacing: -0.035em">Install once. Own it.</div>
+        </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">H2 / 600 / -2.5%</div>
+          <div style="font-size: 32px; font-weight: 600; letter-spacing: -0.025em">A stack is something you add</div>
+        </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">H3 / 600 / -1.5%</div>
+          <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em">Preview writes nothing</div>
+        </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">Body / 400 / 16.5</div>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #EFECF7; max-width: 56ch; text-wrap: pretty">The installer refuses to write into your source tree, refuses a non-empty directory that is not already a workspace, and never overwrites anything you own. That is the whole personality of the product, and the type should read like it means it.</p>
+        </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">Small / 400 / 13.5</div>
+          <div style="font-size: 13.5px; line-height: 1.5; color: #B7B0CC">Captions, table cells, helper text under inputs.</div>
+        </div>
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+        <div style="display: flex; align-items: baseline; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE; width: 132px; flex: none">Mono / 500 / 13</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 500; color: #D9BE55">dryft doctor --workspace ./Dryft</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">03 — Geometry</div>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em">Spacing, radius, satin</h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 18px">
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Spacing — 4px base</div>
+          <div style="display: flex; align-items: flex-end; gap: 10px">
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 4px; height: 4px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">4</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 8px; height: 8px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">8</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 12px; height: 12px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">12</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 16px; height: 16px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">16</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 24px; height: 24px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">24</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 32px; height: 32px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">32</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 48px; height: 48px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">48</div></div>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 72px; height: 72px; background: #D9BE55"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">72</div></div>
+          </div>
+          <div style="font-size: 13px; line-height: 1.5; color: #B7B0CC">Section rhythm is 72 between blocks, 120 between page sections, 26–34 inside a card.</div>
+        </div>
+
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 18px">
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Radius &amp; elevation</div>
+          <div style="display: flex; gap: 12px; align-items: flex-end">
+            <div style="display: flex; flex-direction: column; gap: 7px; align-items: center"><div style="width: 56px; height: 44px; background: #3F3760; border-radius: 4px"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">4</div></div>
+            <div style="display: flex; flex-direction: column; gap: 7px; align-items: center"><div style="width: 56px; height: 44px; background: #3F3760; border-radius: 8px"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">8</div></div>
+            <div style="display: flex; flex-direction: column; gap: 7px; align-items: center"><div style="width: 56px; height: 44px; background: #3F3760; border-radius: 14px"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">14</div></div>
+            <div style="display: flex; flex-direction: column; gap: 7px; align-items: center"><div style="width: 56px; height: 44px; background: #3F3760; border-radius: 999px"></div><div style="font-family: 'Geist Mono', monospace; font-size: 10px; color: #948CAE">pill</div></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="background: #3F3760; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #B7B0CC; border-top: 1px solid rgba(255,255,255,0.10)">Satin: 1px top highlight, no glow</div>
+            <div style="background: #3F3760; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #B7B0CC; border-top: 1px solid rgba(255,255,255,0.10); box-shadow: 0 14px 28px -18px rgba(0,0,0,0.7)">Lifted: same highlight, one soft shadow</div>
+          </div>
+          <div style="font-size: 13px; line-height: 1.5; color: #B7B0CC">No gradients on surfaces. The satin effect is a single top hairline plus a tight, low-opacity shadow.</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">04 — Components</div>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em">Buttons and controls</h2>
+      </div>
+
+      <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 30px; display: flex; flex-direction: column; gap: 26px">
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+          <div sc-camel-on-click="{{ noop }}" style="background: #D9BE55; color: #241F38; font-size: 14.5px; font-weight: 600; padding: 11px 20px; border-radius: 8px; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.28)" style-hover="background: #E5CC6C">Start free</div>
+          <div sc-camel-on-click="{{ noop }}" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #EFECF7; font-size: 14.5px; font-weight: 500; padding: 10px 19px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.14)">Read the docs</div>
+          <div sc-camel-on-click="{{ noop }}" style="color: #EFECF7; font-size: 14.5px; font-weight: 500; padding: 10px 14px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.08)">Cancel</div>
+          <div sc-camel-on-click="{{ noop }}" style="background: rgba(184,80,60,0.16); border: 1px solid rgba(184,80,60,0.45); color: #E9A192; font-size: 14.5px; font-weight: 500; padding: 10px 19px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(184,80,60,0.26)">Uninstall stack</div>
+          <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); color: #6F6890; font-size: 14.5px; font-weight: 500; padding: 10px 19px; border-radius: 8px">Disabled</div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+          <div style="background: #D9BE55; color: #241F38; font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 6px; cursor: pointer">Small</div>
+          <div style="background: #D9BE55; color: #241F38; font-size: 14.5px; font-weight: 600; padding: 11px 20px; border-radius: 8px; cursor: pointer">Medium</div>
+          <div style="background: #D9BE55; color: #241F38; font-size: 16px; font-weight: 600; padding: 15px 28px; border-radius: 10px; cursor: pointer">Large</div>
+          <div style="display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #EFECF7; font-size: 14.5px; font-weight: 500; padding: 10px 18px; border-radius: 8px; cursor: pointer"><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #D9BE55">$</span>Copy install command</div>
+        </div>
+
+        <div style="height: 1px; background: rgba(255,255,255,0.07)"></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Input — {{ formStateLabel }}</div>
+            <sc-if value="{{ formDefault }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 7px">
+                <label style="font-size: 13px; font-weight: 500; color: #B7B0CC">Workspace path</label>
+                <div style="background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 11px 14px; font-family: 'Geist Mono', monospace; font-size: 13.5px; color: #6F6890">./Dryft</div>
+                <div style="font-size: 12.5px; color: #948CAE">Must be empty, or an existing Dryft workspace.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ formFilled }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 7px">
+                <label style="font-size: 13px; font-weight: 500; color: #B7B0CC">Workspace path</label>
+                <div style="background: rgba(0,0,0,0.22); border: 1px solid #D9BE55; border-radius: 8px; padding: 11px 14px; font-family: 'Geist Mono', monospace; font-size: 13.5px; color: #EFECF7; box-shadow: 0 0 0 3px rgba(217,190,85,0.16)">./Work/Dryft</div>
+                <div style="font-size: 12.5px; color: #8FBF9E">Directory is empty. Ready to install.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 7px">
+                <label style="font-size: 13px; font-weight: 500; color: #B7B0CC">Workspace path</label>
+                <div style="background: rgba(184,80,60,0.10); border: 1px solid #B8503C; border-radius: 8px; padding: 11px 14px; font-family: 'Geist Mono', monospace; font-size: 13.5px; color: #EFECF7">./dryft-source</div>
+                <div style="font-size: 12.5px; color: #E9A192">Refused: that is the source tree. Pick a directory you own.</div>
+              </div>
+            </sc-if>
+            <div style="display: flex; gap: 8px">
+              <div sc-camel-on-click="{{ setDefault }}" style="font-size: 12px; padding: 6px 11px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.16); color: #B7B0CC; cursor: pointer">Default</div>
+              <div sc-camel-on-click="{{ setFilled }}" style="font-size: 12px; padding: 6px 11px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.16); color: #B7B0CC; cursor: pointer">Valid</div>
+              <div sc-camel-on-click="{{ setError }}" style="font-size: 12px; padding: 6px 11px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.16); color: #B7B0CC; cursor: pointer">Refused</div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 18px">
+            <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Switch, checkbox, status</div>
+            <div style="display: flex; align-items: center; gap: 14px">
+              <div sc-camel-on-click="{{ toggleSwitch }}" style="width: 44px; height: 26px; border-radius: 999px; padding: 3px; cursor: pointer; display: flex; align-items: center; background: {{ switchTrack }}">
+                <div style="width: 20px; height: 20px; border-radius: 999px; background: #EFECF7; margin-left: {{ switchOffset }}"></div>
+              </div>
+              <span style="font-size: 14px; color: #EFECF7">Require approval note on install</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="width: 18px; height: 18px; border-radius: 5px; background: #D9BE55; display: flex; align-items: center; justify-content: center; color: #241F38; font-size: 12px; font-weight: 700">✓</div>
+              <span style="font-size: 14px; color: #EFECF7">Run Doctor after install</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.24)"></div>
+              <span style="font-size: 14px; color: #B7B0CC">Register projects automatically</span>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px">
+              <span style="display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(110,158,106,0.16); border: 1px solid rgba(110,158,106,0.42); color: #A5CDA0"><span style="width: 5px; height: 5px; border-radius: 50%; background: #6E9E6A"></span>Installed</span>
+              <span style="display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(217,190,85,0.16); border: 1px solid rgba(217,190,85,0.42); color: #E4CE79"><span style="width: 5px; height: 5px; border-radius: 50%; background: #D9BE55"></span>Preview only</span>
+              <span style="display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(184,80,60,0.16); border: 1px solid rgba(184,80,60,0.42); color: #E9A192"><span style="width: 5px; height: 5px; border-radius: 50%; background: #B8503C"></span>Refused</span>
+              <span style="font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #B7B0CC">No stack</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 20px">
+      <h3 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em">Navigation</h3>
+      <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 14px 22px; display: flex; align-items: center; gap: 28px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <div style="width: 22px; height: 22px; border-radius: 6px; background: #D9BE55; display: flex; align-items: center; justify-content: center; color: #241F38; font-weight: 800; font-size: 13px">D</div>
+          <span style="font-size: 14.5px; font-weight: 600">Dryft</span>
+        </div>
+        <div style="display: flex; gap: 22px; font-size: 14px">
+          <a href="#" style="color: #EFECF7">Product</a>
+          <a href="#" style="color: #B7B0CC">Stacks</a>
+          <a href="#" style="color: #B7B0CC">Docs</a>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+          <a href="#" style="font-size: 14px; color: #B7B0CC">Sign in</a>
+          <div style="background: #D9BE55; color: #241F38; font-size: 13.5px; font-weight: 600; padding: 9px 16px; border-radius: 7px; cursor: pointer">Get Dryft</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 48px 0 0; display: flex; flex-direction: column; gap: 20px">
+      <h3 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em">Cards</h3>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px">
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(217,190,85,0.16); border: 1px solid rgba(217,190,85,0.36)"></div>
+          <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em">Bounded retrieval</div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B7B0CC">Agents read what the workspace allows and nothing past it. The boundary is a file you can read.</p>
+        </div>
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(197,106,78,0.18); border: 1px solid rgba(197,106,78,0.42)"></div>
+          <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em">Production records</div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B7B0CC">Every run leaves a record with its inputs, refusals and outputs. Nothing happens off the books.</p>
+        </div>
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(90,136,172,0.20); border: 1px solid rgba(90,136,172,0.45)"></div>
+          <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em">Doctor</div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #B7B0CC">One command tells you what is wrong, in your workspace, in plain sentences.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px">
+        <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 40px -28px rgba(0,0,0,0.8)">
+          <div style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #C56A4E"><span style="width: 5px; height: 5px; border-radius: 50%; background: #C56A4E"></span>Featured</div>
+          <h3 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em">Your workspace is a folder you chose</h3>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #B7B0CC; max-width: 44ch">No hosted tenancy, no hidden state. Dryft installs into a directory, tells you what it wrote, and refuses to touch the rest.</p>
+          <div style="display: flex; gap: 10px; align-items: center">
+            <div style="background: #D9BE55; color: #241F38; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 8px; cursor: pointer">Install Dryft</div>
+            <a href="#" style="font-size: 14px; color: #B7B0CC">See what it writes</a>
+          </div>
+        </div>
+        <div style="background: #3F3760; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 22px; justify-content: center">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.03em; color: #D9BE55">0</div>
+            <div style="font-size: 13.5px; color: #B7B0CC">files written during preview</div>
+          </div>
+          <div style="height: 1px; background: rgba(255,255,255,0.09)"></div>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.03em">5 min</div>
+            <div style="font-size: 13.5px; color: #B7B0CC">from bootstrap to a working workspace</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 48px 0 0; display: flex; flex-direction: column; gap: 20px">
+      <h3 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em">Terminal, callout, table</h3>
+
+      <div style="background: #1F1A30; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 11px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.07)">
+          <span style="width: 9px; height: 9px; border-radius: 50%; background: #B8503C"></span>
+          <span style="width: 9px; height: 9px; border-radius: 50%; background: #D9BE55"></span>
+          <span style="width: 9px; height: 9px; border-radius: 50%; background: #6E9E6A"></span>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 11.5px; color: #948CAE; margin-left: 6px">bash — ./Dryft</span>
+        </div>
+        <div style="padding: 20px 18px; font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.85; display: flex; flex-direction: column">
+          <div><span style="color: #C56A4E">$</span> <span style="color: #EFECF7">installers/bootstrap.sh ./Dryft</span></div>
+          <div style="color: #948CAE">→ packing dryft-os-0.1.0.dryftpkg.tar.gz</div>
+          <div style="color: #948CAE">→ preview: 41 files, 0 written</div>
+          <div><span style="color: #6E9E6A">✓</span> <span style="color: #B7B0CC">installed to ./Dryft — 0 stacks, no error</span></div>
+          <div><span style="color: #C56A4E">$</span> <span style="color: #D9BE55">_</span></div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+        <div style="background: rgba(90,136,172,0.10); border: 1px solid rgba(90,136,172,0.34); border-left: 3px solid #5A88AC; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+          <div style="font-size: 13.5px; font-weight: 600; color: #A9C9DE">Note</div>
+          <div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">A stack is optional. An installation with zero stacks is finished, not broken.</div>
+        </div>
+        <div style="background: rgba(184,80,60,0.10); border: 1px solid rgba(184,80,60,0.34); border-left: 3px solid #B8503C; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+          <div style="font-size: 13.5px; font-weight: 600; color: #E9A192">Refusal</div>
+          <div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">Do not run the test glob directly. <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #EFECF7">tests/run.sh</span> exists so that cannot happen.</div>
+        </div>
+      </div>
+
+      <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 12px 20px; background: #3F3760; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #B7B0CC">
+          <div>Stack</div><div>Version</div><div>Status</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 15px 20px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); align-items: center">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 13px">com.usedryft.software-production</div>
+          <div style="color: #B7B0CC">0.1.0</div>
+          <div><span style="font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(110,158,106,0.16); border: 1px solid rgba(110,158,106,0.42); color: #A5CDA0">Installed</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 15px 20px; font-size: 14px; align-items: center">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #B7B0CC">com.thirdparty.research</div>
+          <div style="color: #B7B0CC">—</div>
+          <div><span style="font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #B7B0CC">Available</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 48px 0 0; display: flex; flex-direction: column; gap: 20px">
+      <h3 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.015em">Steps and accordion</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start">
+        <div style="display: flex; flex-direction: column; gap: 0">
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center; flex: none"><div style="width: 30px; height: 30px; border-radius: 999px; background: #D9BE55; color: #241F38; font-size: 13.5px; font-weight: 700; display: flex; align-items: center; justify-content: center">1</div><div style="width: 1px; flex: 1; background: rgba(255,255,255,0.12)"></div></div>
+            <div style="padding-bottom: 26px; display: flex; flex-direction: column; gap: 5px"><div style="font-size: 15.5px; font-weight: 600">Pack the OS</div><div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">One artifact, versioned, with an owner recorded for every file.</div></div>
+          </div>
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center; flex: none"><div style="width: 30px; height: 30px; border-radius: 999px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.18); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">2</div><div style="width: 1px; flex: 1; background: rgba(255,255,255,0.12)"></div></div>
+            <div style="padding-bottom: 26px; display: flex; flex-direction: column; gap: 5px"><div style="font-size: 15.5px; font-weight: 600">Preview the install</div><div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">Writes nothing. Shows you exactly what it would put where.</div></div>
+          </div>
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center; flex: none"><div style="width: 30px; height: 30px; border-radius: 999px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.18); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">3</div></div>
+            <div style="display: flex; flex-direction: column; gap: 5px"><div style="font-size: 15.5px; font-weight: 600">Install, with a reason</div><div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">Approval is a sentence you write, stored with the record.</div></div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden">
+            <div sc-camel-on-click="{{ toggleFaq0 }}" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; font-size: 15px; font-weight: 500">Is my data hosted anywhere?<span style="color: #D9BE55; font-size: 18px">{{ faqSign0 }}</span></div>
+            <sc-if value="{{ faqOpen0 }}" hint-placeholder-val="{{ true }}"><div style="padding: 0 20px 18px; font-size: 14px; line-height: 1.6; color: #B7B0CC; max-width: 52ch">No. The workspace is a directory on a machine you control. There is no tenancy and no phone-home.</div></sc-if>
+          </div>
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden">
+            <div sc-camel-on-click="{{ toggleFaq1 }}" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; font-size: 15px; font-weight: 500">Do I need a stack to start?<span style="color: #D9BE55; font-size: 18px">{{ faqSign1 }}</span></div>
+            <sc-if value="{{ faqOpen1 }}" hint-placeholder-val="{{ false }}"><div style="padding: 0 20px 18px; font-size: 14px; line-height: 1.6; color: #B7B0CC; max-width: 52ch">No. The OS registers projects, runs Doctor and keeps records on its own. Add a stack when you want one.</div></sc-if>
+          </div>
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden">
+            <div sc-camel-on-click="{{ toggleFaq2 }}" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; font-size: 15px; font-weight: 500">Can I write my own stack?<span style="color: #D9BE55; font-size: 18px">{{ faqSign2 }}</span></div>
+            <sc-if value="{{ faqOpen2 }}" hint-placeholder-val="{{ false }}"><div style="padding: 0 20px 18px; font-size: 14px; line-height: 1.6; color: #B7B0CC; max-width: 52ch">Yes, against the same public contract first-party stacks use. There is no private path.</div></sc-if>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 72px 0 0; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">05 — Rules</div>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em">How to keep it satin</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+        <div style="background: rgba(110,158,106,0.08); border: 1px solid rgba(110,158,106,0.28); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <div style="font-size: 14px; font-weight: 600; color: #A5CDA0">Do</div>
+          <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.55; color: #CFC9E0">
+            <div>One gold element per viewport. If two compete, one of them is decoration.</div>
+            <div>Let surfaces do the separating — border hairlines over shadows.</div>
+            <div>Keep body copy at 16.5 and lines under 62 characters.</div>
+            <div>Use Geist Mono only for real machine output: paths, commands, ids.</div>
+          </div>
+        </div>
+        <div style="background: rgba(184,80,60,0.08); border: 1px solid rgba(184,80,60,0.28); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+          <div style="font-size: 14px; font-weight: 600; color: #E9A192">Don't</div>
+          <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.55; color: #CFC9E0">
+            <div>No purple-to-magenta gradients. The base is one flat colour.</div>
+            <div>No glowing shadows in the accent hue. Satin has no bloom.</div>
+            <div>Never put gold text on the base — only gold fills with dark text.</div>
+            <div>No third accent. Coral and gold is the whole budget.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer style="margin-top: 88px; padding: 40px 0 0; border-top: 1px solid rgba(255,255,255,0.10); display: flex; align-items: flex-end; justify-content: space-between; gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <div style="width: 22px; height: 22px; border-radius: 6px; background: #D9BE55; display: flex; align-items: center; justify-content: center; color: #241F38; font-weight: 800; font-size: 13px">D</div>
+          <span style="font-size: 14.5px; font-weight: 600">Dryft</span>
+        </div>
+        <div style="font-size: 13px; color: #948CAE">Satin Slate — derived from The Simpsons palette, dropped to matte.</div>
+      </div>
+      <div style="display: flex; gap: 28px; font-size: 13.5px">
+        <a href="#" style="color: #B7B0CC">Docs</a>
+        <a href="#" style="color: #B7B0CC">Stacks</a>
+        <a href="#" style="color: #B7B0CC">GitHub</a>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;showHex&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Annotations&quot;},&quot;showUsageNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Annotations&quot;},&quot;demoState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Default&quot;,&quot;Valid&quot;,&quot;Refused&quot;],&quot;default&quot;:&quot;Default&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+class Component extends DCLogic {
+  state = { faq: 0, on: true, form: null };
+
+  renderVals() {
+    const form = this.state.form ?? (this.props.demoState || 'Default');
+    const open = this.state.faq;
+    return {
+      showHex: this.props.showHex ?? true,
+      showUsage: this.props.showUsageNotes ?? true,
+      noop: () => {},
+      formStateLabel: form,
+      formDefault: form === 'Default',
+      formFilled: form === 'Valid',
+      formError: form === 'Refused',
+      setDefault: () => this.setState({ form: 'Default' }),
+      setFilled: () => this.setState({ form: 'Valid' }),
+      setError: () => this.setState({ form: 'Refused' }),
+      switchTrack: this.state.on ? '#D9BE55' : 'rgba(255,255,255,0.16)',
+      switchOffset: this.state.on ? '18px' : '0px',
+      toggleSwitch: () => this.setState(s => ({ on: !s.on })),
+      faqOpen0: open === 0, faqOpen1: open === 1, faqOpen2: open === 2,
+      faqSign0: open === 0 ? '–' : '+',
+      faqSign1: open === 1 ? '–' : '+',
+      faqSign2: open === 2 ? '–' : '+',
+      toggleFaq0: () => this.setState(s => ({ faq: s.faq === 0 ? -1 : 0 })),
+      toggleFaq1: () => this.setState(s => ({ faq: s.faq === 1 ? -1 : 1 })),
+      toggleFaq2: () => this.setState(s => ({ faq: s.faq === 2 ? -1 : 2 }))
+    };
+  }
+}
+</script>
+
+
+</body></html>

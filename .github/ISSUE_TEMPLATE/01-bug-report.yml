@@ -1,0 +1,81 @@
+name: Bug report
+description: Report something in Dryft that is broken.
+title: '[Bug]: '
+labels:
+- bug
+body:
+- type: markdown
+  attributes:
+    value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
+      API keys, private workspace notes, and personal data. For private reports or help by email, contact
+      help@usedryft.com.'
+- type: textarea
+  id: actual
+  attributes:
+    label: What happened?
+    description: Describe the problem and its effect on your work.
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: Steps to reproduce
+    description: Give the smallest sequence that reproduces the issue. Say if it happens intermittently.
+  validations:
+    required: true
+- type: textarea
+  id: expected
+  attributes:
+    label: What did you expect?
+    description: Describe the expected behaviour.
+  validations:
+    required: true
+- type: input
+  id: version
+  attributes:
+    label: Dryft version
+    description: Enter the installed version or source commit. If installation failed, enter the version
+      you tried to install or "unknown".
+  validations:
+    required: true
+- type: dropdown
+  id: os
+  attributes:
+    label: Operating system
+    description: Choose the environment where this happened.
+    options:
+    - Linux
+    - macOS
+    - Windows
+    - Windows (WSL)
+    - Other
+  validations:
+    required: true
+- type: dropdown
+  id: agent
+  attributes:
+    label: Agent
+    description: Which agent were you using?
+    options:
+    - Claude Code
+    - Codex
+    - Both
+    - Neither / not applicable
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Environment details
+    description: Include your OS release, Python version, and agent version if relevant. Avoid personal
+      machine names and private paths.
+  validations:
+    required: false
+- type: textarea
+  id: logs
+  attributes:
+    label: Error messages or logs
+    description: Paste only the relevant output, with secrets and personal details removed.
+    render: text
+  validations:
+    required: false

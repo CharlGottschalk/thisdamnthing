@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "generated_at": "2000-01-01T00:00:00Z",
+  "stacks": [
+    {
+      "id": "example-workflow",
+      "name": "Example workflow",
+      "summary": "Illustrative registry fixture; not a published stack.",
+      "description": "Fictional data for schema validation. All hashes are placeholders.",
+      "author": {
+        "id": "example-author",
+        "name": "Example author",
+        "url": null
+      },
+      "license": "MIT",
+      "repository": "https://github.com/example/example-workflow",
+      "listing_url": "https://stacks.usedryft.com/example-workflow",
+      "extension_type": "capability",
+      "categories": [
+        "software-development"
+      ],
+      "tags": [
+        "planning"
+      ],
+      "icon": null,
+      "screenshots": [],
+      "documentation_url": null,
+      "support_url": null,
+      "first_approved_at": "2000-01-01T00:00:00Z",
+      "featured_rank": null,
+      "github_stars": null,
+      "github_stars_fetched_at": null,
+      "status": {
+        "state": "active",
+        "reason": null,
+        "changed_at": "2000-01-01T00:00:00Z",
+        "replacement_id": null
+      },
+      "latest_version": "1.0.0",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "tag": "v1.0.0",
+          "commit": "0000000000000000000000000000000000000000",
+          "archive_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "approved_at": "2000-01-01T00:00:00Z",
+          "status": {
+            "state": "active",
+            "reason": null,
+            "changed_at": "2000-01-01T00:00:00Z",
+            "replacement_id": null
+          },
+          "supported_agents": [
+            "claude",
+            "codex"
+          ],
+          "dependencies": [
+            {
+              "ref": "jira",
+              "name": "Jira connector",
+              "type": "connector",
+              "required": false,
+              "purpose": "Use an external task provider when selected by the user.",
+              "setup_url": "https://example.com/jira-setup",
+              "version_constraint": null,
+              "authentication_required": true,
+              "payment_required": false
+            }
+          ],
+          "capabilities": [
+            {
+              "type": "connector",
+              "scope": "User-selected Jira project",
+              "purpose": "Read and update tasks when explicitly requested.",
+              "data_leaves_machine": "Task descriptions and requested changes are sent to the selected Jira service."
+            }
+          ],
+          "hooks": [],
+          "review_notes": "Illustrative fixture only; no actual review or host verification.",
+          "manifest_identity": {
+            "contract_version": 1,
+            "id": "example-workflow",
+            "version": "1.0.0",
+            "description": "Illustrative registry fixture; not a published stack.",
+            "author": "Example author",
+            "license": "MIT"
+          }
+        }
+      ]
+    }
+  ]
+}

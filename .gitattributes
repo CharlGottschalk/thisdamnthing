@@ -1,0 +1,2 @@
+# Git for Windows must execute these tracked shell wrappers with LF endings.
+.dev/git-hooks/* text eol=lf

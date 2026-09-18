@@ -1,0 +1,15 @@
+{
+  "name": "Ada Lovelace",
+  "slug": "ada-lovelace",
+  "tasks": "internal",
+  "agents": [
+    "claude",
+    "codex"
+  ],
+  "toolchain": {
+    "git": "git",
+    "python": "python3",
+    "claude": "claude",
+    "codex": "codex"
+  }
+}

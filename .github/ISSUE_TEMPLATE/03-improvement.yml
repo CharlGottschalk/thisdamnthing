@@ -1,0 +1,47 @@
+name: Improvement suggestion
+description: Suggest a change that would make Dryft more useful.
+title: '[Improvement]: '
+labels:
+- enhancement
+body:
+- type: markdown
+  attributes:
+    value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
+      API keys, private workspace notes, and personal data. For private reports or help by email, contact
+      help@usedryft.com.'
+- type: textarea
+  id: problem
+  attributes:
+    label: What problem would this solve?
+    description: Describe the task or use case that is difficult today.
+  validations:
+    required: true
+- type: textarea
+  id: proposal
+  attributes:
+    label: Proposed improvement
+    description: Explain how you would like Dryft to work.
+  validations:
+    required: true
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Alternatives or workarounds
+    description: What have you tried, and where does it fall short?
+  validations:
+    required: false
+- type: dropdown
+  id: area
+  attributes:
+    label: Area of Dryft
+    description: Choose the closest match.
+    options:
+    - Installation and setup
+    - Knowledge capture and review
+    - Search and retrieval
+    - Projects
+    - Stacks and skills
+    - Dryft UI
+    - Other / not sure
+  validations:
+    required: false

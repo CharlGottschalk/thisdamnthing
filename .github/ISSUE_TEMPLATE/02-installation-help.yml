@@ -1,0 +1,79 @@
+name: Installation help
+description: Get help installing or setting up Dryft.
+title: '[Setup]: '
+labels:
+- question
+body:
+- type: markdown
+  attributes:
+    value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
+      API keys, private workspace notes, and personal data. For private reports or help by email, contact
+      help@usedryft.com.'
+- type: dropdown
+  id: method
+  attributes:
+    label: Installation method
+    description: Choose how you installed or tried to install Dryft.
+    options:
+    - pipx
+    - pip
+    - Source checkout / development install
+    - Other / not sure
+  validations:
+    required: true
+- type: textarea
+  id: problem
+  attributes:
+    label: Where are you stuck?
+    description: Describe what you tried and where setup stopped.
+  validations:
+    required: true
+- type: textarea
+  id: command
+  attributes:
+    label: Command and output
+    description: Include the command you ran and its relevant output. Remove secrets and personal paths.
+    render: text
+  validations:
+    required: true
+- type: input
+  id: version
+  attributes:
+    label: Dryft version
+    description: Enter the installed version or source commit. If installation failed, enter the version
+      you tried to install or "unknown".
+  validations:
+    required: true
+- type: dropdown
+  id: os
+  attributes:
+    label: Operating system
+    description: Choose the environment where this happened.
+    options:
+    - Linux
+    - macOS
+    - Windows
+    - Windows (WSL)
+    - Other
+  validations:
+    required: true
+- type: dropdown
+  id: agent
+  attributes:
+    label: Agent
+    description: Which agent were you using?
+    options:
+    - Claude Code
+    - Codex
+    - Both
+    - Neither / not applicable
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Environment details
+    description: Include your OS release, Python version, and agent version if relevant. Avoid personal
+      machine names and private paths.
+  validations:
+    required: false

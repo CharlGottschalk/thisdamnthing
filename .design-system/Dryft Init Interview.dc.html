@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #2A2440; }
+  a { color: #D9BE55; text-decoration: none; }
+  a:hover { color: #E5CC6C; text-decoration: underline; }
+  input, textarea { font-family: inherit; }
+  input[type=range] { accent-color: #D9BE55; }
+</style>
+</helmet>
+
+<div style="font-family: 'Geist', system-ui, sans-serif; background: #2A2440; color: #EFECF7; min-height: 100vh; display: flex">
+
+  <aside style="width: 288px; flex: none; background: #241F38; border-right: 1px solid rgba(255,255,255,0.08); padding: 40px 28px; display: flex; flex-direction: column; gap: 40px">
+    <div style="display: flex; align-items: center; gap: 11px">
+      <div style="width: 26px; height: 26px; border-radius: 7px; background: #D9BE55; display: flex; align-items: center; justify-content: center; color: #241F38; font-weight: 800; font-size: 15px; letter-spacing: -0.04em">D</div>
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">Dryft</span>
+      <span style="font-family: 'Geist Mono', monospace; font-size: 10.5px; color: #948CAE; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); padding: 3px 7px; border-radius: 5px">init</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+        <div style="display: flex; gap: 14px">
+          <div style="display: flex; flex-direction: column; align-items: center; flex: none">
+            <div style="width: 26px; height: 26px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; background: {{ g.dotBg }}; border: 1px solid {{ g.dotBorder }}; color: {{ g.dotColor }}">{{ g.mark }}</div>
+            <div style="width: 1px; flex: 1; min-height: 22px; background: rgba(255,255,255,0.10)"></div>
+          </div>
+          <div style="padding-bottom: 20px; display: flex; flex-direction: column; gap: 3px">
+            <div style="font-size: 14px; font-weight: 500; color: {{ g.labelColor }}">{{ g.label }}</div>
+            <div style="font-size: 12px; color: #6F6890">{{ g.hint }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #948CAE">{{ stepLabel }}</div>
+      <div style="height: 3px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden">
+        <div style="height: 3px; border-radius: 999px; background: #D9BE55; width: {{ pctWidth }}"></div>
+      </div>
+      <div style="font-size: 12px; line-height: 1.5; color: #6F6890">Nothing is written until you confirm.</div>
+    </div>
+  </aside>
+
+  <main style="flex: 1; display: flex; justify-content: center; padding: 72px 56px 96px; overflow-y: auto">
+    <div style="width: 100%; max-width: 640px">
+
+      <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+        <section data-screen-label="00 Welcome" style="display: flex; flex-direction: column; gap: 24px">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #C56A4E">Initialize</div>
+          <h1 style="margin: 0; font-size: 46px; font-weight: 700; line-height: 1.05; letter-spacing: -0.035em; max-width: 22ch">Let's set up your workspace</h1>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #B7B0CC; max-width: 56ch; text-wrap: pretty">Nine questions, grouped into five parts. Every answer becomes a file you can read and change later. Dryft writes nothing to disk until the last screen, and it will never write into a source tree you own.</p>
+          <div style="background: rgba(90,136,172,0.10); border: 1px solid rgba(90,136,172,0.34); border-left: 3px solid #5A88AC; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; max-width: 56ch">
+            <div style="font-size: 13.5px; font-weight: 600; color: #A9C9DE">Note</div>
+            <div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">You can leave and come back. Answers live in <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #EFECF7">.dryft/init.toml</span> as you go.</div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isPath }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="01 Workspace path" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Workspace — 1 of 2</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">Where should the workspace live?</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">Pick a directory you own. It must be empty, or already be a Dryft workspace.</p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 9px">
+            <label style="font-size: 13px; font-weight: 500; color: #B7B0CC">Workspace path</label>
+            <div style="display: flex; gap: 10px">
+              <input type="text" value="{{ path }}" onChange="{{ setPath }}" spellcheck="false" style="flex: 1; background: rgba(0,0,0,0.22); border: 1px solid {{ pathBorder }}; box-shadow: {{ pathGlow }}; border-radius: 8px; padding: 12px 14px; font-family: 'Geist Mono', monospace; font-size: 13.5px; color: #EFECF7; outline: none">
+              <div onClick="{{ noop }}" style="display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #EFECF7; font-size: 14px; font-weight: 500; padding: 11px 17px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.14)">Browse…</div>
+            </div>
+            <div style="font-size: 12.5px; line-height: 1.5; color: {{ pathHintColor }}">{{ pathHint }}</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 9px">
+            <label style="font-size: 13px; font-weight: 500; color: #B7B0CC">Workspace name</label>
+            <input type="text" value="{{ name }}" onChange="{{ setName }}" style="background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 12px 14px; font-size: 14.5px; color: #EFECF7; outline: none">
+            <sc-if value="{{ showHelp }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size: 12.5px; color: #948CAE">Used in records and in the prompt. Change it any time.</div>
+            </sc-if>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isRole }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="02 Operator" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Operator — 1 of 1</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">Who is this workspace for?</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">This only sets the defaults for the next three screens. Nothing here is locked.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <sc-for list="{{ roles }}" as="r" hint-placeholder-count="4">
+              <div onClick="{{ r.pick }}" style="background: {{ r.bg }}; border: 1px solid {{ r.border }}; border-top: 1px solid {{ r.satin }}; border-radius: 12px; padding: 20px; cursor: pointer; display: flex; flex-direction: column; gap: 9px; min-height: 44px" style-hover="background: #4A4270">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+                  <div style="font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em">{{ r.label }}</div>
+                  <div style="width: 18px; height: 18px; flex: none; border-radius: 999px; background: {{ r.dot }}; border: 1px solid {{ r.dotBorder }}; display: flex; align-items: center; justify-content: center; color: #241F38; font-size: 11px; font-weight: 700">{{ r.mark }}</div>
+                </div>
+                <div style="font-size: 13.5px; line-height: 1.55; color: #B7B0CC">{{ r.desc }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isStacks }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="03 Stacks" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Capability — 1 of 1</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">Which stacks should be installed?</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">A stack is optional. Zero stacks is a finished installation, not a broken one — you can add them later with one command.</p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 9px">
+            <sc-for list="{{ stackChips }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.toggle }}" style="display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; cursor: pointer; font-family: 'Geist Mono', monospace; font-size: 12.5px; background: {{ s.bg }}; border: 1px solid {{ s.border }}; color: {{ s.color }}">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ s.dot }}"></span>{{ s.id }}
+              </div>
+            </sc-for>
+          </div>
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 12px; overflow: hidden">
+            <sc-for list="{{ stackRows }}" as="s" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); align-items: center">
+                <div style="display: flex; flex-direction: column; gap: 4px">
+                  <div style="font-size: 14.5px; font-weight: 500">{{ s.title }}</div>
+                  <div style="font-size: 13px; line-height: 1.5; color: #948CAE">{{ s.desc }}</div>
+                </div>
+                <span style="font-size: 12px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: {{ s.tagBg }}; border: 1px solid {{ s.tagBorder }}; color: {{ s.tagColor }}">{{ s.tag }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isBounds }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="04 Boundaries" style="display: flex; flex-direction: column; gap: 30px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Boundaries — 1 of 2</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">How far can an agent read?</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">Retrieval is bounded by a file you can open. Drag to set the default boundary for new projects.</p>
+          </div>
+
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 18px">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+              <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em">{{ depthLabel }}</div>
+              <div style="font-family: 'Geist Mono', monospace; font-size: 11.5px; color: #948CAE">scope = {{ depthKey }}</div>
+            </div>
+            <input type="range" min="0" max="4" step="1" value="{{ depth }}" onChange="{{ setDepth }}" style="width: 100%; height: 24px">
+            <div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; font-size: 10.5px; color: #6F6890">
+              <span>tight</span><span>open</span>
+            </div>
+            <div style="font-size: 13.5px; line-height: 1.55; color: #B7B0CC">{{ depthDesc }}</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 18px">
+            <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #948CAE">Defaults</div>
+            <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
+              <div style="display: flex; align-items: flex-start; gap: 14px">
+                <div onClick="{{ t.toggle }}" style="width: 44px; height: 26px; flex: none; border-radius: 999px; padding: 3px; cursor: pointer; display: flex; align-items: center; background: {{ t.track }}">
+                  <div style="width: 20px; height: 20px; border-radius: 999px; background: #EFECF7; margin-left: {{ t.offset }}"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 3px">
+                  <span style="font-size: 14.5px; color: #EFECF7">{{ t.label }}</span>
+                  <span style="font-size: 12.5px; line-height: 1.5; color: #948CAE">{{ t.desc }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isNote }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="05 Approval note" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Boundaries — 2 of 2</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">Why are you installing this?</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">One sentence, stored with the install record. This is the note anyone auditing the workspace reads first.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 9px">
+            <textarea value="{{ note }}" onChange="{{ setNote }}" rows="4" placeholder="Standing workspace for the billing rewrite. Two engineers, no production credentials." style="background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.14); border-radius: 8px; padding: 14px; font-size: 15px; line-height: 1.6; color: #EFECF7; outline: none; resize: vertical"></textarea>
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: #948CAE">
+              <span>Plain sentences. No template.</span>
+              <span style="font-family: 'Geist Mono', monospace; font-size: 11.5px">{{ noteCount }}</span>
+            </div>
+          </div>
+          <div style="background: #3F3760; border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 8px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #C56A4E">Reference to attach</div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div onClick="{{ noop }}" style="display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #EFECF7; font-size: 13.5px; font-weight: 500; padding: 10px 16px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.14)">Choose folder…</div>
+              <span style="font-family: 'Geist Mono', monospace; font-size: 12.5px; color: #948CAE">optional — read-only mount</span>
+            </div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="06 Review" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #948CAE">Confirm — 1 of 1</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">Here is what will be written</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.6; color: #B7B0CC; max-width: 54ch">Preview only. So far this run has written zero files.</p>
+          </div>
+          <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 12px; overflow: hidden">
+            <sc-for list="{{ summary }}" as="row" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 172px 1fr auto; gap: 16px; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); align-items: baseline">
+                <div style="font-size: 13px; color: #948CAE">{{ row.k }}</div>
+                <div style="font-size: 14px; line-height: 1.5; color: #EFECF7; font-family: {{ row.font }}">{{ row.v }}</div>
+                <div onClick="{{ row.edit }}" style="font-size: 12.5px; color: #B7B0CC; cursor: pointer; padding: 4px 8px; border-radius: 6px" style-hover="background: rgba(255,255,255,0.08)">Change</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background: rgba(184,80,60,0.10); border: 1px solid rgba(184,80,60,0.34); border-left: 3px solid #B8503C; border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px">
+            <div style="font-size: 13.5px; font-weight: 600; color: #E9A192">One-way</div>
+            <div style="font-size: 14px; line-height: 1.55; color: #B7B0CC">Confirming writes {{ fileCount }} files into {{ path }}. Uninstall removes only those files and leaves everything else alone.</div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="07 Provisioning" style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #D9BE55">Installing</div>
+            <h2 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.14">{{ runHeadline }}</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="height: 4px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden">
+              <div style="height: 4px; border-radius: 999px; background: #D9BE55; width: {{ runWidth }}"></div>
+            </div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 11.5px; color: #948CAE">{{ runPct }}</div>
+          </div>
+          <div style="background: #1F1A30; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; overflow: hidden">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 11px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.07)">
+              <span style="width: 9px; height: 9px; border-radius: 50%; background: #B8503C"></span>
+              <span style="width: 9px; height: 9px; border-radius: 50%; background: #D9BE55"></span>
+              <span style="width: 9px; height: 9px; border-radius: 50%; background: #6E9E6A"></span>
+              <span style="font-family: 'Geist Mono', monospace; font-size: 11.5px; color: #948CAE; margin-left: 6px">dryft init — {{ path }}</span>
+            </div>
+            <div style="padding: 18px; font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.85; display: flex; flex-direction: column">
+              <sc-for list="{{ runLog }}" as="l" hint-placeholder-count="4">
+                <div style="color: {{ l.color }}">{{ l.text }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+        <section data-screen-label="08 Done" style="display: flex; flex-direction: column; gap: 24px">
+          <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(110,158,106,0.18); border: 1px solid rgba(110,158,106,0.45); display: flex; align-items: center; justify-content: center; color: #A5CDA0; font-size: 19px; font-weight: 700">✓</div>
+          <h2 style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.032em; line-height: 1.06; max-width: 22ch">{{ name }} is ready</h2>
+          <p style="margin: 0; font-size: 16.5px; line-height: 1.62; color: #B7B0CC; max-width: 54ch; text-wrap: pretty">Installed to <span style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #EFECF7">{{ path }}</span> with {{ stackCount }}. Doctor ran clean. The install record is the first entry in your log.</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+            <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+              <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.03em; color: #D9BE55">{{ fileCount }}</div>
+              <div style="font-size: 13.5px; color: #B7B0CC">files written, each with an owner</div>
+            </div>
+            <div style="background: #342D4E; border: 1px solid rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+              <div style="font-size: 30px; font-weight: 700; letter-spacing: -0.03em">0</div>
+              <div style="font-size: 13.5px; color: #B7B0CC">files touched outside the workspace</div>
+            </div>
+          </div>
+          <div style="background: #1F1A30; border: 1px solid rgba(255,255,255,0.10); border-radius: 10px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+            <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #D9BE55">cd {{ path }} &amp;&amp; dryft doctor</span>
+            <div onClick="{{ noop }}" style="font-size: 12.5px; color: #B7B0CC; cursor: pointer; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.16)" style-hover="background: rgba(255,255,255,0.08)">Copy</div>
+          </div>
+        </section>
+      </sc-if>
+
+      <div style="margin-top: 44px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,0.10); display: flex; align-items: center; gap: 12px">
+        <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ back }}" style="color: #B7B0CC; font-size: 14.5px; font-weight: 500; padding: 11px 16px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.08)">Back</div>
+        </sc-if>
+        <sc-if value="{{ canNext }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ next }}" style="margin-left: auto; background: {{ nextBg }}; color: #241F38; font-size: 15px; font-weight: 600; padding: 13px 24px; border-radius: 8px; cursor: {{ nextCursor }}; border-top: 1px solid rgba(255,255,255,0.28)" style-hover="background: #E5CC6C">{{ nextLabel }}</div>
+        </sc-if>
+        <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-left: auto; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); color: #6F6890; font-size: 15px; font-weight: 500; padding: 12px 24px; border-radius: 8px">Working…</div>
+        </sc-if>
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ restart }}" style="margin-left: auto; color: #B7B0CC; font-size: 14px; padding: 11px 16px; border-radius: 8px; cursor: pointer" style-hover="background: rgba(255,255,255,0.08)">Run it again</div>
+        </sc-if>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;pathState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Live&quot;,&quot;Default&quot;,&quot;Valid&quot;,&quot;Refused&quot;],&quot;default&quot;:&quot;Live&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;},&quot;approvalRequired&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Defaults&quot;},&quot;showHelperText&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Defaults&quot;}}">
+const STEPS = ['intro', 'path', 'role', 'stacks', 'bounds', 'note', 'review', 'running', 'done'];
+const GROUP_OF = [0, 0, 1, 2, 3, 3, 4, 4, 4];
+const GROUPS = [
+  { label: 'Workspace', hint: 'Path and name' },
+  { label: 'Operator', hint: 'Who it is for' },
+  { label: 'Capability', hint: 'Stacks to install' },
+  { label: 'Boundaries', hint: 'Reach and records' },
+  { label: 'Confirm', hint: 'Review and write' }
+];
+const ROLES = [
+  { id: 'solo', label: 'Solo developer', desc: 'One machine, one workspace. Defaults stay permissive and quiet.' },
+  { id: 'lead', label: 'Team lead', desc: 'You set the boundaries others inherit. Approval notes on by default.' },
+  { id: 'operator', label: 'Non-technical operator', desc: 'Plain-language prompts, no shell. Doctor runs itself on a schedule.' },
+  { id: 'admin', label: 'Enterprise admin', desc: 'Policy first. Every write and refusal is recorded and exportable.' }
+];
+const STACKS = [
+  { id: 'com.usedryft.software-production', title: 'Software production', desc: 'Plans, builds and reviews code against a written contract.', tag: 'First party' },
+  { id: 'com.usedryft.research', title: 'Research', desc: 'Bounded retrieval with a citation record for every claim.', tag: 'First party' },
+  { id: 'com.usedryft.operations', title: 'Operations', desc: 'Runbooks, incident records, scheduled Doctor checks.', tag: 'First party' },
+  { id: 'com.thirdparty.analytics', title: 'Analytics', desc: 'Community stack. Reads your warehouse credentials.', tag: 'Unsigned' }
+];
+const DEPTHS = [
+  { key: 'project', label: 'This project only', desc: 'An agent sees the one directory it was invoked in. Nothing else is readable, including sibling projects.' },
+  { key: 'project+siblings', label: 'Project and registered siblings', desc: 'Reach extends to projects you have registered by hand. Unregistered folders stay invisible.' },
+  { key: 'workspace', label: 'The whole workspace', desc: 'Everything under the workspace directory is readable. The recommended default for a single operator.' },
+  { key: 'workspace+mounts', label: 'Workspace and reference mounts', desc: 'Adds read-only mounts you attach explicitly — docs, specs, archived repositories.' },
+  { key: 'machine', label: 'Anything the machine can read', desc: 'No boundary file. Doctor will flag this on every run, and every read is written to the record.' }
+];
+
+class Component extends DCLogic {
+  state = {
+    step: 0,
+    path: './Dryft',
+    name: 'Atlas',
+    role: 'solo',
+    stacks: ['com.usedryft.software-production'],
+    depth: 2,
+    approval: null,
+    doctor: true,
+    autoRegister: false,
+    note: '',
+    progress: 0
+  };
+
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  startRun() {
+    clearInterval(this.timer);
+    this.setState({ step: 7, progress: 0 });
+    this.timer = setInterval(() => {
+      this.setState(s => {
+        const p = s.progress + 7;
+        if (p >= 100) { clearInterval(this.timer); return { progress: 100, step: 8 }; }
+        return { progress: p };
+      });
+    }, 130);
+  }
+
+  pathState() {
+    const p = (this.state.path || '').trim();
+    const forced = this.props.pathState;
+    if (forced && forced !== 'Live') return forced.toLowerCase();
+    if (!p) return 'default';
+    if (/source|src\b/i.test(p)) return 'refused';
+    if (p === './Dryft') return 'default';
+    return 'valid';
+  }
+
+  renderVals() {
+    const s = this.state;
+    const step = s.step;
+    const kind = STEPS[step];
+    const approval = s.approval ?? (this.props.approvalRequired ?? true);
+    const ps = this.pathState();
+    const depth = DEPTHS[s.depth];
+    const go = n => () => this.setState({ step: n });
+
+    const groups = GROUPS.map((g, i) => {
+      const cur = GROUP_OF[step] === i;
+      const done = GROUP_OF[step] > i;
+      return {
+        label: g.label,
+        hint: g.hint,
+        mark: done ? '✓' : String(i + 1),
+        dotBg: cur ? '#D9BE55' : done ? 'rgba(110,158,106,0.20)' : 'rgba(255,255,255,0.06)',
+        dotBorder: cur ? '#D9BE55' : done ? 'rgba(110,158,106,0.45)' : 'rgba(255,255,255,0.16)',
+        dotColor: cur ? '#241F38' : done ? '#A5CDA0' : '#6F6890',
+        labelColor: cur ? '#EFECF7' : done ? '#B7B0CC' : '#6F6890'
+      };
+    });
+
+    const roles = ROLES.map(r => {
+      const on = s.role === r.id;
+      return {
+        label: r.label, desc: r.desc,
+        pick: () => this.setState({ role: r.id }),
+        bg: on ? '#3F3760' : '#342D4E',
+        border: on ? 'rgba(217,190,85,0.55)' : 'rgba(255,255,255,0.08)',
+        satin: on ? 'rgba(217,190,85,0.55)' : 'rgba(255,255,255,0.14)',
+        dot: on ? '#D9BE55' : 'transparent',
+        dotBorder: on ? '#D9BE55' : 'rgba(255,255,255,0.24)',
+        mark: on ? '✓' : ''
+      };
+    });
+
+    const toggle = id => () => this.setState(st => ({
+      stacks: st.stacks.includes(id) ? st.stacks.filter(x => x !== id) : st.stacks.concat([id])
+    }));
+    const stackChips = STACKS.map(k => {
+      const on = s.stacks.includes(k.id);
+      const risky = k.tag === 'Unsigned';
+      return {
+        id: k.id, toggle: toggle(k.id),
+        bg: on ? (risky ? 'rgba(184,80,60,0.16)' : 'rgba(217,190,85,0.16)') : 'rgba(255,255,255,0.05)',
+        border: on ? (risky ? 'rgba(184,80,60,0.50)' : 'rgba(217,190,85,0.50)') : 'rgba(255,255,255,0.12)',
+        color: on ? (risky ? '#E9A192' : '#E4CE79') : '#948CAE',
+        dot: on ? (risky ? '#B8503C' : '#D9BE55') : 'rgba(255,255,255,0.20)'
+      };
+    });
+    const stackRows = STACKS.map(k => {
+      const on = s.stacks.includes(k.id);
+      const risky = k.tag === 'Unsigned';
+      return {
+        title: k.title, desc: k.desc,
+        tag: on ? 'Selected' : k.tag,
+        tagBg: on ? 'rgba(110,158,106,0.16)' : risky ? 'rgba(184,80,60,0.14)' : 'rgba(255,255,255,0.07)',
+        tagBorder: on ? 'rgba(110,158,106,0.42)' : risky ? 'rgba(184,80,60,0.40)' : 'rgba(255,255,255,0.12)',
+        tagColor: on ? '#A5CDA0' : risky ? '#E9A192' : '#B7B0CC'
+      };
+    });
+
+    const sw = on => ({ track: on ? '#D9BE55' : 'rgba(255,255,255,0.16)', offset: on ? '18px' : '0px' });
+    const toggles = [
+      Object.assign({
+        label: 'Require an approval note before any install',
+        desc: 'A sentence you write, stored with the record. Recommended when more than one person uses the workspace.',
+        toggle: () => this.setState({ approval: !approval })
+      }, sw(approval)),
+      Object.assign({
+        label: 'Run Doctor after every install',
+        desc: 'Checks the workspace and prints what is wrong in plain sentences.',
+        toggle: () => this.setState(st => ({ doctor: !st.doctor }))
+      }, sw(s.doctor)),
+      Object.assign({
+        label: 'Register new projects automatically',
+        desc: 'Off means you register each project by hand, which keeps the boundary explicit.',
+        toggle: () => this.setState(st => ({ autoRegister: !st.autoRegister }))
+      }, sw(s.autoRegister))
+    ];
+
+    const mono = "'Geist Mono', monospace";
+    const roleLabel = (ROLES.find(r => r.id === s.role) || ROLES[0]).label;
+    const stackCount = s.stacks.length === 0 ? 'no stacks' : s.stacks.length === 1 ? '1 stack' : s.stacks.length + ' stacks';
+    const fileCount = 41 + s.stacks.length * 12;
+    const summary = [
+      { k: 'Workspace path', v: s.path, font: mono, edit: go(1) },
+      { k: 'Name', v: s.name, font: 'inherit', edit: go(1) },
+      { k: 'Operator', v: roleLabel, font: 'inherit', edit: go(2) },
+      { k: 'Stacks', v: s.stacks.length ? s.stacks.join(', ') : 'None — the OS runs on its own', font: mono, edit: go(3) },
+      { k: 'Retrieval boundary', v: depth.label, font: 'inherit', edit: go(4) },
+      { k: 'Approval note', v: approval ? 'Required' : 'Not required', font: 'inherit', edit: go(4) },
+      { k: 'Doctor', v: s.doctor ? 'After every install' : 'On demand only', font: 'inherit', edit: go(4) },
+      { k: 'Reason on record', v: s.note.trim() || 'Not written yet', font: 'inherit', edit: go(5) }
+    ];
+
+    const p = s.progress;
+    const runLog = [
+      { text: '$ dryft init ' + s.path, color: '#EFECF7' },
+      { text: '→ packing dryft-os-0.1.0.dryftpkg.tar.gz', color: '#948CAE' },
+      { text: '→ preview: ' + fileCount + ' files, 0 written', color: '#948CAE' },
+      p > 30 ? { text: '→ writing workspace skeleton', color: '#948CAE' } : null,
+      p > 55 ? { text: '→ installing ' + stackCount, color: '#948CAE' } : null,
+      p > 78 ? { text: '→ boundary file: ' + depth.key, color: '#948CAE' } : null,
+      p >= 100 ? { text: '✓ installed — no error', color: '#A5CDA0' } : null
+    ].filter(Boolean);
+
+    const nextLabels = {
+      intro: 'Start', path: 'Continue', role: 'Continue', stacks: s.stacks.length ? 'Continue' : 'Continue with no stacks',
+      bounds: 'Continue', note: approval ? 'Continue' : 'Skip and continue', review: 'Confirm and install'
+    };
+
+    return {
+      groups, roles, stackChips, stackRows, toggles, summary, runLog,
+      noop: () => {},
+      isIntro: kind === 'intro', isPath: kind === 'path', isRole: kind === 'role',
+      isStacks: kind === 'stacks', isBounds: kind === 'bounds', isNote: kind === 'note',
+      isReview: kind === 'review', isRunning: kind === 'running', isDone: kind === 'done',
+      showHelp: this.props.showHelperText ?? true,
+      stepLabel: 'Step ' + Math.min(step + 1, 8) + ' of 8',
+      pctWidth: Math.round(Math.min(step, 8) / 8 * 100) + '%',
+      path: s.path, name: s.name, note: s.note, depth: s.depth,
+      setPath: e => this.setState({ path: e.target.value }),
+      setName: e => this.setState({ name: e.target.value }),
+      setNote: e => this.setState({ note: e.target.value }),
+      setDepth: e => this.setState({ depth: Number(e.target.value) }),
+      pathBorder: ps === 'valid' ? '#D9BE55' : ps === 'refused' ? '#B8503C' : 'rgba(255,255,255,0.14)',
+      pathGlow: ps === 'valid' ? '0 0 0 3px rgba(217,190,85,0.16)' : 'none',
+      pathHint: ps === 'valid' ? 'Directory is empty. Ready to install.'
+        : ps === 'refused' ? 'Refused: that looks like a source tree. Pick a directory you own.'
+        : 'Must be empty, or an existing Dryft workspace.',
+      pathHintColor: ps === 'valid' ? '#8FBF9E' : ps === 'refused' ? '#E9A192' : '#948CAE',
+      depthLabel: depth.label, depthDesc: depth.desc, depthKey: depth.key,
+      noteCount: s.note.trim().length + ' characters',
+      stackCount, fileCount,
+      runHeadline: p >= 100 ? 'Done' : p > 55 ? 'Installing stacks' : 'Writing the workspace',
+      runWidth: p + '%', runPct: p + '%',
+      canBack: step > 0 && step < 7,
+      canNext: step < 7,
+      nextLabel: nextLabels[kind] || 'Continue',
+      nextBg: ps === 'refused' && kind === 'path' ? 'rgba(255,255,255,0.10)' : '#D9BE55',
+      nextCursor: ps === 'refused' && kind === 'path' ? 'not-allowed' : 'pointer',
+      back: () => this.setState({ step: Math.max(0, step - 1) }),
+      next: () => {
+        if (kind === 'path' && ps === 'refused') return;
+        if (kind === 'review') return this.startRun();
+        this.setState({ step: step + 1 });
+      },
+      restart: () => { clearInterval(this.timer); this.setState({ step: 0, progress: 0 }); }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

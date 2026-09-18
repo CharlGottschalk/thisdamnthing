@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "usedryft"
+version = "0.1.0"
+description = "A local knowledge workspace with optional stacks"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.urls]
+Homepage = "https://usedryft.com"
+Documentation = "https://usedryft.com/docs"
+Repository = "https://github.com/1one8/dryft"
+Issues = "https://github.com/1one8/dryft/issues"
+
+[project.scripts]
+dryft = "dryft.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["dryft*"]
+
+[tool.setuptools.package-data]
+dryft = ["resources/workspace/*.md", "resources/docs/*.md", "resources/harness/*.md",
+         "resources/harness/hooks/*.py", "resources/harness/contracts/*.md",
+         "resources/harness/skills/*/SKILL.md", "resources/ui/*", "resources/marketplace/*.json"]

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+.dev/developer.json
+.dev/local/
+
+# Per-clone development handoff
+.dev/CONTINUITY.md

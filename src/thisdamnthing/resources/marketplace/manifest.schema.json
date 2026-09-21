@@ -13,17 +13,6 @@
         "both"
       ]
     },
-    "categories": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-        "maxLength": 64
-      },
-      "minItems": 1,
-      "maxItems": 5,
-      "uniqueItems": true
-    },
     "tags": {
       "type": "array",
       "items": {
@@ -109,7 +98,6 @@
   },
   "required": [
     "extension_type",
-    "categories",
     "tags",
     "icon",
     "screenshots",

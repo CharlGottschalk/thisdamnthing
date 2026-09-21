@@ -151,6 +151,18 @@ def validate_schema(value, rule, schema, path='$'):
 
 def validate_manifest_metadata(metadata, *, executable=False):
     schema = json.loads(resource_text('marketplace/manifest.schema.json'))
+    # Compatibility for immutable, already-published manifests. Categories no
+    # longer classify a listing and are absent from the new authoring schema.
+    if isinstance(metadata, dict):
+        metadata = dict(metadata)
+        if 'categories' in metadata:
+            legacy = {'type': 'array', 'minItems': 1, 'maxItems': 5, 'uniqueItems': True,
+                      'items': {'type': 'string', 'pattern': r'^[a-z0-9]+(-[a-z0-9]+)*$', 'maxLength': 64}}
+            validate_schema(metadata.pop('categories'), legacy, schema, '$.marketplace.categories (legacy)')
+        validate_schema(metadata.get('tags'), dict(schema['properties']['tags'], uniqueItems=False), schema, '$.marketplace.tags')
+        if any(not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', tag) for tag in metadata['tags']):
+            raise WorkspaceError('Marketplace tags must be lowercase hyphenated slugs')
+        metadata['tags'] = sorted(set(metadata['tags']))
     validate_schema(metadata, schema, schema, '$.marketplace')
     def check_text(value):
         if isinstance(value, str) and not value.strip():

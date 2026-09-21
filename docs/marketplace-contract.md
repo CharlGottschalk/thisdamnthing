@@ -30,12 +30,19 @@ Only published, non-draft, non-prerelease GitHub releases qualify. Their tags mu
 match the manifest's numeric `MAJOR.MINOR.PATCH` version after removing at most
 one leading `v`.
 
-Manifest metadata lives only in `stack.json` under `marketplace`. The submission
-form collects name, GitHub URL and description. All other listing and release
-metadata is read from the pinned commit. The database stores no copy, including
-no dependency, capability, hook or supported-agent columns. Review records and
-immutable release references/digests remain in the database. Search filters and
-the registry are built from manifests, and unavailable manifests fail the read.
+The submission form collects name, GitHub URL, one curated category and description.
+The listing's `category_slug` references the marketplace category vocabulary.
+Manifest metadata lives in `stack.json.marketplace`; validated, normalized tags
+are the sole searchable copy on `stack_versions.tags`. All other metadata stays
+in pinned manifests. Staff recheck indexed tags against the immutable manifest;
+release identity or tag changes invalidate that check, and approval requires it.
+Category and tag filters combine with AND in SQL, using only the latest approved
+active release. SQL also orders and paginates queries without manifest filters.
+Text keeps case-insensitive substring matching across name, summary, description,
+author name and current tags. Text, agent and extension filters require pinned
+manifests, so those queries read SQL-filtered candidates in batches and paginate
+after manifest filtering. Name ordering uses the database collation, with stack ID
+as the stable tie-breaker for every sort. Unavailable manifests fail the read.
 
 The required `extension_type` describes purpose and grants no permissions:
 
@@ -206,17 +213,18 @@ option. Local integration does not establish public deployment or transport.
 
 For marketplace publication, add a `marketplace` object to `stack.json` (v1 or
 v2). It is optional for local-only stacks, but required by the marketplace.
-The manifest is the only metadata source: the website reads it at the pinned
-release commit and does not store a copy in its database. The form asks only
-for a name, GitHub URL and description. A repository URL selects GitHub's latest
-stable release; a release URL selects that version. Verification displays the
+The website reads metadata at the pinned release commit. The form asks for a
+name, GitHub URL, required curated category and description. The listing category
+is authoritative; do not put categories in new manifests. Only tags are copied
+from manifests into a searchable release array; there is no editable tags field.
+A repository URL selects GitHub's latest stable release; a release URL selects that version. Verification displays the
 resolved version and commit before submission and checks them again on submit.
 
 Required fields in `marketplace`:
 
 - `extension_type`: `functionality`, `capability` or `both`.
-- `categories`: one to five controlled marketplace category slugs.
-- `tags`: up to twenty unique lowercase hyphen-separated slugs.
+- `tags`: up to twenty lowercase hyphen-separated slugs, at most 64 characters
+  each. Readers deduplicate and sort them before indexing.
 - `supported_agents`: one or both of `claude` and `codex`, reflecting verification.
 - `dependencies`: registry prerequisite objects (up to fifty), including type,
   ref, name, required, purpose, HTTPS setup_url, nullable version_constraint,
@@ -234,8 +242,8 @@ runtime providers; `marketplace.capabilities` describes effects and data flows.
 The packaged `marketplace/manifest.schema.json` defines exact fields and bounds.
 Changes require a new release commit and review. The database keeps listing
 presentation, repository ownership, pinned release references, digests and review
-records, but no manifest metadata. Public reads fail as unavailable if any required
-pinned manifest cannot be read or validated; they never substitute branch content
+records and indexed release tags, but no other manifest metadata. Public reads
+fail as unavailable if any required pinned manifest cannot be read or validated; they never substitute branch content
 or empty disclosures. Published manifests must remain readable at their commits.
 
 
@@ -243,3 +251,10 @@ The manifest-only transition preserves old release and review records privately.
 A verification timestamp (not metadata) gates public visibility and approval.
 Releases without a compatible manifest at their pinned commit must publish a new
 version; neither old approved commits nor their manifests are rewritten.
+
+Legacy published manifests may retain `marketplace.categories`: readers validate
+its old shape then ignore it. New authoring schemas omit it. Do not rewrite old
+releases, tags or digests. Listing/feed categories contain the selected category.
+Public tags come only from the latest approved active release; with no active
+release they are empty, even when the page shows an older approved release.
+Staff must compare indexed tags with the pinned manifest before approval.

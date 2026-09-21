@@ -1,8 +1,8 @@
 # Reviewing staged content for privacy
 
 Before an authorized agent commit in this repository, use
-[the development privacy skill](../.dev/skills/dryft-dev-pii/SKILL.md) and its
-[review procedure](../.dev/skills/dryft-dev-pii/review.md). Review the exact staged
+[the development privacy skill](../.dev/skills/tdt-dev-pii/SKILL.md) and its
+[review procedure](../.dev/skills/tdt-dev-pii/review.md). Review the exact staged
 snapshot and complete proposed message, including body and trailers.
 
 ## Review the bytes that will be committed

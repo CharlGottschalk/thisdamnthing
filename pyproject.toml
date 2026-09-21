@@ -3,9 +3,10 @@ requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "usedryft"
+name = "thisdamnthing"
 version = "0.1.0"
 description = "A local knowledge workspace with optional stacks"
+authors = [{name = "Charl Gottschalk"}]
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
@@ -13,19 +14,19 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.urls]
-Homepage = "https://usedryft.com"
-Documentation = "https://usedryft.com/docs"
-Repository = "https://github.com/1one8/dryft"
-Issues = "https://github.com/1one8/dryft/issues"
+Homepage = "https://usethisdamnthing.com"
+Documentation = "https://usethisdamnthing.com/docs"
+Repository = "https://github.com/CharlGottschalk/thisdamnthing"
+Issues = "https://github.com/CharlGottschalk/thisdamnthing/issues"
 
 [project.scripts]
-dryft = "dryft.cli:main"
+tdt = "thisdamnthing.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["dryft*"]
+include = ["thisdamnthing*"]
 
 [tool.setuptools.package-data]
-dryft = ["resources/workspace/*.md", "resources/docs/*.md", "resources/harness/*.md",
+thisdamnthing = ["resources/workspace/*.md", "resources/docs/*.md", "resources/harness/*.md",
          "resources/harness/hooks/*.py", "resources/harness/contracts/*.md",
          "resources/harness/skills/*/SKILL.md", "resources/ui/*", "resources/marketplace/*.json"]

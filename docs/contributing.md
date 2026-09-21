@@ -13,8 +13,8 @@ Create a branch from the agreed base. If that checkout has unrelated edits,
 use a separate worktree from the base revision so they stay untouched:
 
 ```sh
-git worktree add -b my-change .../dryft-my-change master
-cd .../dryft-my-change
+git worktree add -b my-change .../tdt-my-change master
+cd .../tdt-my-change
 ```
 
 ## Work and check
@@ -27,9 +27,9 @@ format changes. See [architecture](architecture.md) for where to look.
 Run the CLI from source without an installation:
 
 ```sh
-PYTHONPATH=src python3 -m dryft --help
-PYTHONPATH=src python3 -m dryft init ../disposable-workspace --agent none
-PYTHONPATH=src python3 -m dryft --workspace ../disposable-workspace doctor
+PYTHONPATH=src python3 -m thisdamnthing --help
+PYTHONPATH=src python3 -m thisdamnthing init ../disposable-workspace --agent none
+PYTHONPATH=src python3 -m thisdamnthing --workspace ../disposable-workspace doctor
 ```
 
 Use a new directory outside the checkout and existing projects. Check the
@@ -48,7 +48,7 @@ the repository's `.dev/` records, outside the how-to guides.
 
 A request to edit files does not authorize staging, committing or pushing.
 Before an authorized agent commit, run the repository's
-[privacy skill](../.dev/skills/dryft-dev-pii/SKILL.md) against the exact staged
+[privacy skill](../.dev/skills/tdt-dev-pii/SKILL.md) against the exact staged
 snapshot and complete message. Findings or incomplete review pause the commit.
 See [setup](development.md) for Git safeguards and message format.
 

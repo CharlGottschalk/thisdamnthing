@@ -1,19 +1,19 @@
 # Workspace constitution
 
-`src/dryft/constitution.py` manages the workspace's user-authored policy at
-`.dryft/CONSTITUTION.md`. Core initialization, stack operations and integration
+`src/thisdamnthing/constitution.py` manages the workspace's user-authored policy at
+`.tdt/CONSTITUTION.md`. Core initialization, stack operations and integration
 changes must preserve it. Project-specific rules are a separate concern; see
 [project constitution integration](constitution-privacy-integration.md).
 
 ## Read and save policy
 
 ```sh
-dryft constitution show
-dryft constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
+tdt constitution show
+tdt constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
 ```
 
 Read the complete policy and its revision before proposing changes. Clarify
-ambiguous permissions, contradictions and exception duration through chat or DUI.
+ambiguous permissions, contradictions and exception duration through chat or UI.
 Show the exact revised text and save only after approval. The reference records
 that decision; it cannot authenticate human intent.
 

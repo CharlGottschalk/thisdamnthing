@@ -1,14 +1,14 @@
 # Implementing host adapters
 
-Host-specific behavior belongs in `src/dryft/hosts.py` and the packaged adapter
+Host-specific behavior belongs in `src/thisdamnthing/hosts.py` and the packaged adapter
 resources. Core modules operate on normalized inputs so Claude Code and Codex
 share capture, policy and stack behavior.
 
 ## Keep canonical instructions in one place
 
-Full skills live in the installed `.dryft/skills/` directory. Enabled hosts receive
+Full skills live in the installed `.tdt/skills/` directory. Enabled hosts receive
 thin discovery bridges in `.claude/skills/` or `.agents/skills/`, plus owned root
-instruction blocks. Skill names and directories use `dryft-*`; stack IDs and repository folders use lowercase hyphen-separated names.
+instruction blocks. Skill names and directories use `tdt-*`; stack IDs and repository folders use lowercase hyphen-separated names.
 
 Generate only the selected host's resources. Preserve unrelated settings and
 record bridge ownership with the skill's original owner. Use the shared
@@ -25,7 +25,7 @@ shared code. Exclude outside sessions and nested independent workspaces. Keep
 host transcript formats in the host/history adapters, with bounded reads and
 explicit handling of unsupported input.
 
-| Event | Dryft behavior |
+| Event | ThisDamnThing behavior |
 | --- | --- |
 | SessionStart | Supplies workspace context and current policy. |
 | UserPromptSubmit | Reads current workspace policy for the request. |
@@ -33,19 +33,19 @@ explicit handling of unsupported input.
 
 Keep response JSON valid for the selected host. Route diagnostics so they cannot
 corrupt protocol output. Hook trust and execution remain host responsibilities;
-Dryft must not change permission settings to make a hook run.
+ThisDamnThing must not change permission settings to make a hook run.
 
 ## Preserve the capture handshake
 
 A Stop hook records a capture request and asks the active agent to continue with
-a fenced `dryft-capture` JSON summary. The next Stop validates that response and
+a fenced `tdt-capture` JSON summary. The next Stop validates that response and
 persists pending knowledge through the shared capture code. The summary is visible
 in the conversation. This path uses the active agent; Python does not call a model
 or read transcripts to produce the summary.
 
 Keep request identity, replay deduplication and incomplete-request recovery intact.
 Only user review can promote a candidate to approved knowledge. Follow the
-[capture contract](../src/dryft/resources/harness/contracts/capture-event.md)
+[capture contract](../src/thisdamnthing/resources/harness/contracts/capture-event.md)
 for payload fields and refusal behavior. No pre-compaction capture hook is installed.
 
 ## Verify an adapter change

@@ -18,7 +18,7 @@ hash. Scope the loader to the project so outside directories and nested independ
 Git projects do not receive its instructions.
 
 Project policy can coexist with the workspace Constitution. Do not silently copy
-Dryft's development rules into a user's project. Keep machine-specific developer
+ThisDamnThing's development rules into a user's project. Keep machine-specific developer
 configuration ignored before writing local values.
 
 ## Make generated setup independent

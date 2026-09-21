@@ -1,5 +1,5 @@
 name: Installation help
-description: Get help installing or setting up Dryft.
+description: Get help installing or setting up ThisDamnThing.
 title: '[Setup]: '
 labels:
 - question
@@ -8,12 +8,12 @@ body:
   attributes:
     value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
       API keys, private workspace notes, and personal data. For private reports or help by email, contact
-      help@usedryft.com.'
+      support@usethisdamnthing.com.'
 - type: dropdown
   id: method
   attributes:
     label: Installation method
-    description: Choose how you installed or tried to install Dryft.
+    description: Choose how you installed or tried to install ThisDamnThing.
     options:
     - pipx
     - pip
@@ -39,7 +39,7 @@ body:
 - type: input
   id: version
   attributes:
-    label: Dryft version
+    label: ThisDamnThing version
     description: Enter the installed version or source commit. If installation failed, enter the version
       you tried to install or "unknown".
   validations:

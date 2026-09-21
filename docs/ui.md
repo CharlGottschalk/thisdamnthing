@@ -1,20 +1,20 @@
-# Building DUI interactions
+# Building UI interactions
 
-DUI provides local browser questions and custom pages through `src/dryft/ui.py`
+UI provides local browser questions and custom pages through `src/thisdamnthing/ui.py`
 and packaged assets in `resources/ui/`. Follow the
-[DUI contract](../src/dryft/resources/harness/contracts/ui.md) and
-[installed usage guide](../src/dryft/resources/docs/ui.md) for schemas and examples.
+[UI contract](../src/thisdamnthing/resources/harness/contracts/ui.md) and
+[installed usage guide](../src/thisdamnthing/resources/docs/ui.md) for schemas and examples.
 No stack is required.
 
 ## Run a session
 
 ```sh
-dryft ui start --no-open
-dryft ui present SESSION questions.json
-dryft ui wait SESSION --after 0 --timeout 20
-dryft ui ack SESSION 1
-dryft ui present SESSION follow-up.json
-dryft ui close SESSION
+tdt ui start --no-open
+tdt ui present SESSION questions.json
+tdt ui wait SESSION --after 0 --timeout 20
+tdt ui ack SESSION 1
+tdt ui present SESSION follow-up.json
+tdt ui close SESSION
 ```
 
 Replace `SESSION` with the returned session ID and open its private local URL.
@@ -37,10 +37,10 @@ are not answers or authorization.
 
 Description, field help and answer previews support fenced code and inline
 backticks. Other Markdown stays literal. Render source with text nodes so HTML-like
-input remains visible text. Shared `dui-code` styling is available to custom pages.
+input remains visible text. Shared `tdt-code` styling is available to custom pages.
 
-For custom interaction, use inline HTML/JavaScript and the supported `dui.submit`
-or declared `dui.action` bridge. Provide keyboard input and readable selection
+For custom interaction, use inline HTML/JavaScript and the supported `tdt.submit`
+or declared `tdt.action` bridge. Provide keyboard input and readable selection
 feedback. Stack authors can declare JSON interview templates through the ordinary
 manifest; installing a template does not run its code.
 
@@ -55,7 +55,7 @@ add custom server endpoints for a page.
 Accepted events retain their original prompts. Session JSON stays separate from
 approved brain knowledge. `close` stops the service; `cleanup` deletes retained
 session answers. Restart an expired or stopped session with
-`dryft ui start --session SESSION --no-open` and open the returned URL. Do not reuse
+`tdt ui start --session SESSION --no-open` and open the returned URL. Do not reuse
 a stale port or remove state while its owned server is active.
 
 ## Verify changes

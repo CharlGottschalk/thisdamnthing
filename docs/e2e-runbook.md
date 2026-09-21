@@ -33,15 +33,15 @@ Do not weaken production HTTPS or archive validation to make a fixture work.
 | 3. Preservation | Add unrelated provider settings and user files; repeat init. | Their hashes/values survive, repeated init is stable. |
 | 4. Live startup | Open a fresh trusted host session and invoke workspace orientation. | Skill invocation plus actual SessionStart output, not merely instruction-file reading. |
 | 5. Capture/review | Discuss two harmless decisions, display generated proposals, explicitly approve one and reject the other. | Automatic Stop capture, sources, pending exclusion, exact user decisions and approved-only search. Do not fabricate approval. |
-| 6. Retrieval | Ask a linked question, an absent-evidence question and a conflicting-evidence question. | Actual dryft-search invocation, cited note paths, honest gaps and unresolved conflict. |
+| 6. Retrieval | Ask a linked question, an absent-evidence question and a conflicting-evidence question. | Actual tdt-search invocation, cited note paths, honest gaps and unresolved conflict. |
 | 7. Project onboarding | Hash scratch source, invoke add-project, review proposed knowledge. | Canonical ID/path, evidence-based onboarding, identical external source hashes after registration. |
-| 8. DUI | Use a grouped interview, submit in the browser and answer a follow-up. | Real event IDs and answers read/acknowledged by the active agent; chat fallback works. Close service. |
+| 8. UI | Use a grouped interview, submit in the browser and answer a follow-up. | Real event IDs and answers read/acknowledged by the active agent; chat fallback works. Close service. |
 | 9. Stack builder | Install local builder, create/validate/install a minimal stack, invoke it. | Real output, explicit selected files, refusal to overwrite existing source. |
 | 10. Software workflow | Install software-production; create brief, init tasks, build/close one tiny change in scratch source. | Project artifacts, observable behavior, task state and workspace handoffs. Exercise task/tasks/triage as applicable. |
 | 11. Community bundle | Install harmless fixture with hooks and knowledge through ordinary public commands. | Digest-bound explicit hook trust, real host notification, pending knowledge excluded until approved. |
 | 12. Marketplace | Discover the selected releases; install via CLI and live install skill, including a community-style entry. | Transport type, registry/repo/tag/commit and both digests; prerequisites, withdrawal refusal and no install on refusal. |
 | 13. Website submission | Follow the actual Sites author submission/review flow for an authorized sample. | Submitted/reviewed listing result or explicit unavailable status; a draft file is not submission. |
-| 14. Removal | Snapshot brain and unrelated host files, remove stacks, doctor and use core again. | Brain/user settings preserved, owned skills removed, zero-stack brain/project/DUI behavior remains. |
+| 14. Removal | Snapshot brain and unrelated host files, remove stacks, doctor and use core again. | Brain/user settings preserved, owned skills removed, zero-stack brain/project/UI behavior remains. |
 
 Use approved disposable content for replay/deduplication and stale-hash probes.
 Observe that repeated capture delivery does not duplicate the proposal. Keep

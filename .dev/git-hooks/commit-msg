@@ -6,6 +6,6 @@ if command -v python3 >/dev/null 2>&1; then
 elif command -v python >/dev/null 2>&1; then
     exec python "$hook_dir/check.py" commit-msg "$@"
 else
-    echo "Dryft Git hooks require Python 3.11+." >&2
+    echo "ThisDamnThing Git hooks require Python 3.11+." >&2
     exit 1
 fi

@@ -1,6 +1,6 @@
 # Marketplace contract
 
-This contract defines the public registry consumed by Dryft and the requirements
+This contract defines the public registry consumed by ThisDamnThing and the requirements
 for approving and installing registry releases. Website implementation and hosting
 are separate from this repository. Submission, accounts and ratings have no public
 write API in this contract; payments and automated submission are outside its scope.
@@ -8,10 +8,10 @@ write API in this contract; payments and automated submission are outside its sc
 Use these sources together:
 
 - [Registry schema](../src/marketplace/registry.schema.json) and its identical
-  [packaged copy](../src/dryft/resources/marketplace/registry.schema.json) define
+  [packaged copy](../src/thisdamnthing/resources/marketplace/registry.schema.json) define
   exact fields, types and bounds. The [example feed](../src/marketplace/registry.example.json)
   contains fictional data, not approved or downloadable releases.
-- [Stack contract](../src/dryft/resources/harness/contracts/stack.md) defines
+- [Stack contract](../src/thisdamnthing/resources/harness/contracts/stack.md) defines
   manifests, selected files, compatibility, asset limits and executable trust.
 - [Client development](marketplace.md) covers implementation and verification;
   [stack lifecycle](stack-lifecycle.md) covers approved updates and removal.
@@ -19,7 +19,7 @@ Use these sources together:
 ## Identity and metadata
 
 Stack IDs contain 1–80 lowercase letters, digits and single separating hyphens,
-starting with a letter, such as `dryft-search-sqlite`. Use the same ID for the
+starting with a letter, such as `tdt-search-sqlite`. Use the same ID for the
 source directory and repository name. Listing IDs, release manifest identities,
 stack dependency references and replacement IDs must satisfy this format.
 
@@ -42,7 +42,7 @@ The required `extension_type` describes purpose and grants no permissions:
 
 | Value | Meaning |
 | --- | --- |
-| `functionality` | Extends Dryft itself, such as a search provider. |
+| `functionality` | Extends ThisDamnThing itself, such as a search provider. |
 | `capability` | Adds skills or workflows for a kind of work. |
 | `both` | Combines functionality with domain skills or workflows. |
 
@@ -58,8 +58,8 @@ active release; older installations compare against their own release identity.
 Prerequisite types are `mcp`, `connector`, `service`, `stack`, `cli` and `runtime`.
 Each declares its reference, name, necessity, purpose, setup URL and optional
 version constraint, authentication and payment requirements. Stack references are
-Dryft stack IDs; other references identify the provider or package. Constraints
-are display-only, not executable expressions. Dryft does not install dependencies,
+ThisDamnThing stack IDs; other references identify the provider or package. Constraints
+are display-only, not executable expressions. ThisDamnThing does not install dependencies,
 solve versions or collect credentials. Unknown availability must stay unknown
 until verified; required prerequisites must be confirmed before installation.
 
@@ -74,13 +74,13 @@ Disclosures and registry approval are neither a sandbox nor execution consent.
    assigning ownership of a stack ID. First-party and community stacks follow
    the same review process for every version.
 2. Resolve the eligible release tag to a full commit SHA. Fetch its immutable
-   archive and validate the root manifest with Dryft. Match ID, version, author,
+   archive and validate the root manifest with ThisDamnThing. Match ID, version, author,
    license and description against the submitted release metadata.
 3. Review selected content, prerequisites, capabilities, security, privacy and
    data flows. Test in a disposable environment without production credentials;
    never execute submissions in the website request process. Keep review evidence
    and reviewer identity private.
-4. Approve the exact archive SHA256 and Dryft selected-content digest. Publish
+4. Approve the exact archive SHA256 and ThisDamnThing selected-content digest. Publish
    only approved versions. Commit, version, tag, manifest identity, dependencies
    and capabilities cannot be edited in place; changes require a new release
    and review. Moderate presentation edits and audit status changes.
@@ -114,7 +114,7 @@ cannot enforce its withdrawal state.
 
 ## Public read interface
 
-`GET https://stacks.usedryft.com/registry/v1/index.json` returns one UTF-8 JSON
+`GET https://stacks.usethisdamnthing.com/registry/v1/index.json` returns one UTF-8 JSON
 feed with `application/json`, schema version and `generated_at`. No login, cookies,
 API key or client identifier is required. Publish atomically, with at most 5 MiB
 of decoded data and 1,000 listings. No pagination or server-side search is defined;
@@ -129,7 +129,7 @@ invalid tag/version or manifest identity, duplicate prerequisite type/reference
 pairs, unsafe or duplicate hook paths, invalid status metadata and incorrect
 latest-version selection. Enforce schema and semantic checks together.
 
-Canonical listing URLs are `https://stacks.usedryft.com/<stack-id>`; a configured
+Canonical listing URLs are `https://stacks.usethisdamnthing.com/<stack-id>`; a configured
 registry uses its own origin plus the same ID path. Preserve the page after
 withdrawal. Optional rating links may append `#ratings`; ratings stay outside the
 CLI feed and open only on user request or acceptance. Do not put workspace,
@@ -172,7 +172,7 @@ collisions and excessive expansion. Require exactly one top-level directory with
 
 Apply the stack contract's stricter selected-file limits. V2 assets have per-file
 SHA256/size declarations, a 128 MiB per-file limit and a 384 MiB total bundle
-limit, plus Dryft/platform/Python compatibility. V1 limits remain unchanged.
+limit, plus ThisDamnThing/platform/Python compatibility. V1 limits remain unchanged.
 Match approved manifest identity, exact hooks and both archive/content digests.
 
 Before activation, disclose repository, version, commit, status, prerequisites,

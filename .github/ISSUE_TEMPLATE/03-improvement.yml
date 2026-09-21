@@ -1,5 +1,5 @@
 name: Improvement suggestion
-description: Suggest a change that would make Dryft more useful.
+description: Suggest a change that would make ThisDamnThing more useful.
 title: '[Improvement]: '
 labels:
 - enhancement
@@ -8,7 +8,7 @@ body:
   attributes:
     value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
       API keys, private workspace notes, and personal data. For private reports or help by email, contact
-      help@usedryft.com.'
+      support@usethisdamnthing.com.'
 - type: textarea
   id: problem
   attributes:
@@ -20,7 +20,7 @@ body:
   id: proposal
   attributes:
     label: Proposed improvement
-    description: Explain how you would like Dryft to work.
+    description: Explain how you would like ThisDamnThing to work.
   validations:
     required: true
 - type: textarea
@@ -33,7 +33,7 @@ body:
 - type: dropdown
   id: area
   attributes:
-    label: Area of Dryft
+    label: Area of ThisDamnThing
     description: Choose the closest match.
     options:
     - Installation and setup
@@ -41,7 +41,7 @@ body:
     - Search and retrieval
     - Projects
     - Stacks and skills
-    - Dryft UI
+    - ThisDamnThing's UI
     - Other / not sure
   validations:
     required: false

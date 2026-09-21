@@ -81,7 +81,7 @@ tdt agent disable claude
 tdt agent disable codex
 ```
 
-Disabling removes only that agent's recorded ThisDamnThing instruction blocks, hooks and
+Disabling removes only that agent's recorded TDT instruction blocks, hooks and
 skill entry points. It keeps the brain, canonical skills, stacks, other agent and
 unrelated settings. It does not uninstall the agent application. Repeating disable
 is safe; enable adds the integration again.
@@ -105,7 +105,7 @@ environment available and review changed hooks in the host.
 Edited or missing owned files, name clashes and managed symlinks cause refusal.
 Preserve your changes separately and reconcile them before retrying. Do not delete
 ownership records to force a refresh. Older workspaces infer agents from recorded
-ThisDamnThing ownership; unrelated agent directories do not enable an integration.
+TDT ownership; unrelated agent directories do not enable an integration.
 
 After an interrupted refresh or integration change, keep host sessions idle and
 run `tdt stack recover`, then doctor and retry. An unfinished user-skill save

@@ -26,7 +26,7 @@ recovery have no dedicated skill; your agent can run those commands for you.
 | Review refuses a stale hash | Use `/tdt-review-brain` to redisplay the candidate and obtain a decision on its current contents; use its new hash. |
 | Init/remove reports edited or missing owned files | Save your edits separately and restore the exact recorded version from backup before retrying. Do not delete ownership state or overwrite the edits to suppress the error. |
 | A stack operation was interrupted | Ask the active `/tdt-update-stack` or `/tdt-remove-stack` workflow to recover, or ask your agent directly. Keep other host sessions idle. Technical recovery: run `tdt stack recover`, then doctor and retry. Preserve the journal if recovery fails. |
-| Workspace is busy | Let the other ThisDamnThing operation finish, then retry. Do not run simultaneous init or bypass the lock. |
+| Workspace is busy | Let the other TDT operation finish, then retry. Do not run simultaneous init or bypass the lock. |
 | Project path is unavailable | Restore it at the recorded location or use `/tdt-add-project` to register its new path as a new identity. Approved notes are not automatically refreshed. |
 | Registry access fails | Ask `/tdt-install-stack` to explain the failure. Confirm the explicit HTTPS endpoint and connectivity. There is no cached/offline catalog fallback; local directory installation remains available. |
 | Archive/digest/withdrawal checks refuse an install | Stop and have the publisher resolve the metadata or release problem. Do not bypass validation. Existing installs are not automatically revoked. |
@@ -43,7 +43,7 @@ heuristic filtering: inspect them before approval or sharing.
 Ask your agent to help with the operation using [workspace care](workspace-care.md),
 then use `/tdt-workspace` to check the result. Technical procedure follows.
 
-With agent sessions and UI services stopped and ThisDamnThing writes idle, back up the
+With agent sessions and UI services stopped and TDT writes idle, back up the
 whole workspace, including hidden harness/provider directories and brain files.
 Back up linked project source separately: it lives outside the workspace. Keep
 backups private; UI responses and local configuration can contain private data.

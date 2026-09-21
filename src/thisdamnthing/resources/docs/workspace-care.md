@@ -10,7 +10,7 @@ External projects remain at their registered paths and need separate backups.
 
 ## Back up and restore
 
-Close UI sessions, stop agent sessions and let ThisDamnThing writes finish before copying
+Close UI sessions, stop agent sessions and let TDT writes finish before copying
 the entire workspace, including hidden directories. Keep backups private and
 preserve file contents and directory structure. Restore a consistent whole copy,
 then use `/tdt-workspace` in a fresh agent session to check it (terminal:

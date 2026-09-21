@@ -1,6 +1,6 @@
 # Core skills
 
-These skills come with every ThisDamnThing workspace; no optional stacks are required.
+These skills come with every TDT workspace; no optional stacks are required.
 Use them to manage your workspace, knowledge, projects and workflows through your
 agent. Select a skill below to read its usage guide. In Claude, invoke it with
 `/` before its name; in Codex, use `$` or the skill picker.

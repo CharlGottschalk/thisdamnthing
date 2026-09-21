@@ -1,7 +1,7 @@
-# Your ThisDamnThing workspace
+# Your TDT workspace
 
 Run the setup examples from a parent directory outside your projects and the
-ThisDamnThing source checkout. Paths are relative to that directory.
+TDT source checkout. Paths are relative to that directory.
 
 ThisDamnThing keeps reviewed knowledge in local Markdown and links projects at their
 existing paths. Claude or Codex supplies the active agent; optional stacks add
@@ -31,7 +31,7 @@ Start with [getting started](getting-started.md), then use these guides:
 
 `brain/` holds knowledge; `.tdt/` holds skills, configuration and working state;
 `docs/` holds these guides. Provider instructions and skill bridges point into
-`.tdt/`. Keep the workspace outside the ThisDamnThing source repository and keep your
+`.tdt/`. Keep the workspace outside the TDT source repository and keep your
 external projects at their original locations.
 
 Use `/tdt-workspace` to inspect the workspace and explain diagnostics.

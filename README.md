@@ -1,5 +1,14 @@
 ![ThisDamnThing](https://raw.githubusercontent.com/CharlGottschalk/thisdamnthing/HEAD/docs/assets/banner.png)
 
+> First I called it **Dryft**, but that was taken.<br>
+> Then I tried **Ryft**. Taken.<br>
+> **Seska?** Ugh.<br>
+> **Ardra?** Dammit!.<br>
+> **Laya?** Of course that's taken.<br>
+> And on and on and on..<br>
+> Eventually I said "screw it!".<br>
+> So just use **ThisDamnThing**.
+
 # ThisDamnThing
 
 A local workspace for Claude Code and Codex, with a knowledge brain that grows
@@ -72,3 +81,7 @@ your agent and say **“onboard me”** for guided development setup.
 [Making a change](https://github.com/CharlGottschalk/thisdamnthing/blob/HEAD/docs/contributing.md)
 
 Licensed under [Apache-2.0](https://github.com/CharlGottschalk/thisdamnthing/blob/HEAD/LICENSE).
+
+---
+
+> If you find any bugs, it's because I left them there, so I have something to do later.

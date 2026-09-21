@@ -73,3 +73,38 @@ do not permit private ThisDamnThing developer paths or credentials. Remove unnec
 launchers/build metadata where safe; preserve licenses and native library bytes.
 Record source snapshots, artifact hashes, the scoped review and remaining coverage
 limits before publication.
+
+## GitHub Trusted Publishing
+
+The workflow `.github/workflows/publish.yml` builds the source distribution and
+wheel, checks their metadata, and verifies a fresh wheel installation on Linux
+with Python 3.12. Pull requests affecting package files and manual workflow runs
+perform these checks and retain downloadable distributions and checksums without
+uploading to PyPI.
+
+Configure a pending GitHub publisher in the PyPI account with project
+`thisdamnthing`, the canonical repository owner/name, workflow `publish.yml`, and
+environment `pypi`. Create the same environment in the GitHub repository. No PyPI
+API token or repository secret is required.
+
+For the first release:
+
+1. Merge the workflow and any intended package changes into main. Run the workflow
+   manually from main and inspect the build result and downloadable artifacts.
+2. Confirm the version in `pyproject.toml` and the exact source commit to release.
+   Check that the version has not already been published; never replace a release.
+3. Prepare a GitHub release with tag `v0.1.0` for version `0.1.0`, targeting the
+   reviewed commit. Review its title and notes before publishing it.
+4. Publishing that stable GitHub release triggers a new build and the PyPI upload.
+   The tag must equal `v` followed by the package version. Prereleases are refused.
+   If the `pypi` environment requires approval, approve the verified publishing job.
+5. Confirm both artifacts appear on PyPI and verify a fresh public installation
+   before claiming the package is available. Record the uploaded artifact hashes.
+
+The publishing job downloads only that run's checked distributions and uses
+PyPI Trusted Publishing with job-scoped OIDC permission. It does not check out
+or build source. Builds made by GitHub may have different archive hashes from
+local builds; use the publishing run's checksums for the uploaded files.
+
+If a run fails after a partial upload, inspect PyPI and compare the already
+uploaded files before retrying. Do not overwrite files or bypass duplicate checks.

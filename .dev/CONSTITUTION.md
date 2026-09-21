@@ -1,4 +1,4 @@
-# Dryft development constitution
+# ThisDamnThing development constitution
 
 1. Follow the user's current instructions. Complete authorized work without
    inventing approval gates.
@@ -19,7 +19,7 @@
    pausing work. Keep it ignored and untracked for each developer; initialize it
    from the current session when absent.
 
-Before an authorized agent commit, run `/dryft-dev-pii` from
-`.dev/skills/dryft-dev-pii/SKILL.md` for the exact staged snapshot and complete
+Before an authorized agent commit, run `/tdt-dev-pii` from
+`.dev/skills/tdt-dev-pii/SKILL.md` for the exact staged snapshot and complete
 message. Findings or incomplete review pause the commit; preserve explicit
 unchanged-content decisions. Review does not authorize staging, commit or push.

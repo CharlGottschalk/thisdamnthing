@@ -1,18 +1,18 @@
 # Maintaining the stack documentation catalog
 
-`src/dryft/stack_docs.py` builds `.dryft/stack-docs.md` from installed stack records.
-Declared documents stay in their bundles. `.dryft/state/stack-docs.json` stores
+`src/thisdamnthing/stack_docs.py` builds `.tdt/stack-docs.md` from installed stack records.
+Declared documents stay in their bundles. `.tdt/state/stack-docs.json` stores
 the catalog's ownership digest; avoid adding a second document registry.
 
 ## Declare and discover guides
 
 List each guide in the manifest's optional `docs` array under the
-[stack contract](../src/dryft/resources/harness/contracts/stack.md). Only declared
+[stack contract](../src/thisdamnthing/resources/harness/contracts/stack.md). Only declared
 files appear in the catalog. Documentation does not become approved brain knowledge.
 
 ```sh
-dryft stack docs
-dryft stack docs example-stack
+tdt stack docs
+tdt stack docs example-stack
 ```
 
 The commands return local paths grouped by stack ID and version without opening
@@ -32,8 +32,8 @@ from document filename rules.
 ## Repair without losing edits
 
 ```sh
-dryft stack docs --rebuild
-dryft doctor
+tdt stack docs --rebuild
+tdt doctor
 ```
 
 An edited or unowned catalog blocks mutation. Preserve useful edits in a separate

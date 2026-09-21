@@ -2,7 +2,7 @@
 
 Use focused manual checks for the behavior being changed. Create disposable
 workspaces and harmless fixtures outside source repositories and personal
-workspaces. Dryft development does not use an automated test suite.
+workspaces. ThisDamnThing development does not use an automated test suite.
 
 Choose relevant checks below. For a complete installed-product workflow, use the
 [workspace runbook](e2e-runbook.md). This page defines checks; keep execution logs,
@@ -19,7 +19,7 @@ results and local paths in development records outside these guides.
 | Review | Approve, edit and reject candidates. Check stale-content refusal and exclusion of pending/rejected content from every retrieval hop. |
 | Retrieval | Query literal, linked, missing and conflicting evidence. Inspect citations and confirm unsupported answers acknowledge the gap. |
 | Projects | Register and inspect scratch source. Confirm stable identity and unchanged external files; report missing paths without relinking. |
-| DUI | Submit grouped and custom browser answers, handle a follow-up, retry an event and check retained answers after restart. |
+| UI | Submit grouped and custom browser answers, handle a follow-up, retry an event and check retained answers after restart. |
 | User skills | Propose, refine, approve and decline. Check overlaps, stale versions, batch conflicts, recovery and fresh-session discovery. |
 | History discovery | Use bounded native records with trustworthy completion evidence. Check workspace scope, duplicates and unavailable/partial coverage. |
 | Workspace policy | Review and save rules, update by revision, check missing-policy failure and actual current-policy delivery. |

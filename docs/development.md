@@ -20,7 +20,7 @@ Use [source onboarding](../.dev/ONBOARDING.md) for setup questions. The
 [portable example](../.dev/developer.example.json) covers identity and executable
 paths. Existing local settings are preserved.
 
-The read-only standard-library helper works without installing Dryft:
+The read-only standard-library helper works without installing ThisDamnThing:
 
 ```sh
 python3 .dev/config.py get toolchain.python
@@ -116,11 +116,11 @@ changing their configuration.
 
 ## Agent privacy review
 
-Run `python3 .dev/skills/setup.py` to expose `/dryft-dev-pii` through this
+Run `python3 .dev/skills/setup.py` to expose `/tdt-dev-pii` through this
 repository's Claude/Codex discovery. It preserves conflicting entries, never
 registers globally and reports read-only directories as pending. AGENTS.md also
 points directly to the canonical skill. Read
-[the review procedure](../.dev/skills/dryft-dev-pii/review.md) before any authorized
+[the review procedure](../.dev/skills/tdt-dev-pii/review.md) before any authorized
 agent commit. The read-only helper adds exact snapshot/message evidence and
 heuristics; semantic review is required in addition to the existing Git hooks.
 No new hooks are introduced. All development skills stay outside the wheel.

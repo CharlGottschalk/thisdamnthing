@@ -196,7 +196,7 @@ def main():
     except (ValueError, OSError, KeyError, IndexError, subprocess.CalledProcessError) as exc:
         # Never print Git stderr or raw exception values that may contain secrets.
         message = str(exc) if type(exc) is ValueError else 'Unable to complete Git safeguards; check configuration and Git state.'
-        print('Dryft Git: ' + message, file=sys.stderr)
+        print('ThisDamnThing Git: ' + message, file=sys.stderr)
         return 1
 
 

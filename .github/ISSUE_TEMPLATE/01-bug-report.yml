@@ -1,5 +1,5 @@
 name: Bug report
-description: Report something in Dryft that is broken.
+description: Report something in ThisDamnThing that is broken.
 title: '[Bug]: '
 labels:
 - bug
@@ -8,7 +8,7 @@ body:
   attributes:
     value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
       API keys, private workspace notes, and personal data. For private reports or help by email, contact
-      help@usedryft.com.'
+      support@usethisdamnthing.com.'
 - type: textarea
   id: actual
   attributes:
@@ -33,7 +33,7 @@ body:
 - type: input
   id: version
   attributes:
-    label: Dryft version
+    label: ThisDamnThing version
     description: Enter the installed version or source commit. If installation failed, enter the version
       you tried to install or "unknown".
   validations:

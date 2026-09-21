@@ -1,12 +1,12 @@
 # Architecture
 
-Dryft is a small Python CLI around a local Markdown knowledge brain. Core works
+ThisDamnThing is a small Python CLI around a local Markdown knowledge brain. Core works
 without stacks, a database or a background service. Optional stacks add domain
 workflows or local search providers. [MVP scope](mvp.md) explains the boundaries.
 
 ## Where to look
 
-All modules below are in `src/dryft/`.
+All modules below are in `src/thisdamnthing/`.
 
 | Area | Modules | Responsibility |
 | --- | --- | --- |
@@ -20,7 +20,7 @@ All modules below are in `src/dryft/`.
 | Stacks | `stacks.py`, `stack_updates.py`, `stack_docs.py` | Validate, install, update, remove and catalog owned content. |
 | Search extensions | `capabilities.py` | Discover and invoke explicitly selected local providers. |
 | Marketplace | `marketplace.py` | Validate feeds and fetch explicitly requested archives. |
-| DUI | `ui.py`, `ui_resources.py` | Serve local questions and return submitted events. |
+| UI | `ui.py`, `ui_resources.py` | Serve local questions and return submitted events. |
 
 `resources/workspace/` holds initial workspace files. `resources/harness/` holds
 contracts, canonical skills, hooks and context. `resources/docs/` holds installed
@@ -29,8 +29,8 @@ holds the packaged registry schema. Package-data rules are in `pyproject.toml`.
 
 ## Main flows
 
-Initialization writes a brain, `.dryft/` harness and local user docs. Enabled
-hosts get thin skill/configuration bridges; `.dryft/` stays canonical. Setup
+Initialization writes a brain, `.tdt/` harness and local user docs. Enabled
+hosts get thin skill/configuration bridges; `.tdt/` stays canonical. Setup
 preserves unrelated content and refuses ownership conflicts.
 
 Capture hooks ask the active agent for a concise sourced summary. Core saves
@@ -48,7 +48,7 @@ content. Search providers run on demand as trusted local subprocesses; their
 indexes are disposable and Markdown stays authoritative. Process separation
 is not an OS permission or network sandbox.
 
-DUI starts an on-demand local browser service. The active agent waits for events,
+UI starts an on-demand local browser service. The active agent waits for events,
 reads answers and can ask follow-ups. A browser submission cannot restart a
 stopped agent. UI state is separate from approved brain knowledge.
 

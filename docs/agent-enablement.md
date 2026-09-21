@@ -3,17 +3,17 @@
 Run these examples from the source repository root; relative paths are resolved
 from that directory. Keep disposable workspaces and stack checkouts outside it.
 
-Use `src/dryft/agents.py` and `bootstrap.py` for workspace host selection and
+Use `src/thisdamnthing/agents.py` and `bootstrap.py` for workspace host selection and
 registration. Agent detection checks executable availability; it does not verify
 account access, hook trust or runtime discovery.
 
 ## Select hosts
 
 ```sh
-dryft init ../workspace --agent none
-dryft --workspace ../workspace agent enable claude
-dryft --workspace ../workspace agent enable codex
-dryft --workspace ../workspace agent disable claude
+tdt init ../workspace --agent none
+tdt --workspace ../workspace agent enable claude
+tdt --workspace ../workspace agent enable codex
+tdt --workspace ../workspace agent disable claude
 ```
 
 Initial setup detects `claude` and `codex` on PATH unless `--agent` selects
@@ -27,7 +27,7 @@ works without enabled hosts.
 ## Maintain ownership across features
 
 Enabling a host adds bridges for core, stack and approved user skills, owned
-instruction blocks and hook registrations. Canonical skills stay in `.dryft/`.
+instruction blocks and hook registrations. Canonical skills stay in `.tdt/`.
 Record each new bridge with its original owner so stack removal and skill updates
 can manage it later.
 
@@ -46,10 +46,10 @@ settings and core resources through the stack transaction journal. Recover an
 interrupted operation before retrying:
 
 ```sh
-dryft --workspace ../workspace stack recover
+tdt --workspace ../workspace stack recover
 ```
 
-User-skill saves have a separate journal and `dryft skill recover` command. Each
+User-skill saves have a separate journal and `tdt skill recover` command. Each
 operation refuses the other's pending transaction. Enabling a host can change the
 ownership snapshot of a pending skill update; re-propose it against current state
 before seeking approval.

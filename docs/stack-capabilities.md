@@ -3,16 +3,16 @@
 Contract v2 adds hashed assets, compatibility declarations and the `brain.search`
 interface to the ordinary stack lifecycle. Workflow-only v1 stacks keep their
 existing restrictions and digest format. The
-[stack contract](../src/dryft/resources/harness/contracts/stack.md) defines the
-manifest and provider protocol; `src/dryft/capabilities.py` implements the host side.
+[stack contract](../src/thisdamnthing/resources/harness/contracts/stack.md) defines the
+manifest and provider protocol; `src/thisdamnthing/capabilities.py` implements the host side.
 
 ## Choose a provider explicitly
 
 ```sh
-dryft brain providers
-dryft brain index --provider PROVIDER_ID
-dryft brain index --provider PROVIDER_ID --rebuild
-dryft brain search "query" --provider PROVIDER_ID
+tdt brain providers
+tdt brain index --provider PROVIDER_ID
+tdt brain index --provider PROVIDER_ID --rebuild
+tdt brain search "query" --provider PROVIDER_ID
 ```
 
 Repeat `--provider` to combine providers. Selection applies to the invocation;

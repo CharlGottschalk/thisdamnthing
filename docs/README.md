@@ -1,8 +1,8 @@
-# Dryft development
+# ThisDamnThing development
 
-These guides explain how to change Dryft, extend its contracts and verify its
+These guides explain how to change ThisDamnThing, extend its contracts and verify its
 behavior. User guides live in
-[src/dryft/resources/docs](../src/dryft/resources/docs/README.md) and are installed
+[src/thisdamnthing/resources/docs](../src/thisdamnthing/resources/docs/README.md) and are installed
 into each workspace.
 
 ## Get started
@@ -26,7 +26,6 @@ source repositories and use the same contract and installer as community stacks.
 | [Product scope](mvp.md) | Understand core boundaries, workspace layout and shared formats. |
 | [Documentation maintenance](documentation.md) | Write and maintain developer and installed user guides. |
 | [Packaging and release](releasing.md) | Inspect a wheel, verify installation and publish an authorized release. |
-| [Release readiness](release-readiness.md) | Check compatibility limits and the publication checklist. |
 | [Component verification](acceptance.md) | Choose focused manual checks for a change. |
 | [Workspace walkthrough](e2e-runbook.md) | Verify the installed product across a complete workflow. |
 
@@ -37,15 +36,15 @@ source repositories and use the same contract and installer as community stacks.
 | Agents and skills | [Host adapters](agent-adapters.md), [enable and disable integrations](agent-enablement.md), [reusable skills and history discovery](skill-discovery.md) |
 | Rules and privacy | [Workspace constitution](workspace-constitution.md), [project constitution and privacy integration](constitution-privacy-integration.md), [staged-content privacy review](privacy-review.md) |
 | Stacks | [Authoring with Stack Builder](stack-builder.md), [Software Production integration](software-production.md), [lifecycle and recovery](stack-lifecycle.md), [documentation catalog](stack-documentation.md), [search capabilities](stack-capabilities.md) |
-| Browser interaction | [DUI sessions and custom pages](ui.md) |
+| Browser interaction | [UI sessions and custom pages](ui.md) |
 | Registry integration | [Marketplace client](marketplace.md) |
 
 ## Runtime contracts
 
 Use the packaged contracts when changing shared formats:
-[stacks](../src/dryft/resources/harness/contracts/stack.md),
-[capture events](../src/dryft/resources/harness/contracts/capture-event.md) and
-[DUI](../src/dryft/resources/harness/contracts/ui.md).
+[stacks](../src/thisdamnthing/resources/harness/contracts/stack.md),
+[capture events](../src/thisdamnthing/resources/harness/contracts/capture-event.md) and
+[UI](../src/thisdamnthing/resources/harness/contracts/ui.md).
 The [marketplace contract](marketplace-contract.md) defines registry behavior.
 Keep the public [schema](../src/marketplace/registry.schema.json) and its
-[packaged copy](../src/dryft/resources/marketplace/registry.schema.json) identical.
+[packaged copy](../src/thisdamnthing/resources/marketplace/registry.schema.json) identical.

@@ -3,13 +3,13 @@
 Run these examples from the source repository root; relative paths are resolved
 from that directory. Keep disposable workspaces and stack checkouts outside it.
 
-Publish the release wheel to PyPI so users can install with `pipx install usedryft`.
-Users can also ask their agent to install and set up Dryft via pipx; this follows
+Publish the release wheel to PyPI so users can install with `pipx install thisdamnthing`.
+Users can also ask their agent to install and set up ThisDamnThing via pipx; this follows
 the same CLI installation, workspace initialization and doctor flow. No source
 clone or manual wheel download is needed for the public user path.
 
-The distribution is `usedryft`; the Python package and CLI are `dryft`.
-Canonical source is `https://github.com/1one8/dryft`. The package description
+The distribution and Python package are `thisdamnthing`; the CLI is `tdt`.
+Canonical source is `https://github.com/CharlGottschalk/thisdamnthing`. The package description
 uses the root README and declares Apache-2.0 with the included LICENSE file.
 Setuptools 77.0.3 or newer is required to build this license metadata.
 Verify README image/document links after moving the source to the canonical
@@ -31,7 +31,7 @@ python3 -m pip wheel . --no-deps --wheel-dir dist
 Build tooling may need network access if it is not already available. For an
 offline check, prepare it first rather than claiming the command is offline.
 Inspect the wheel with Python's `zipfile` module or an archive viewer. It should
-contain `dryft`, its runtime resources and package metadata. It must not contain
+contain `thisdamnthing`, its runtime resources and package metadata. It must not contain
 `.dev/`, root development docs, local profiles or optional stack source.
 
 Install the wheel in a disposable environment outside the checkout. Run version,
@@ -52,8 +52,8 @@ records. Keep raw logs and local locations under ignored `.dev/local/`.
 4. Prepare concise release notes and accurate installation guidance.
 5. Publish only with authorization, then verify the actual download and installation.
 
-Before release, label `pipx install usedryft` as the planned public installation
-command. After publishing, verify it resolves to the intended Dryft package and
+Before release, label `pipx install thisdamnthing` as the planned public installation
+command. After publishing, verify it resolves to the intended ThisDamnThing package and
 installs successfully before claiming availability.
 Stack releases also need an actual repository/license, immutable revision, selected
 content hashes and archive digest required by the [marketplace contract](marketplace-contract.md).
@@ -69,7 +69,7 @@ source. Never include a developer workspace or local evidence in an artifact.
 
 Unmodified third-party libraries may retain upstream build/system paths, public
 author attribution, license contacts and protocol URLs. These accepted exceptions
-do not permit private Dryft developer paths or credentials. Remove unnecessary
+do not permit private ThisDamnThing developer paths or credentials. Remove unnecessary
 launchers/build metadata where safe; preserve licenses and native library bytes.
 Record source snapshots, artifact hashes, the scoped review and remaining coverage
 limits before publication.

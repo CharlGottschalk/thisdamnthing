@@ -1,16 +1,16 @@
 # Developing the marketplace client
 
-`src/dryft/marketplace.py` validates registry feeds and fetches selected archives.
+`src/thisdamnthing/marketplace.py` validates registry feeds and fetches selected archives.
 Installation uses the ordinary stack transaction. Keep the
 [public contract](marketplace-contract.md),
 [registry schema](../src/marketplace/registry.schema.json) and
-[packaged schema](../src/dryft/resources/marketplace/registry.schema.json) consistent.
+[packaged schema](../src/thisdamnthing/resources/marketplace/registry.schema.json) consistent.
 
 ## Follow the discovery and installation flow
 
 ```sh
-dryft marketplace search "query"
-dryft stack install example-stack --inspect
+tdt marketplace search "query"
+tdt stack install example-stack --inspect
 ```
 
 Use a configured HTTPS registry for explicit discovery and installation. Validate
@@ -51,7 +51,7 @@ It applies to install/inspect; updates do not inherit it. Keep every manifest,
 archive, content, prerequisite and trust check enabled. Never use it as fallback
 for a failed public request.
 
-See the [installed stack guide](../src/dryft/resources/docs/stacks.md) for complete
+See the [installed stack guide](../src/thisdamnthing/resources/docs/stacks.md) for complete
 local transport commands. Recompute archive digests for the bytes served by each
 transport; two ZIPs with identical selected content can have different hashes.
 

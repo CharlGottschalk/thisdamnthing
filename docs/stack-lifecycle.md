@@ -10,9 +10,9 @@ stacks so ownership, trust and recovery remain consistent.
 ## Inspect before changing installed content
 
 ```sh
-dryft stack validate ../example-stack
-dryft stack install ../example-stack --inspect
-dryft stack update example-stack --check
+tdt stack validate ../example-stack
+tdt stack install ../example-stack --inspect
+tdt stack update example-stack --check
 ```
 
 Validation checks the manifest and selected files. Inspection discloses content,
@@ -24,7 +24,7 @@ For an interactive update, the terminal requires an explicit yes. For agent-driv
 or noninteractive use, pass the inspected hash only after approval:
 
 ```sh
-dryft stack update example-stack --approve APPROVAL_SHA256
+tdt stack update example-stack --approve APPROVAL_SHA256
 ```
 
 Changed inputs require a new inspection and approval. Executable trust is separate
@@ -53,7 +53,7 @@ Use the existing journal and cooperating-writer lock. Keep hosts idle during
 mutation. After an interrupted operation:
 
 ```sh
-dryft stack recover
+tdt stack recover
 ```
 
 Recovery must preserve unexpected edits and report conflicts. It does not protect
@@ -62,10 +62,10 @@ against hostile concurrent filesystem replacement or guarantee power-loss durabi
 ## Remove only owned runtime assets
 
 ```sh
-dryft stack uninstall example-stack
-dryft stack list
-dryft stack docs
-dryft doctor
+tdt stack uninstall example-stack
+tdt stack list
+tdt stack docs
+tdt doctor
 ```
 
 `uninstall` and `remove` use the same implementation. Remove the bundle, owned

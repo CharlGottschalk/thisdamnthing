@@ -16,7 +16,7 @@ def main():
     if sys.argv[1:] not in ([], ['--check']):
         raise ValueError('Usage: python3 .dev/git-hooks/setup.py [--check]')
     if git('rev-parse', '--show-toplevel').stdout.strip() != str(ROOT):
-        raise ValueError('Run this setup from a Dryft source checkout.')
+        raise ValueError('Run this setup from a ThisDamnThing source checkout.')
     current = git('config', '--get', 'core.hooksPath')
     if current.returncode not in (0, 1):
         raise ValueError('Unable to inspect Git hook configuration.')
@@ -47,5 +47,5 @@ if __name__ == '__main__':
     try:
         main()
     except (ValueError, OSError) as exc:
-        print('Dryft hook setup: ' + str(exc), file=sys.stderr)
+        print('ThisDamnThing hook setup: ' + str(exc), file=sys.stderr)
         raise SystemExit(1)

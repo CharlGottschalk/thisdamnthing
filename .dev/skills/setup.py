@@ -3,15 +3,15 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[2]
 bridge = '''---
-name: dryft-dev-pii
-description: Review staged source and the complete message before authorized Dryft development commits.
+name: tdt-dev-pii
+description: Review staged source and the complete message before authorized ThisDamnThing development commits.
 ---
 
-Read and follow .dev/skills/dryft-dev-pii/SKILL.md from this repository root.
+Read and follow .dev/skills/tdt-dev-pii/SKILL.md from this repository root.
 '''
 pending = False
 for host in ('.agents', '.claude'):
-    target = root / host / 'skills' / 'dryft-dev-pii' / 'SKILL.md'
+    target = root / host / 'skills' / 'tdt-dev-pii' / 'SKILL.md'
     if any(p.is_symlink() for p in (target, *target.parents) if p != root.parent):
         raise SystemExit('Refusing symlinked discovery path.')
     if target.exists() and target.read_text() != bridge:

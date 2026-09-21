@@ -94,7 +94,7 @@ transcript paths are references only and transcripts remain with the host.
 Writes use a workspace advisory lock and atomic replacement. A busy operation
 fails with a retry message. Interrupted candidate/approval writes can be retried
 with the same request/proposal; existing canonical content is preserved. These
-protections coordinate ThisDamnThing processes, not arbitrary concurrent file editors.
+protections coordinate TDT processes, not arbitrary concurrent file editors.
 
 ## Optional offline search stacks
 

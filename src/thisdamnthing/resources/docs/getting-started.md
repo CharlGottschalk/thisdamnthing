@@ -1,6 +1,6 @@
 # Getting started
 
-Setup starts in a parent directory outside your projects and the ThisDamnThing source
+Setup starts in a parent directory outside your projects and the TDT source
 checkout. After `cd`, the remaining commands run from the new workspace root.
 
 ThisDamnThing gives your agent a local knowledge workspace. You can capture and review
@@ -18,11 +18,11 @@ Ask your agent to handle setup:
 > Install ThisDamnThing using its release instructions, create a workspace at my chosen
 > directory, and check it.
 
-There is no ThisDamnThing setup skill before installation. Once the workspace is ready,
+There is no TDT setup skill before installation. Once the workspace is ready,
 use `/tdt-workspace` to check it. Throughout these guides, Codex users can use
 `$` in place of `/` for skill names, or use the skill picker.
 
-For terminal setup, the public installation command, once the ThisDamnThing release is
+For terminal setup, the public installation command, once the TDT release is
 available on PyPI, is:
 
 ```sh
@@ -39,8 +39,8 @@ shell. Keep the pipx environment installed: workspace hooks use its interpreter.
 
 ## Create your workspace
 
-Choose a folder outside your existing projects, any other ThisDamnThing workspace and
-the ThisDamnThing source checkout. Give your agent the chosen path and ask it to create
+Choose a folder outside your existing projects, any other TDT workspace and
+the TDT source checkout. Give your agent the chosen path and ask it to create
 the workspace. For terminal setup, replace the example path with your own:
 
 ```sh

@@ -166,7 +166,7 @@ Codex reads response messages only, omitting mirrored event messages. Line refer
 are used when stable message IDs are absent. The agent must still exclude retries,
 copied context and equivalent duplicated records when counting independent occasions.
 Raw output is evidence to analyze in the active conversation; never persist it in
-ThisDamnThing. Summaries alone cannot establish independent recurrence reliably.
+TDT. Summaries alone cannot establish independent recurrence reliably.
 
 Return at most ten candidates with proposed name, purpose, reusable steps, inputs,
 recurrence count, source session/turn references, limitations, overlapping skills

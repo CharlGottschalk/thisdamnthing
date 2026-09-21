@@ -42,7 +42,7 @@ with its own GitHub repository.
 - Core UI provides optional local browser questions and interactive input for
   users and all stacks, including standard controls and custom HTML/JavaScript.
   Chat/TUI remains available.
-- Declare external and stack prerequisites in registry metadata; no dependency
+- Declare external and stack prerequisites in stack.json marketplace metadata; no dependency
   solver, automatic stack upgrades, or custom package format.
 - No automated tests. Source development uses the constitution loader and the
   explicitly authorized tracked Git safeguards; no other development hooks.

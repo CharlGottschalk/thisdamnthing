@@ -92,7 +92,7 @@ def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=F
     manifest_text = read('stack.json', 2 * 1024 * 1024)
     data = parse_settings(manifest_text)
     required = {'contract_version', 'id', 'version', 'description', 'author', 'license', 'skills', 'hooks', 'knowledge'}
-    if not isinstance(data, dict) or not required <= set(data) or set(data) - required - ({'templates', 'docs', 'capabilities', 'assets', 'compatibility'} if data.get('contract_version') == 2 else {'templates', 'docs'}):
+    if not isinstance(data, dict) or not required <= set(data) or set(data) - required - ({'templates', 'docs', 'capabilities', 'assets', 'compatibility', 'marketplace'} if data.get('contract_version') == 2 else {'templates', 'docs', 'marketplace'}):
         raise WorkspaceError('Invalid stack fields; see .tdt/contracts/stack.md')
     if type(data['contract_version']) is not int or data['contract_version'] not in (1, 2):
         raise WorkspaceError('Expected contract_version integer 1 or 2')
@@ -106,6 +106,9 @@ def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=F
         clean_text(data[field], field, 500)
         if '\n' in data[field]:
             raise WorkspaceError(f'{field} must be one line')
+    if 'marketplace' in data:
+        from .marketplace import validate_manifest_metadata
+        validate_manifest_metadata(data['marketplace'], executable=bool(data['hooks'] or data.get('capabilities')))
     files = {'stack.json': manifest_text}
     names = set()
     for category in ('skills', 'hooks', 'knowledge', 'templates', 'docs'):

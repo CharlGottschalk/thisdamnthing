@@ -30,13 +30,12 @@ Only published, non-draft, non-prerelease GitHub releases qualify. Their tags mu
 match the manifest's numeric `MAJOR.MINOR.PATCH` version after removing at most
 one leading `v`.
 
-Listing metadata stays outside `stack.json`; manifest contracts v1 and v2 reject
-unknown fields. Listings describe name, summary, plain-text description, public
-author identity, license, repository, categories, tags and optional documentation,
-support and media links. Categories are controlled; tags are lowercase slugs.
-Media requires alt text, and links use HTTPS. Render content as data, never author
-HTML or scripts. Keep private account identifiers, emails and review records out
-of the public feed.
+Manifest metadata lives only in `stack.json` under `marketplace`. The submission
+form collects name, GitHub URL and description. All other listing and release
+metadata is read from the pinned commit. The database stores no copy, including
+no dependency, capability, hook or supported-agent columns. Review records and
+immutable release references/digests remain in the database. Search filters and
+the registry are built from manifests, and unavailable manifests fail the read.
 
 The required `extension_type` describes purpose and grants no permissions:
 
@@ -50,7 +49,7 @@ Show this classification on listing cards and detail pages and verify it during
 review. It is distinct from tags, release capability disclosures and manifest v2
 runtime-provider declarations.
 
-Each release records its immutable manifest identity, supported agents (`claude`,
+Each release resolves its immutable manifest identity, supported agents (`claude`,
 `codex`), prerequisites, capabilities and hooks. Compatibility claims must reflect
 reviewed environments. Listing summary, author name and license match the latest
 active release; older installations compare against their own release identity.
@@ -202,3 +201,45 @@ implicit fallback/persistent setting. Preserve TLS, origin, time/size, archive,
 manifest, digest, prerequisite and trust checks. Local provenance adds
 `archive_transport=local-loopback` and `archive_url`. Updates do not inherit this
 option. Local integration does not establish public deployment or transport.
+
+## Marketplace metadata in stack.json
+
+For marketplace publication, add a `marketplace` object to `stack.json` (v1 or
+v2). It is optional for local-only stacks, but required by the marketplace.
+The manifest is the only metadata source: the website reads it at the pinned
+release commit and does not store a copy in its database. The form asks only
+for a name, GitHub URL and description. A repository URL selects GitHub's latest
+stable release; a release URL selects that version. Verification displays the
+resolved version and commit before submission and checks them again on submit.
+
+Required fields in `marketplace`:
+
+- `extension_type`: `functionality`, `capability` or `both`.
+- `categories`: one to five controlled marketplace category slugs.
+- `tags`: up to twenty unique lowercase hyphen-separated slugs.
+- `supported_agents`: one or both of `claude` and `codex`, reflecting verification.
+- `dependencies`: registry prerequisite objects (up to fifty), including type,
+  ref, name, required, purpose, HTTPS setup_url, nullable version_constraint,
+  authentication_required and payment_required booleans.
+- `capabilities`: registry disclosure objects (up to fifty) with type, scope,
+  purpose and data_leaves_machine. Types are file_read, file_write, network,
+  process, connector and other. Declare effects requested through skills too.
+- `icon`: null or an object with HTTPS `url` and `alt`.
+- `screenshots`: up to eight objects with HTTPS `url` and `alt`.
+- `documentation_url`, `support_url`: null or credential-free HTTPS URLs without fragments.
+
+Use empty arrays or null explicitly where appropriate; do not omit disclosures
+for executable hooks or providers. Top-level v2 `capabilities` still declares
+runtime providers; `marketplace.capabilities` describes effects and data flows.
+The packaged `marketplace/manifest.schema.json` defines exact fields and bounds.
+Changes require a new release commit and review. The database keeps listing
+presentation, repository ownership, pinned release references, digests and review
+records, but no manifest metadata. Public reads fail as unavailable if any required
+pinned manifest cannot be read or validated; they never substitute branch content
+or empty disclosures. Published manifests must remain readable at their commits.
+
+
+The manifest-only transition preserves old release and review records privately.
+A verification timestamp (not metadata) gates public visibility and approval.
+Releases without a compatible manifest at their pinned commit must publish a new
+version; neither old approved commits nor their manifests are rewritten.

@@ -15,6 +15,7 @@ network fetching or provider permission changes exist in this contract.
 | skills | Array of explicit `skills/tdt-<name>/SKILL.md` paths. |
 | hooks | Array of objects containing exactly `event` and `path` strings. |
 | knowledge | Array of explicit `knowledge/*.md` paths; subdirectories allowed. |
+| marketplace | Optional object for publication metadata; see the marketplace section below. |
 | templates, docs | Optional arrays of explicit file paths under the corresponding directory. |
 
 Unknown fields are rejected. Each array has at most 50 entries. Every selected
@@ -232,3 +233,39 @@ network sandbox. Offline behavior is a provider requirement, verified separately
 
 New bundles require normalized IDs. Existing ownership records with dotted IDs
 remain readable for use and removal; they are not automatically renamed.
+
+## Marketplace metadata in stack.json
+
+For marketplace publication, add a `marketplace` object to `stack.json` (v1 or
+v2). It is optional for local-only stacks, but required by the marketplace.
+The manifest is the only metadata source: the website reads it at the pinned
+release commit and does not store a copy in its database. The form asks only
+for a name, GitHub URL and description. A repository URL selects GitHub's latest
+stable release; a release URL selects that version. Verification displays the
+resolved version and commit before submission and checks them again on submit.
+
+Required fields in `marketplace`:
+
+- `extension_type`: `functionality`, `capability` or `both`.
+- `categories`: one to five controlled marketplace category slugs.
+- `tags`: up to twenty unique lowercase hyphen-separated slugs.
+- `supported_agents`: one or both of `claude` and `codex`, reflecting verification.
+- `dependencies`: registry prerequisite objects (up to fifty), including type,
+  ref, name, required, purpose, HTTPS setup_url, nullable version_constraint,
+  authentication_required and payment_required booleans.
+- `capabilities`: registry disclosure objects (up to fifty) with type, scope,
+  purpose and data_leaves_machine. Types are file_read, file_write, network,
+  process, connector and other. Declare effects requested through skills too.
+- `icon`: null or an object with HTTPS `url` and `alt`.
+- `screenshots`: up to eight objects with HTTPS `url` and `alt`.
+- `documentation_url`, `support_url`: null or credential-free HTTPS URLs without fragments.
+
+Use empty arrays or null explicitly where appropriate; do not omit disclosures
+for executable hooks or providers. Top-level v2 `capabilities` still declares
+runtime providers; `marketplace.capabilities` describes effects and data flows.
+The packaged `marketplace/manifest.schema.json` defines exact fields and bounds.
+Changes require a new release commit and review. The database keeps listing
+presentation, repository ownership, pinned release references, digests and review
+records, but no manifest metadata. Public reads fail as unavailable if any required
+pinned manifest cannot be read or validated; they never substitute branch content
+or empty disclosures. Published manifests must remain readable at their commits.

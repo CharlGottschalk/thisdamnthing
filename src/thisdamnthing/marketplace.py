@@ -149,6 +149,29 @@ def validate_schema(value, rule, schema, path='$'):
         raise WorkspaceError(f'Invalid registry number at {path}')
 
 
+def validate_manifest_metadata(metadata, *, executable=False):
+    schema = json.loads(resource_text('marketplace/manifest.schema.json'))
+    validate_schema(metadata, schema, schema, '$.marketplace')
+    def check_text(value):
+        if isinstance(value, str) and not value.strip():
+            raise WorkspaceError('Marketplace text must not be blank')
+        if isinstance(value, dict):
+            for item in value.values():
+                check_text(item)
+        if isinstance(value, list):
+            for item in value:
+                check_text(item)
+    check_text(metadata)
+    seen = set()
+    for dep in metadata['dependencies']:
+        key = (dep['type'], dep['ref'])
+        if key in seen or dep['type'] == 'stack' and not stacks.ID.fullmatch(dep['ref']):
+            raise WorkspaceError('Invalid or duplicate marketplace prerequisite')
+        seen.add(key)
+    if executable and not metadata['capabilities']:
+        raise WorkspaceError('Executable stacks require marketplace capability disclosures')
+
+
 def version_key(value):
     return tuple(map(int, value.split('.')))
 
@@ -326,6 +349,8 @@ def prepared(listing, release, registry_url, *, local_origin=None):
         if (any(manifest[k] != v for k, v in release['manifest_identity'].items())
                 or manifest['hooks'] != release['hooks'] or local['sha256'] != release['content_sha256']):
             raise WorkspaceError('Approved manifest, hooks or content SHA256 mismatch')
+        if 'marketplace' in manifest and any(manifest['marketplace'][k] != release[k] for k in ('supported_agents', 'dependencies', 'capabilities')):
+            raise WorkspaceError('Registry metadata differs from stack.json')
         for hook in manifest['hooks']:
             print(f"Executable Python hook: {hook['event']} {hook['path']}\n{files[hook['path']]}")
         provenance = {'kind': 'marketplace', 'registry_origin': origin(registry_url), 'registry_url': registry_url,

@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Stack marketplace metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "extension_type": {
+      "type": "string",
+      "description": "Whether the stack extends ThisDamnThing functionality, adds domain capabilities, or both.",
+      "enum": [
+        "functionality",
+        "capability",
+        "both"
+      ]
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "maxLength": 64
+      },
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "maxLength": 64
+      },
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "icon": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/image"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "screenshots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/image"
+      },
+      "maxItems": 8,
+      "uniqueItems": true
+    },
+    "documentation_url": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 2048
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "support_url": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 2048
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "supported_agents": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "claude",
+          "codex"
+        ]
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "maxItems": 50,
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capability"
+      },
+      "maxItems": 50,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "extension_type",
+    "categories",
+    "tags",
+    "icon",
+    "screenshots",
+    "documentation_url",
+    "support_url",
+    "supported_agents",
+    "dependencies",
+    "capabilities"
+  ],
+  "$defs": {
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 2048
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "url",
+        "alt"
+      ]
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "type": {
+          "enum": [
+            "mcp",
+            "connector",
+            "service",
+            "stack",
+            "cli",
+            "runtime"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "setup_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 2048
+        },
+        "version_constraint": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "authentication_required": {
+          "type": "boolean"
+        },
+        "payment_required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ref",
+        "name",
+        "type",
+        "required",
+        "purpose",
+        "setup_url",
+        "version_constraint",
+        "authentication_required",
+        "payment_required"
+      ]
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "file_read",
+            "file_write",
+            "network",
+            "process",
+            "connector",
+            "other"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "data_leaves_machine": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "type",
+        "scope",
+        "purpose",
+        "data_leaves_machine"
+      ]
+    }
+  }
+}

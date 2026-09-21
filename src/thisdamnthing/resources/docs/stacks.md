@@ -161,7 +161,7 @@ via `--registry HTTPS_URL`; a different origin is refused. Source kinds cannot b
 switched. Versions use numeric MAJOR.MINOR.PATCH ordering. Same-version content
 replacement, downgrades, deprecated/withdrawn selections and incompatible manifests
 are refused. Missing/network-invalid sources are errors, never “up to date.”
-Registry review notes/capabilities/prerequisites and actual changed file names are
+Registry review notes and manifest capabilities/prerequisites and actual changed file names are
 shown; there are no inline release notes in registry v1. Links are not auto-opened.
 
 Hook trust is separate from update approval: review displayed source and pass

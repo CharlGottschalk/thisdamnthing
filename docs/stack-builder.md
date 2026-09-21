@@ -33,7 +33,7 @@ existing target content.
 
 Run public validation on the result. Installation is a separate requested action;
 executable hooks or providers also require exact-content trust. Draft registry
-metadata stays outside the stack manifest and does not constitute publication.
+metadata lives in stack.json.marketplace and does not constitute publication.
 
 ## Prepare a release
 

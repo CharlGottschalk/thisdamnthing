@@ -284,7 +284,8 @@ def serve(root, sid):
                             html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>' + resource_text('ui/tokens.css') + '</style><script>' + bridge + '</script></head><body class="tdt-custom">' + state['page']['custom_html'] + '</body></html>'
                             self.respond(200, html, 'text/html', custom=True)
                             return
-                        assets = {'/': ('shell.html', 'text/html'), '/shell.js': ('shell.js', 'text/javascript'), '/tokens.css': ('tokens.css', 'text/css')}
+                        assets = {'/': ('shell.html', 'text/html'), '/shell.js': ('shell.js', 'text/javascript'),
+                                  '/tokens.css': ('tokens.css', 'text/css'), '/logo.svg': ('logo.svg', 'image/svg+xml')}
                         require(self.path in assets, 'Unknown asset')
                         name, mime = assets[self.path]
                         self.respond(200, files('thisdamnthing').joinpath('resources', 'ui', name).read_bytes(), mime)

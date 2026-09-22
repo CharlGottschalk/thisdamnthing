@@ -120,7 +120,7 @@ cannot enforce its withdrawal state.
 
 ## Public read interface
 
-`GET https://stacks.usethisdamnthing.com/registry/v1/index.json` returns one UTF-8 JSON
+`GET https://stacks.usetdt.com/registry/v1/index.json` returns one UTF-8 JSON
 feed with `application/json`, schema version and `generated_at`. No login, cookies,
 API key or client identifier is required. Publish atomically, with at most 5 MiB
 of decoded data and 1,000 listings. No pagination or server-side search is defined;
@@ -135,7 +135,7 @@ invalid tag/version or manifest identity, duplicate prerequisite type/reference
 pairs, unsafe or duplicate hook paths, invalid status metadata and incorrect
 latest-version selection. Enforce schema and semantic checks together.
 
-Canonical listing URLs are `https://stacks.usethisdamnthing.com/<stack-id>`; a configured
+Canonical listing URLs are `https://stacks.usetdt.com/<stack-id>`; a configured
 registry uses its own origin plus the same ID path. Preserve the page after
 withdrawal. Optional rating links may append `#ratings`; ratings stay outside the
 CLI feed and open only on user request or acceptance. Do not put workspace,

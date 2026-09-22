@@ -66,7 +66,7 @@ zero stacks and detects Claude and Codex on PATH. Add `--agent claude`,
 `--agent codex`, `--agent both` or `--agent none` to `init` to choose explicitly.
 Existing unrelated files are preserved; conflicting files are refused.
 
-Read the [usage guides](https://usethisdamnthing.com/docs), or open the local guides in
+Read the [usage guides](https://usetdt.com/docs), or open the local guides in
 your workspace's `docs/` folder.
 
 ---

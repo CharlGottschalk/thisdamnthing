@@ -8,7 +8,7 @@ body:
   attributes:
     value: 'Search existing issues before opening a new one. Reports are public: leave out passwords,
       API keys, private workspace notes, and personal data. For private reports or help by email, contact
-      support@usethisdamnthing.com.'
+      support@usetdt.com.'
 - type: input
   id: page
   attributes:

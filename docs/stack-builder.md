@@ -45,7 +45,7 @@ worktree is clean. Missing or declined `gh` leads to a manual release checklist.
 
 The installed bundle's `docs/publishing.md` covers history and archive review,
 version agreement, immutable release verification and partial-failure recovery.
-Authors visit https://stacks.usethisdamnthing.com to submit the verified release for review;
+Authors visit https://stacks.usetdt.com to submit the verified release for review;
 the skill does not perform marketplace submission or approval.
 
 ## Change the builder safely

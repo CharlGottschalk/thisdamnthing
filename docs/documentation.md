@@ -12,7 +12,7 @@
 | `.dev/` records and ignored `.dev/local/` | Development coordination, execution results and private local evidence. |
 | Separate stack repositories | Stack-specific usage, templates and authoring guidance. |
 
-Full web usage docs will be at [usethisdamnthing.com/docs](https://usethisdamnthing.com/docs).
+Full web usage docs will be at [usetdt.com/docs](https://usetdt.com/docs).
 This source repository does not publish that site. Coordinate website changes
 separately; do not describe a planned page as verified live.
 

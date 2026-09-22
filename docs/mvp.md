@@ -33,8 +33,8 @@ with its own GitHub repository.
 - Automatic capture creates concise candidate notes with source references for
   user approval. Only approved candidates become authoritative brain knowledge.
   Full transcripts remain with the host agent.
-- The marketplace contract uses `stacks.usethisdamnthing.com` as the registry destination
-  on the usethisdamnthing.com website. Each stack has its own GitHub repository. The CLI
+- The marketplace contract uses `stacks.usetdt.com` as the registry destination
+  on the usetdt.com website. Each stack has its own GitHub repository. The CLI
   and `/tdt-install-stack` skill fetch its ZIP/source archive through the registry
   JSON endpoint. Author accounts, submissions and ratings belong
   to the separate website; marketplace payments are future scope. See
@@ -189,7 +189,7 @@ the ZIP/source archive, validate it, and record its origin and resolved revision
 CLI and `/tdt-install-stack` share the same installer. Community authors submit
 their repository metadata for registry review. Use [the marketplace contract](marketplace-contract.md) for the JSON
 endpoint contract. The separate Sites project
-owns the listing page and endpoint for `stacks.usethisdamnthing.com`; verify deployment
+owns the listing page and endpoint for `stacks.usetdt.com`; verify deployment
 before documenting a public registry as available.
 
 ## Verify the installed product

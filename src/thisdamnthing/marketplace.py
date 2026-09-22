@@ -22,7 +22,7 @@ from . import stacks
 from .bootstrap import parse_settings
 from .workspace import WorkspaceError, resource_text
 
-DEFAULT_REGISTRY = 'https://stacks.usethisdamnthing.com/registry/v1/index.json'
+DEFAULT_REGISTRY = 'https://stacks.usetdt.com/registry/v1/index.json'
 FEED_LIMIT = 5 * 1024 * 1024
 ARCHIVE_LIMIT = 384 * 1024 * 1024
 EXPANDED_LIMIT = 512 * 1024 * 1024

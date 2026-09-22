@@ -78,7 +78,7 @@ GitHub stars (null means unavailable), their fetch times and review notes.
 `/tdt-install-stack` guides the same inspection and installation commands.
 Use an explicit `./directory` for a local directory whose name resembles an ID.
 
-The default feed is `https://stacks.usethisdamnthing.com/registry/v1/index.json`.
+The default feed is `https://stacks.usetdt.com/registry/v1/index.json`.
 `--registry HTTPS_URL` selects another registry explicitly. Listings must belong
 to that origin. This trusts that registry's release approvals; inspect its source
 and disclosures. Registry redirects stay on its origin, archives on GitHub's

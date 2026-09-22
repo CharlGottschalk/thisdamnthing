@@ -14,8 +14,8 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.urls]
-Homepage = "https://usethisdamnthing.com"
-Documentation = "https://usethisdamnthing.com/docs"
+Homepage = "https://usetdt.com"
+Documentation = "https://usetdt.com/docs"
 Repository = "https://github.com/CharlGottschalk/thisdamnthing"
 Issues = "https://github.com/CharlGottschalk/thisdamnthing/issues"
 

@@ -2,7 +2,7 @@
 
 .tdt-custom main{margin:24px auto;padding-bottom:24px}
 
-.brand img{display:block;width:112px;height:auto;flex:none}
+.brand img{display:block;width:auto;height:20px;flex:none}
 
 #status.agent-waiting{display:flex;align-items:center;gap:20px;padding:24px;background:var(--surface);border:1px solid var(--gold);border-radius:var(--radius);color:var(--chalk)}
 .agent-waiting strong{display:block;font-size:18px;line-height:1.4}
@@ -24,5 +24,3 @@ p code{background:var(--inset);color:var(--chalk);border-radius:4px;padding:2px 
 .code-language{display:block;font:12px/1.5 Geist,system-ui,sans-serif;color:var(--muted);margin-bottom:8px}
 #description>p:first-child,.help>p:first-child,dd>p:first-child{margin-top:0}
 #description>p:last-child,.help>p:last-child,dd>p:last-child{margin-bottom:0}
-
-.wordmark{font-size:clamp(1.125rem,4vw,1.5rem);font-weight:600;letter-spacing:-.035em;color:var(--accent,#d9be55)}

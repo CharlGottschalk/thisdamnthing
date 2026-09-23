@@ -38,6 +38,8 @@ def main(argv=None):
     listing = actions.add_parser("candidates", help="show candidate proposals and review hashes")
     listing.add_argument("--status", choices=("pending", "approved", "rejected", "all"), default="pending")
     actions.add_parser("requests", help="list incomplete capture request ids for recovery")
+    names = actions.add_parser("migrate-names", help="preview readable brain filenames and link updates")
+    names.add_argument("--apply", action="store_true", help="apply the migration with recoverable writes")
     review = actions.add_parser("review", help="apply an explicitly instructed user review")
     review.add_argument("id")
     review.add_argument("--decision", choices=("approve", "reject", "edit"), required=True)
@@ -233,7 +235,9 @@ def main(argv=None):
             elif args.action == "candidates":
                 with brain.locked(root):
                     for meta, body in brain.candidates(root, args.status):
-                        path = managed_path(root, f"brain/candidates/{brain.identifier(meta['id'])}.md")
+                        path = managed_path(root, brain.find_note(root, "candidates", meta['id']))
+                        print("Candidate path: " + str(path.relative_to(root)))
+                        print("Approval destination: " + brain.canonical_path(root, meta))
                         print(path.read_text(encoding="utf-8"))
                         print("Review SHA256: " + brain.digest(path.read_text(encoding="utf-8")))
             elif args.action == "requests":
@@ -245,6 +249,9 @@ def main(argv=None):
             elif args.action == "review":
                 print(brain.review(root, args.id, args.decision, args.user_instruction,
                                    args.expected_sha256, input_json() if args.decision == "edit" else None))
+            elif args.action == "migrate-names":
+                from .brain_names import migrate
+                print(json.dumps(migrate(root, args.apply), indent=2, ensure_ascii=False))
             elif args.action in ("providers", "index"):
                 from . import capabilities
                 if args.action == "providers":

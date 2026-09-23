@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import unicodedata
 
 from .workspace import WorkspaceError, managed_path, read_config, read_json
 
@@ -92,6 +93,58 @@ def read_note(root, relative):
     return meta, body.strip()
 
 
+def note_files(root, categories=("candidates", "knowledge", "projects", "sessions")):
+    """Bounded, symlink-safe inventory shared by naming and migration."""
+    if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+        raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
+    result = []
+    count = 0
+    def failed(error):
+        raise WorkspaceError(f"Cannot scan brain: {error}")
+    for category in categories:
+        directory = managed_path(root, f"brain/{category}")
+        for current, directories, filenames in os.walk(directory, followlinks=False, onerror=failed):
+            directories.sort()
+            count += len(directories) + len(filenames)
+            if count > 2000:
+                raise WorkspaceError("Brain scan exceeds 2000 entries")
+            for name in directories + sorted(filenames):
+                relative = str((Path(current) / name).relative_to(root))
+                managed_path(root, relative)
+                if name in filenames and name.endswith(".md"):
+                    result.append(relative)
+    return result
+
+
+def find_note(root, category, key):
+    identifier(key)
+    matches = [relative for relative in note_files(root, (category,))
+               if read_note(root, relative)[0]["id"] == key]
+    if len(matches) > 1:
+        raise WorkspaceError(f"Duplicate note identity in {category}: {key}")
+    return matches[0] if matches else None
+
+
+def named_path(root, category, key, title, reserved=()):
+    """Allocate once; extend the ID suffix on collisions without overwriting."""
+    identifier(key)
+    if category not in ("candidates", "knowledge", "projects", "sessions"):
+        raise WorkspaceError("Invalid note category")
+    normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode()
+    slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"
+    occupied = {p.casefold() for p in note_files(root, (category,))} | {p.casefold() for p in reserved}
+    for length in range(8, 65, 4):
+        relative = f"brain/{category}/{slug}-{key[:length]}.md"
+        if relative.casefold() not in occupied and not managed_path(root, relative).exists():
+            return relative
+    raise WorkspaceError("Note filename conflict; existing content preserved")
+
+
+def canonical_path(root, meta):
+    return (find_note(root, "knowledge", meta["id"])
+            or named_path(root, "knowledge", meta["id"], meta["title"]))
+
+
 def clean_text(value, field, maximum):
     if (not isinstance(value, str) or not value.strip() or len(value) > maximum
             or any(ord(c) < 32 and c not in "\n\t" for c in value)):
@@ -153,9 +206,9 @@ def capture(root, key, data):
         request = read_request(root, key)
         if request.get("status") in ("captured", "skipped"):
             return request["status"] + ": " + key
-        existing = managed_path(root, f"brain/candidates/{key}.md")
-        if existing.exists():
-            previous, _ = read_note(root, f"brain/candidates/{key}.md")
+        existing = find_note(root, "candidates", key)
+        if existing:
+            previous, _ = read_note(root, existing)
             if previous.get("id") != key or previous.get("provenance") != request["provenance"]:
                 raise WorkspaceError("Candidate ownership conflict")
             request.update(status="captured", completed=now())
@@ -165,7 +218,7 @@ def capture(root, key, data):
             request.update(status="skipped", completed=now())
         else:
             value = summary(data)
-            relative = f"brain/candidates/{key}.md"
+            relative = named_path(root, "candidates", key, value["title"])
             body = value.pop("body")
             meta = {"format_version": 1, "id": key, "status": "pending",
                     "created": request["created"], "updated": now(),
@@ -178,10 +231,9 @@ def capture(root, key, data):
 
 
 def candidates(root, status="pending"):
-    directory = managed_path(root, "brain/candidates")
     result = []
-    for path in sorted(directory.glob("*.md")):
-        meta, body = read_note(root, str(path.relative_to(root)))
+    for relative in note_files(root, ("candidates",)):
+        meta, body = read_note(root, relative)
         if status == "all" or meta.get("status") == status:
             result.append((meta, body))
     return result
@@ -194,7 +246,9 @@ def review(root, key, decision, instruction, expected, edited=None):
     if decision not in ("approve", "reject", "edit"):
         raise WorkspaceError("Expected approve, reject or edit")
     with locked(root):
-        relative = f"brain/candidates/{key}.md"
+        relative = find_note(root, "candidates", key)
+        if relative is None:
+            raise WorkspaceError("Unknown candidate id")
         path = managed_path(root, relative)
         original = path.read_text(encoding="utf-8")
         if digest(original) != expected:
@@ -216,8 +270,8 @@ def review(root, key, decision, instruction, expected, edited=None):
         meta["review"].append(record)
         if decision == "approve":
             # Always create a distinct canonical note: conflicting evidence survives.
-            target = f"brain/knowledge/{key}.md"
-            meta["canonical"] = f"knowledge/{key}"
+            target = canonical_path(root, meta)
+            meta["canonical"] = target[6:-3]
             content = note_text(meta, body)
             destination = managed_path(root, target)
             if destination.exists() and destination.read_text(encoding="utf-8") != content:
@@ -237,6 +291,8 @@ def review(root, key, decision, instruction, expected, edited=None):
 
 def eligible_notes(root):
     """Current canonical approvals, restricted to registered project identities."""
+    if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+        raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
     from .projects import registry
     project_ids = {p['id'] for p in registry(root)}
     notes = {}

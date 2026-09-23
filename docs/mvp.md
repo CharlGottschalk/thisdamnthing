@@ -134,6 +134,10 @@ can call the same Python core; do not build a parallel command API for everythin
 Use Markdown with small metadata fields: id, title, kind, timestamps, source,
 and optional project id. Wikilinks use brain-relative paths without `.md`, such
 as `[[projects/example]]`, avoiding duplicate-title ambiguity.
+New filenames use a readable title slug and short ID suffix, extending the suffix
+on collisions. Full IDs remain in metadata; editing a title does not rename a
+file. Legacy hash filenames remain supported; `tdt brain migrate-names` previews
+an explicit migration, and `--apply` renames them and updates current brain links.
 
 Candidates record pending/approved/rejected state, provenance, and review history.
 `/tdt-review-brain` presents candidates and promotes only what the user approves.

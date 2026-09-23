@@ -93,7 +93,7 @@ For the first release:
    manually from main and inspect the build result and downloadable artifacts.
 2. Confirm the version in `pyproject.toml` and the exact source commit to release.
    Check that the version has not already been published; never replace a release.
-3. Prepare a GitHub release with tag `v0.1.0` for version `0.1.0`, targeting the
+3. Prepare a GitHub release with tag `v0.1.3` for version `0.1.3`, targeting the
    reviewed commit. Review its title and notes before publishing it.
 4. Publishing that stable GitHub release triggers a new build and the PyPI upload.
    The tag must equal `v` followed by the package version. Prereleases are refused.

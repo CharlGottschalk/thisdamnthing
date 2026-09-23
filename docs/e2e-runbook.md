@@ -44,6 +44,13 @@ Do not weaken production HTTPS or archive validation to make a fixture work.
 | 14. Removal | Snapshot brain and unrelated host files, remove stacks, doctor and use core again. | Brain/user settings preserved, owned skills removed, zero-stack brain/project/UI behavior remains. |
 
 Use approved disposable content for replay/deduplication and stale-hash probes.
+Check readable filenames across project registration, capture, stack import and
+approval; edit a title and confirm its existing filename stays unchanged. In a
+legacy fixture, preview/apply `tdt brain migrate-names`, confirm IDs/review history
+survive and current links resolve, then repeat with no further changes. Exercise
+suffix collisions, duplicate-ID/symlink refusal and interrupted migration rollback
+with `tdt stack recover`. Rebuild an optional provider index and verify retrieval
+uses the new paths. Keep real user workspaces untouched during these probes.
 Observe that repeated capture delivery does not duplicate the proposal. Keep
 failures/recovery observations, and fix blockers before rerunning affected steps.
 No automated suite or new development hooks are required.

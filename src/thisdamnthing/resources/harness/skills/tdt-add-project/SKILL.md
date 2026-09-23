@@ -24,7 +24,7 @@ only immediately approved knowledge; onboarding interpretation remains tentative
 For useful durable knowledge, submit one concise summary JSON on stdin to
 `tdt --workspace <root> project propose <id>`. Use title, kind (inference when
 interpreting), body (at most 3000 characters), sources (1–8 exact references),
-and links (use projects/<id>). See docs/brain.md for the summary format. Include
+and links (use the `brain_link` returned by project inspection). See docs/brain.md for the summary format. Include
 purpose, structure, entry points and unknowns only as supported by inspected
 sources. This creates a pending candidate; it does not approve it. Show the
 proposal and offer /tdt-review-brain for explicit review. Do not claim the

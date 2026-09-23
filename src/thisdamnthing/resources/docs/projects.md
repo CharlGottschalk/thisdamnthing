@@ -12,6 +12,9 @@ In Codex, use `$tdt-add-project` or the skill picker.
 Terminal alternative: `tdt project add ../project` prints its stable ID and
 bounded onboarding evidence. No project files are changed or copied into the
 workspace. The project note records directory registration only; interpretations need approval.
+Its filename combines the project directory name and a short ID suffix, such as
+`brain/projects/sites-a31f29c8.md`. Inspection returns its actual `brain_link` for
+use in proposals. Full project IDs remain stable and are still used in commands.
 
 ## Get oriented
 
@@ -50,6 +53,7 @@ remain necessary. Use `--workspace PATH` before the command outside the workspac
 Relative project arguments are resolved from the command’s current directory.
 Registration stores the canonical absolute path in local state and project notes
 to preserve identity across working directories and workspace moves. Keep these
-files private or review them before sharing. Existing registrations and notes are
-unchanged; no migration is needed. A moved external directory remains missing
+files private or review them before sharing. Existing registrations retain their
+identity. Older hash filenames can be migrated using the [brain guide](brain.md).
+A moved external directory remains missing
 until explicitly registered at its new location.

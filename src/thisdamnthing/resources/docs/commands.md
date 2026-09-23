@@ -23,6 +23,7 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-constitution` | `tdt constitution show` | Read the current workspace policy and revision hash. |
 | `/tdt-review-brain` | `tdt brain candidates --status all` | Inspect pending, approved and rejected proposals. Default is pending. |
 | Ask your agent to inspect incomplete capture requests | `tdt brain requests` | List incomplete capture requests. |
+| Ask your agent to make older brain filenames readable | `tdt brain migrate-names` / `tdt brain migrate-names --apply` | Preview or apply legacy note renames and current brain link updates. |
 | `/tdt-search` | `tdt brain search "query" --limit 10 --depth 1` | Retrieve current eligible notes with bounded links. |
 | `/tdt-search` with a provider request | `tdt brain providers` | List installed search providers without executing them. |
 | `/tdt-search` with an explicit indexing request | `tdt brain index --provider ID --rebuild` | Explicitly rebuild a selected provider index; omit rebuild to reconcile. |
@@ -36,7 +37,7 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-update-stack` | `tdt stack update ID --check` | Inspect a newer replacement without changing workspace state. |
 | `/tdt-update-stack` after review | `tdt stack update ID --approve HASH` | Apply the exact inspected and user-approved replacement. |
 | `/tdt-remove-stack` | `tdt stack remove ID` | Uninstall owned stack runtime files, preserving brain knowledge; `uninstall` is an alias. |
-| Ask your agent to recover an interrupted operation | `tdt stack recover` | Recover an interrupted lifecycle, refresh or host-integration transaction. |
+| Ask your agent to recover an interrupted operation | `tdt stack recover` | Recover an interrupted lifecycle, refresh, brain filename migration or host-integration transaction. |
 | `/tdt-install-stack` | `tdt marketplace search "query"` | Search the selected HTTPS registry; requires network access. |
 | `/tdt-find-skills` for inventory; ask your agent for recovery | `tdt skill list` / `tdt skill recover` | Inspect skills/proposals or recover an interrupted user-skill save. |
 | `/tdt-ui` | `tdt ui read SESSION --after 0` | Read retained interview responses. |

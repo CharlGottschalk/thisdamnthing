@@ -44,7 +44,14 @@ Notes use JSON front matter between `---` delimiters, followed by Markdown.
 Metadata includes format_version, stable id, title, kind, created/updated UTC
 timestamps, status, sources, host/session/turn provenance, optional project id,
 links and review history. Links are brain-relative without `.md`, e.g.
-`[[projects/example]]`. IDs and canonical `knowledge/<id>` paths never change.
+`[[projects/sites-a31f29c8]]`. Full IDs stay in metadata. New project, candidate
+and knowledge filenames use a readable title slug plus the first eight ID
+characters, e.g. `knowledge/sites-project-overview-b742e901.md`. A collision
+extends the suffix. Slugs use lowercase ASCII letters, numbers and hyphens;
+titles without usable ASCII characters use `note`. Editing a title does not
+rename an existing file. Commands still accept the full ID, and candidate listing
+prints the actual candidate path and proposed approval destination. Existing
+hash filenames remain readable and reviewable.
 Approval always creates a separate canonical note; it never overwrites an
 existing fact or silently resolves conflicting evidence. Rejected candidates
 remain for audit. `tdt brain search QUERY` searches approved canonical notes
@@ -54,6 +61,40 @@ matching seeds retrieval; direct matches precede linked notes and cycles are
 deduplicated. Pending/rejected notes never become link targets. Brain scans are
 limited to 2000 entries and each note to 32 KiB. Missing links are ignored;
 malformed notes or unsafe symlinks produce an error.
+
+### Browse your brain and migrate older filenames
+
+Open `brain/` as your vault when using Obsidian so brain-relative links start at
+the vault root. Use its [Absolute path in vault](https://obsidian.md/help/settings)
+link format when creating links. Candidates remain visible files in the vault; their presence does
+not mean they are approved. TDT retrieval still excludes pending/rejected notes.
+Obsidian integration has not been verified end to end.
+
+With TDT 0.1.3 or newer, refresh the workspace with `tdt init <workspace>` to update
+the installed skills and guides. Existing notes keep their filenames until you
+explicitly migrate them. From the workspace root:
+
+```sh
+tdt brain migrate-names
+tdt brain migrate-names --apply
+```
+
+The first command previews the renames without writing. The second recomputes and
+applies them under the workspace lock. Migration covers hash-named notes under
+`candidates/`, `knowledge/`, `projects/` and `sessions/`, updates their current
+link/canonical metadata, wikilinks in those notes and `brain/index.md`, and stack
+candidate references. Wikilink aliases and heading suffixes are retained. IDs,
+approval states, timestamps, provenance and historical review entries stay intact.
+Other files and links outside this scope are not rewritten.
+
+Close other editors during migration and keep a backup of your workspace.
+Duplicate IDs, unsafe paths or malformed notes refuse the operation; occupied
+filenames are preserved. Interrupted writes use the workspace transaction journal;
+run `tdt stack recover` to roll back, then rerun the migration. Repeating a completed
+migration makes no further changes. Redisplay pending proposals before reviewing
+because link updates can change their review hashes. Rebuild any optional search
+provider's index after migration. Do not downgrade TDT after migrating; older
+versions expect hash-named candidates.
 
 If `tdt-search` is missing after an upgrade, ask your agent to refresh the
 workspace (terminal: `tdt init <workspace>`) and

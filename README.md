@@ -15,7 +15,7 @@ A local workspace for Claude Code and Codex, with a knowledge brain that grows
 with your work and stacks that extend what your agents can do.
 
 > [!NOTE]
-> **Version 0.1.0** has only been tested on Linux. Windows and macOS testing is
+> **Version 0.1.3** has only been tested on Linux. Windows and macOS testing is
 > underway. You're welcome to try installing it on either platform and report
 > what works or any issues you encounter through [GitHub Issues](https://github.com/CharlGottschalk/thisdamnthing/issues).
 

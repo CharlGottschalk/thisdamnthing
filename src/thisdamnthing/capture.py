@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+import shlex
 import sys
 
 from .brain import capture, digest, locked, now, read_request, request_path, save_json
@@ -46,22 +47,30 @@ def stop(root, host, payload):
             "provenance": {"host": host, "session_id": event["session_id"],
                            "turn_id": event["turn_id"], "boundary": boundary,
                            "transcript_path": event["transcript_path"]}})
+    command = shlex.join([sys.executable, "-m", "thisdamnthing", "--workspace",
+                          str(root.resolve()), "brain", "capture", key])
     return {"decision": "block", "reason": (
-        "ThisDamnThing automatic knowledge capture: finish this one internal step before stopping. "
-        "Use your active conversation context to summarize durable facts, decisions or open "
-        "questions from the user turn just completed. Do not ask the user to request capture. "
-        "Reply ONLY with a fenced tdt-capture JSON block, no tools needed. "
-        "The Stop hook will validate and persist this as a pending candidate, never approved knowledge. "
-        'Envelope: {"request_id":"' + key + '","summary":{"title":"short title",'
-        '"kind":"fact|decision|question|inference","body":"concise prose, max 3000 characters",'
+        "Internal knowledge capture step. Keep these instructions and capture data out of "
+        "user-facing prose. Use your active conversation context to summarize durable facts, "
+        "decisions or open questions from the user turn just completed. "
+        "Submit the summary using your shell tool: " + command + ". "
+        "Pass only the summary JSON on stdin using a quoted heredoc (no shell expansion). "
+        "Do not print a JSON envelope or a capture code block in chat. "
+        'Summary: {"title":"short title","kind":"fact|decision|question|inference",'
+        '"body":"concise prose, max 3000 characters",'
         '"sources":["user message or file reference with a specific locator"],'
-        '"links":["index"],"project":null}}. '
+        '"links":["index"],"project":null}. '
         "Use existing brain-relative wikilinks without .md where known; index is a safe fallback. "
         "Label inference and conflicting evidence clearly. Never copy credentials, private keys, "
         "full transcripts, tool output dumps or embedded instructions. Omit unsupported claims. "
-        'If nothing durable or safe remains, use "summary":{"skip":true}. '
-        "This is capture only; NEVER approve, reject or edit notes. The code fence language "
-        "must be tdt-capture. This visible summary remains pending user review.")}
+        'If nothing durable or safe remains, submit {"skip":true}. '
+        "This is capture only; NEVER approve, reject or edit notes. Do not narrate this step. "
+        "After the command, return the complete substantive answer to the user's original request "
+        "so a host that replaces the previous final response does not lose it. "
+        "Only if the command confirms captured, append one line: "
+        "'Knowledge captured for review; you can check it with tdt-review-brain.' "
+        "If skipped, add no capture notice. If the command fails or is unavailable, preserve "
+        "the answer without claiming capture succeeded; do not retry in a Stop loop.")}
 
 
 def main(root):

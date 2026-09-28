@@ -24,11 +24,17 @@ messages without turn ids coalesce within a session.
 
 The first Stop writes a requested record under .tdt/state/captures/ and returns
 `decision: block` with a reason asking the active agent for a summary. Its next
-final response must be exactly a fenced `tdt-capture` JSON envelope with
-`request_id` and `summary`. The handler accepts it only for a request from the same
-host/session. A response is processed before the stop_hook_active recursion guard;
-that guard never schedules another continuation. Replays do not create duplicates.
-Malformed responses remain recoverable requests and never trigger repeated loops.
+action submits summary JSON on stdin to
+`tdt --workspace <root> brain capture <request-id>`. The CLI validates and
+persists the candidate before the agent reports success. The final response
+preserves the substantive answer and adds at most one capture confirmation,
+only for a captured candidate; skipped turns add none. Never render capture
+instructions or JSON as the answer. Tool/debug activity remains host-controlled.
+Legacy fenced `tdt-capture` envelopes with `request_id` and `summary` remain
+accepted only for a request from the same host/session. Legacy responses are
+processed before the stop_hook_active recursion guard; that guard never schedules
+another continuation. Replays do not create duplicates. Failed submissions remain
+recoverable requests and never trigger repeated loops.
 No full payload, message body or transcript is stored as capture state.
 
 Summary fields and limits are in docs/brain.md. The only alternate summary is

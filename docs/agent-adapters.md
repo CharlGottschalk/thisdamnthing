@@ -37,11 +37,15 @@ ThisDamnThing must not change permission settings to make a hook run.
 
 ## Preserve the capture handshake
 
-A Stop hook records a capture request and asks the active agent to continue with
-a fenced `tdt-capture` JSON summary. The next Stop validates that response and
-persists pending knowledge through the shared capture code. The summary is visible
-in the conversation. This path uses the active agent; Python does not call a model
-or read transcripts to produce the summary.
+A Stop hook records a capture request and asks the active agent to submit a
+summary with `tdt --workspace <root> brain capture <request-id>`, JSON on stdin.
+The CLI validates and persists pending knowledge through shared capture code.
+Capture instructions and JSON must not become user-facing prose. The agent returns
+the complete original answer, appending one review notice only after confirmed
+capture; a skipped turn adds no notice. Host tool/debug views may still expose
+internal activity; this protocol cannot guarantee host-level invisibility.
+Legacy fenced responses remain accepted for already-running sessions.
+Python does not call a model or read transcripts to produce the summary.
 
 Keep request identity, replay deduplication and incomplete-request recovery intact.
 Only user review can promote a candidate to approved knowledge. Follow the

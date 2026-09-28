@@ -7,7 +7,10 @@ Use `/tdt-review-brain` to review them and `/tdt-search` to find what you know.
 ## Capture useful knowledge
 
 With trusted capture hooks enabled, ThisDamnThing asks your active agent for a concise
-summary after a turn. This adds a visible continuation using your host subscription.
+summary after a turn using your host subscription. The agent submits it through
+the CLI, preserves your answer, and adds one short confirmation when knowledge is
+captured for review. Capture JSON and instructions do not belong in the answer;
+your host may still show internal tool activity in its tool or debug views.
 The summary stays pending until reviewed. Full transcripts remain with the host,
 and a turn with nothing useful to retain can be skipped. Capture runs after
 supported turns; no pre-compaction capture hook is installed.

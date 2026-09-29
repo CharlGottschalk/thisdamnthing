@@ -239,7 +239,7 @@ def recover(root):
     for relative, before in record['before'].items():
         safe_path(relative)
         brain_note = relative == 'brain/index.md' or (
-            relative.startswith(('brain/knowledge/', 'brain/projects/', 'brain/sessions/'))
+            relative.startswith(('brain/knowledge/', 'brain/projects/', 'brain/sessions/', 'brain/notes/'))
             and relative.endswith('.md'))
         if not (brain_note or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/'))):
             raise WorkspaceError('Unexpected recovery path')
@@ -319,6 +319,7 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
             key = sha(data['id'] + ':' + origin['sha256'] + ':' + relative)
             from .brain import find_note, named_path
             target = (find_note(root, 'candidates', key)
+                      or find_note(root, 'knowledge', key)
                       or named_path(root, 'candidates', key, Path(relative).stem, changes))
             candidates.append(target)
             # Prior candidates/approved notes survive removal and reinstall.

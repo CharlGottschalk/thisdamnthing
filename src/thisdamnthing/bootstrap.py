@@ -12,7 +12,7 @@ from .workspace import WorkspaceError, managed_path, read_json, resource_text
 MANIFEST = ".tdt/state/bootstrap.json"
 PROVIDERS = {"claude": ("CLAUDE.md", ".claude/skills", ".claude/settings.json"),
              "codex": ("AGENTS.md", ".agents/skills", ".codex/hooks.json")}
-SKILLS = ("tdt-constitution", "tdt-workspace", "tdt-review-brain", "tdt-search", "tdt-add-project", "tdt-ui", "tdt-install-stack", "tdt-find-skills", "tdt-update-stack", "tdt-remove-stack")
+SKILLS = ("tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-constitution", "tdt-workspace", "tdt-review-brain", "tdt-search", "tdt-add-project", "tdt-ui", "tdt-install-stack", "tdt-find-skills", "tdt-update-stack", "tdt-remove-stack")
 LEGACY_SKILLS = {name.replace('tdt-', 'tdt.', 1): name for name in SKILLS}
 LEGACY_SKILLS.update({'tdt.ask-brain': 'tdt-search', 'tdt-ask-brain': 'tdt-search'})
 # Original core-only templates had no bootstrap ownership manifest. Adopt only
@@ -23,6 +23,7 @@ LEGACY_STACK_DOCS = {
     'docs/stacks.md': 'aa6771c1535a4ebf6e227226e7b4b3933b587272a4d44726ab709b8e82840218',
 }
 RESOURCES = {
+    "docs/reminders.md": "docs/reminders.md",
     "docs/constitution.md": "docs/constitution.md",
     ".tdt/hooks/constitution.py": "harness/hooks/constitution.py",
     ".tdt/skills/tdt-constitution/SKILL.md": "harness/skills/tdt-constitution/SKILL.md",
@@ -31,7 +32,7 @@ RESOURCES = {
     ".tdt/contracts/stack.md": "harness/contracts/stack.md",
     "docs/stacks.md": "docs/stacks.md",
     **{f".tdt/skills/{name}/SKILL.md": f"harness/skills/{name}/SKILL.md"
-       for name in ("tdt-search", "tdt-add-project", "tdt-install-stack", "tdt-update-stack", "tdt-remove-stack")},
+       for name in ("tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-search", "tdt-add-project", "tdt-install-stack", "tdt-update-stack", "tdt-remove-stack")},
     ".tdt/skills/tdt-find-skills/SKILL.md": "harness/skills/tdt-find-skills/SKILL.md",
     "docs/skills.md": "docs/skills.md",
     "docs/projects.md": "docs/projects.md",
@@ -151,8 +152,8 @@ def plan_bootstrap(root, agent, config, owned):
             if legacy.exists():
                 raise WorkspaceError("Claude command name conflict: .claude/commands/tdt-workspace.md")
         generated[f"{skills}/tdt-workspace/SKILL.md"] = (
-            "---\nname: tdt-workspace\ndescription: Orient the user in a ThisDamnThing workspace "
-            "and diagnose its core files and agent setup.\n---\n\n"
+            "---\nname: tdt-workspace\ndescription: Onboard or orient the user in a ThisDamnThing workspace, "
+            "diagnose setup, and offer reminder delivery preferences.\n---\n\n"
             "Read and follow .tdt/skills/tdt-workspace/SKILL.md from the\n"
             "workspace root (the ancestor containing .tdt/config.json).\n")
         if host == "claude" and managed_path(root, ".claude/commands/tdt-review-brain.md").exists():
@@ -161,7 +162,7 @@ def plan_bootstrap(root, agent, config, owned):
             "---\nname: tdt-review-brain\ndescription: Review pending knowledge candidates "
             "and apply explicit user approval, edits or rejection.\n---\n\n"
             "Read and follow .tdt/skills/tdt-review-brain/SKILL.md from the workspace root.\n")
-        for name, description in (("tdt-update-stack", "Inspect and approve a newer installed stack version."), ("tdt-remove-stack", "Uninstall a selected stack while preserving user work."), ("tdt-constitution", "Define or update workspace permission rules in natural language."), ("tdt-find-skills", "Find reusable workflows in completed workspace sessions and propose skills for approval."), ("tdt-install-stack", "Discover, inspect and install optional workflow stacks."), ("tdt-ui", "Use UI for local browser questions and custom interactive interviews."), ("tdt-search", "Answer using approved linked knowledge with references and honest gaps."),
+        for name, description in (("tdt-remind", "Save and manage one-time reminders; remind me to do something at a specified time."), ("tdt-check-reminders", "Check and display due reminders manually or from a scheduler."), ("tdt-search-notes", "Search scratchpad notes and related ideas; recall what the user wanted to investigate."), ("tdt-capture", "Save knowledge explicitly supplied by the user; remember this or save this as knowledge."), ("tdt-note", "Save a tagged scratchpad idea when the user says add a note or jot this down; find related notes."), ("tdt-update-stack", "Inspect and approve a newer installed stack version."), ("tdt-remove-stack", "Uninstall a selected stack while preserving user work."), ("tdt-constitution", "Define or update workspace permission rules in natural language."), ("tdt-find-skills", "Find reusable workflows in completed workspace sessions and propose skills for approval."), ("tdt-install-stack", "Discover, inspect and install optional workflow stacks."), ("tdt-ui", "Use UI for local browser questions and custom interactive interviews."), ("tdt-search", "Answer using approved linked knowledge with references and honest gaps."),
                                   ("tdt-add-project", "Register an external project and offer bounded onboarding.")):
             if host == "claude" and managed_path(root, f".claude/commands/{name}.md").exists():
                 raise WorkspaceError(f"Claude command name conflict: {name}")

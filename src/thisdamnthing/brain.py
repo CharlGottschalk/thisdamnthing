@@ -13,7 +13,7 @@ import unicodedata
 from .workspace import WorkspaceError, managed_path, read_config, read_json
 
 IDENTIFIER = re.compile(r"[a-f0-9]{64}\Z")
-LINK = re.compile(r"(?:index|(?:knowledge|projects|sessions)/[a-z0-9][a-z0-9/_-]*)\Z")
+LINK = re.compile(r"(?:index|(?:knowledge|projects|sessions|notes)/[a-z0-9][a-z0-9/_-]*)\Z")
 SECRET = re.compile(r"-----BEGIN .*PRIVATE KEY-----|\b(?:sk-[A-Za-z0-9_-]{16,}|AKIA[A-Z0-9]{16}|gh[pousr]_[A-Za-z0-9]{20,})|(?:password|api[_ -]?key|access[_ -]?token|secret)\s*[:=]\s*\S+", re.I)
 
 
@@ -84,7 +84,7 @@ def read_note(root, relative):
     meta = json.loads(head)
     if (not isinstance(meta, dict) or meta.get("format_version") != 1
             or not isinstance(meta.get("id"), str) or not IDENTIFIER.fullmatch(meta["id"])
-            or meta.get("status") not in ("pending", "approved", "rejected")
+            or meta.get("status") not in ("pending", "approved", "rejected", "scratchpad")
             or not isinstance(meta.get("title"), str)
             or not isinstance(meta.get("review"), list)
             or any(not isinstance(item, dict) for item in meta["review"])
@@ -93,7 +93,7 @@ def read_note(root, relative):
     return meta, body.strip()
 
 
-def note_files(root, categories=("candidates", "knowledge", "projects", "sessions")):
+def note_files(root, categories=("candidates", "knowledge", "projects", "sessions", "notes")):
     """Bounded, symlink-safe inventory shared by naming and migration."""
     if managed_path(root, ".tdt/state/stack-transaction.json").exists():
         raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
@@ -103,8 +103,8 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
         raise WorkspaceError(f"Cannot scan brain: {error}")
     for category in categories:
         directory = managed_path(root, f"brain/{category}")
-        if category == "sessions" and not directory.exists():
-            continue  # Optional legacy notes; new workspaces do not create this folder.
+        if category in ("sessions", "notes", "reminders") and not directory.exists():
+            continue  # Legacy sessions and workspaces not yet refreshed with scratchpad support.
         for current, directories, filenames in os.walk(directory, followlinks=False, onerror=failed):
             directories.sort()
             count += len(directories) + len(filenames)
@@ -130,7 +130,7 @@ def find_note(root, category, key):
 def named_path(root, category, key, title, reserved=()):
     """Allocate once; extend the ID suffix on collisions without overwriting."""
     identifier(key)
-    if category not in ("candidates", "knowledge", "projects", "sessions"):
+    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders"):
         raise WorkspaceError("Invalid note category")
     normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode()
     slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"
@@ -208,7 +208,8 @@ def capture(root, key, data):
         request = read_request(root, key)
         if request.get("status") in ("captured", "skipped"):
             return request["status"] + ": " + key
-        existing = find_note(root, "candidates", key)
+        existing = (find_note(root, "candidates", key)
+                    or find_note(root, "knowledge", key))
         if existing:
             previous, _ = read_note(root, existing)
             if previous.get("id") != key or previous.get("provenance") != request["provenance"]:
@@ -287,6 +288,10 @@ def review(root, key, decision, instruction, expected, edited=None):
                 meta = prior
             else:
                 atomic(root, target, content)
+            # Keep the pending proposal until canonical persistence succeeds. If
+            # deletion fails, the same approval can recover using the record above.
+            path.unlink()
+            return "approved: " + key + " -> " + target
         atomic(root, relative, note_text(meta, body))
         return meta["status"] + ": " + key
 

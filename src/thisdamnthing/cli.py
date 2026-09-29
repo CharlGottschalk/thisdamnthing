@@ -35,6 +35,14 @@ def main(argv=None):
     actions = brain.add_subparsers(dest="action", required=True)
     submit = actions.add_parser("capture", help="submit a summary for a host request, JSON on stdin")
     submit.add_argument("id")
+    guard = actions.add_parser("review-turn", help="suppress automatic capture for the current review turn")
+    guard.add_argument("token")
+    for action in ("save", "note"):
+        direct = actions.add_parser(action, help="save explicit user knowledge" if action == "save" else "save a tagged scratchpad note")
+        direct.add_argument("--user-instruction", required=True)
+    listing_notes = actions.add_parser("notes", help="list scratchpad notes and tags")
+    listing_notes.add_argument("--tag")
+    actions.add_parser("related", help="find scratchpad notes sharing subject tags").add_argument("id")
     listing = actions.add_parser("candidates", help="show candidate proposals and review hashes")
     listing.add_argument("--status", choices=("pending", "approved", "rejected", "all"), default="pending")
     actions.add_parser("requests", help="list incomplete capture request ids for recovery")
@@ -45,8 +53,9 @@ def main(argv=None):
     review.add_argument("--decision", choices=("approve", "reject", "edit"), required=True)
     review.add_argument("--user-instruction", required=True, help="actual user instruction or message reference")
     review.add_argument("--expected-sha256", required=True, help="hash from the displayed proposal")
-    search = actions.add_parser("search", help="search approved knowledge only")
+    search = actions.add_parser("search", help="search approved knowledge, or explicitly include scratchpad notes")
     search.add_argument("query")
+    search.add_argument("--scope", choices=("knowledge", "notes", "all"), default="knowledge")
     search.add_argument("--limit", type=int, default=10)
     search.add_argument("--depth", type=int, default=1)
     search.add_argument("--provider", action="append", default=[], help="explicit stack id; repeat to fuse rankings")
@@ -99,6 +108,8 @@ def main(argv=None):
         market_search.add_argument("--" + field)
     market_search.add_argument("--agent", choices=("claude", "codex"))
     market_search.add_argument("--browse", choices=("new", "featured", "popular"), default="new")
+    from . import reminders
+    reminders.add_parser(commands)
     from . import skills
     skills.add_parser(commands)
     from . import ui
@@ -209,6 +220,10 @@ def main(argv=None):
             if len(raw) > 16384:
                 raise ValueError("JSON input exceeds 16 KiB")
             return json.loads(raw)
+        if args.command == "reminder":
+            data = input_json() if args.action in ("add", "edit", "snooze") else None
+            print(json.dumps(reminders.cli(root, args, data), ensure_ascii=False, indent=2))
+            return 0
         if args.command == "skill":
             print(json.dumps(skills.cli(root, args, input_json() if args.action in ("propose", "history") else None), indent=2, ensure_ascii=False))
             return 0
@@ -230,7 +245,22 @@ def main(argv=None):
         if args.command == "brain":
             from . import brain
             from .workspace import managed_path, read_json
-            if args.action == "capture":
+            if args.action in ("save", "note", "notes", "related"):
+                from . import notes
+                if args.action in ("save", "note"):
+                    result = notes.save(root, input_json(), args.user_instruction, scratchpad=args.action == "note")
+                    if args.action == "note":
+                        result["related"] = notes.related(root, result["id"])
+                elif args.action == "related":
+                    result = notes.related(root, args.id)
+                else:
+                    result = [{"path": path, **meta, "body": body} for path, meta, body in notes.inventory(root)
+                              if args.tag is None or args.tag in meta["tags"]]
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+            elif args.action == "review-turn":
+                from .capture import suppress_review_turn
+                print(suppress_review_turn(root, args.token))
+            elif args.action == "capture":
                 print(brain.capture(root, args.id, input_json()))
             elif args.action == "candidates":
                 with brain.locked(root):
@@ -259,9 +289,15 @@ def main(argv=None):
                 else:
                     print(json.dumps(capabilities.index(root, args.provider, args.rebuild)))
             else:
-                hits = brain.search(root, args.query, args.limit, args.depth, args.provider)
+                if args.scope != "knowledge" and args.provider:
+                    raise ValueError("Search providers support knowledge scope only")
+                hits = brain.search(root, args.query, args.limit, args.depth, args.provider) if args.scope != "notes" else []
+                if args.scope != "knowledge":
+                    from . import notes
+                    hits += notes.search(root, args.query, args.limit)
+                    hits = hits[:args.limit]
                 if not hits:
-                    print("No approved evidence found for this query.")
+                    print("No approved evidence found for this query." if args.scope == "knowledge" else "No matching notes found for this query.")
                 for path, title, body in hits:
                     print(f"{path}: {title}\n{body}\n")
             return 0

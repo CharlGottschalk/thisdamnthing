@@ -48,3 +48,25 @@ Review and policy writes require an actual decision on displayed contents. Use
 proposal, hash and JSON-input details. Executable stack trust is separate from
 update approval: see [stacks](stacks.md). For browser start, present, wait and
 acknowledgement commands, see [UI](ui.md).
+
+Explicit saves and scratchpad commands:
+
+| Skill | CLI | Purpose |
+| --- | --- | --- |
+| `/tdt-capture` | `tdt brain save --user-instruction TEXT` | Save supplied knowledge; summary JSON on stdin. |
+| `/tdt-note` | `tdt brain note --user-instruction TEXT` | Save scratchpad summary JSON with tags on stdin. |
+| `/tdt-search-notes` | `tdt brain search QUERY --scope notes` | Search scratchpad content and tags. |
+| | `tdt brain notes [--tag TAG]` | List scratchpad notes, metadata and IDs. |
+| | `tdt brain related ID` | Find scratchpad notes sharing subject tags. |
+
+## Reminders
+
+`tdt reminder configure` reads preferences; `--timezone IANA --chat on|off`
+updates them. `--schedule REFERENCE` records an externally configured job;
+`--clear-schedule` clears the reference. These commands do not create/delete jobs.
+`tdt reminder add --user-instruction TEXT` accepts reminder JSON on stdin.
+`list [--status pending|done|cancelled|all]` shows records. `edit`, `snooze`, `done`
+and `cancel` require an ID, current `--revision` and `--user-instruction`; edit and
+snooze accept JSON on stdin. `check --channel manual|chat|scheduled [--limit N]`
+claims due items; `ack ID --token TOKEN` records notification, not completion.
+See [reminders](reminders.md) for the schema, setup and delivery recovery.

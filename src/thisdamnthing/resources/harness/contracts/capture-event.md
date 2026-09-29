@@ -42,3 +42,21 @@ Summary fields and limits are in docs/brain.md. The only alternate summary is
 Markdown, host provenance and explicit review history are separate from approved
 canonical notes. PreCompact normalization remains available but is not wired:
 there is no portable pre-compaction active-agent continuation contract here.
+
+UserPromptSubmit issues a fresh opaque review-turn token in additional context.
+The review skill calls `tdt brain review-turn <token>` on every review turn,
+including follow-up decisions and empty listings. Direct capture and scratchpad
+saving skills use the same command to avoid duplicate automatic proposals. State under
+`.tdt/state/capture-turns/` is isolated by host and session and stores only the
+current token, optional turn ID and suppression flag. Stale tokens are refused.
+A suppressed Stop returns without requesting a summary, accepting a legacy
+capture envelope, or notifying turn-complete stack hooks. Suppression persists
+through repeated Stops and resets on the next user prompt; unrelated sessions
+remain unaffected. No prompt matching or transcript parsing is used.
+
+Dedicated reminder creation, management and manual/scheduled checking turns also
+use the current suppression token. An opted-in request hook may ask the agent to
+check due reminders alongside unrelated work; that does not suppress the whole
+turn. The capture continuation explicitly excludes reminder records, operations
+and notifications from summaries while retaining unrelated durable knowledge.
+This exclusion relies on active-agent adherence, like other summary boundaries.

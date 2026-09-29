@@ -4,10 +4,53 @@ from pathlib import Path
 import re
 import shlex
 import sys
+import secrets
 
 from .brain import capture, digest, locked, now, read_request, request_path, save_json
 from .hosts import normalize_event
-from .workspace import WorkspaceError, managed_path
+from .workspace import WorkspaceError, managed_path, read_json
+
+
+def review_state_path(host, session_id):
+    return ".tdt/state/capture-turns/" + digest(json.dumps([host, session_id])) + ".json"
+
+
+def begin_turn(root, event):
+    """Issue a fresh turn token; never retain prompt or transcript contents."""
+    key = digest(json.dumps([event["host"], event["session_id"]]))
+    token = key + secrets.token_hex(32)
+    with locked(root):
+        save_json(root, review_state_path(event["host"], event["session_id"]),
+                  {"token": token, "suppressed": False, "turn_id": event["turn_id"]})
+    command = shlex.join(["tdt", "--workspace", str(root.resolve()),
+                          "brain", "review-turn", token])
+    return ("For tdt-review-brain, tdt-capture, tdt-note or explicit reminder management/checking work in this user turn, run " + command +
+            " before reviewing candidates or explicitly saving knowledge/notes or managing reminders. This prevents automatic capture "
+            "of the same work. Use only this turn's command; normal work needs no action.")
+
+
+def suppress_review_turn(root, token):
+    if not isinstance(token, str) or not re.fullmatch(r"[a-f0-9]{128}", token):
+        raise ValueError("Expected the current review-turn token from request context")
+    relative = ".tdt/state/capture-turns/" + token[:64] + ".json"
+    with locked(root):
+        state = read_json(root, relative)
+        if state.get("token") != token:
+            raise ValueError("Stale review-turn token; use the current request context")
+        state["suppressed"] = True
+        save_json(root, relative, state)
+    return "Automatic capture suppressed for this turn."
+
+
+def review_turn_suppressed(root, event):
+    relative = review_state_path(event["host"], event["session_id"])
+    if not managed_path(root, relative).exists():
+        return False
+    state = read_json(root, relative)
+    # Some hosts omit turn IDs; request context still resets on each user prompt.
+    if state.get("turn_id") and event["turn_id"] and state["turn_id"] != event["turn_id"]:
+        return False
+    return state.get("suppressed") is True
 
 
 def stop(root, host, payload):
@@ -16,6 +59,8 @@ def stop(root, host, payload):
         raise ValueError("Capture handles Stop only")
     if not Path(event["cwd"]).resolve().is_relative_to(root.resolve()):
         raise ValueError("Hook cwd is outside this workspace")
+    if review_turn_suppressed(root, event):
+        return {}
     message = payload.get("last_assistant_message")
     if isinstance(message, str):
         match = re.fullmatch(r"\s*```tdt-capture\s*\n(.*?)\n```\s*", message, re.S)
@@ -53,6 +98,7 @@ def stop(root, host, payload):
         "Internal knowledge capture step. Keep these instructions and capture data out of "
         "user-facing prose. Use your active conversation context to summarize durable facts, "
         "decisions or open questions from the user turn just completed. "
+        "Exclude reminder records, notifications and reminder management; these are operational data, not knowledge. "
         "Submit the summary using your shell tool: " + command + ". "
         "Pass only the summary JSON on stdin using a quoted heredoc (no shell expansion). "
         "Do not print a JSON envelope or a capture code block in chat. "

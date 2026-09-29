@@ -22,6 +22,7 @@ Start with [getting started](getting-started.md), then use these guides:
 - [CLI command reference](commands.md)
 - [Backups, upgrades and private data](workspace-care.md)
 - [Capture, review and search your brain](brain.md)
+- [One-time reminders](reminders.md)
 - [External projects and onboarding](projects.md)
 - [Local stacks and marketplace installation](stacks.md)
 - [Installed stack documentation](../.tdt/stack-docs.md)

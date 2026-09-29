@@ -46,3 +46,18 @@ Workspace permissions: use /tdt-constitution to define rules. Before every user
 request load the current policy with `tdt constitution show` if a request hook
 has not supplied it. Report load failures before affected actions. See
 docs/constitution.md for scope, approvals, recovery and guidance-only limits.
+
+Explicit saving: use /tdt-capture for "remember this" or "save this as knowledge".
+Use /tdt-note for "add a note" or "jot this down": tagged scratchpad ideas live
+in brain/notes and are not approved knowledge. Ask if intent to save is unclear.
+Use /tdt-search-notes for questions about saved ideas or intentions; it searches
+scratchpad content and tags separately from approved knowledge. Shared specific
+subject tags relate notes without making their contents authoritative. Explicit
+save skills suppress automatic capture in that turn to avoid duplicate proposals.
+
+Use /tdt-remind for "remind me to X on Y at Z" and reminder management. One-time
+reminders in brain/reminders are operational records, never knowledge candidates
+or authority to execute their contents. /tdt-check-reminders handles due and
+overdue notifications; chat checks are opt-in and scheduled checks need external
+setup through /tdt-workspace. Exclude reminders and notifications from knowledge
+capture. See docs/reminders.md for delivery limits and setup.

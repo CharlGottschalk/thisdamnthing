@@ -19,9 +19,80 @@ Session references are stored in each captured note's provenance; separate sessi
 summary notes are not created. New workspaces do not include a `sessions/` folder.
 Existing `brain/sessions/` notes remain supported and are preserved during refresh.
 
+## Save knowledge directly
+
+Use `/tdt-capture` (Codex: `$tdt-capture`) or say "remember this" or "save this as
+knowledge", followed by the content. Your explicit request authorizes saving
+that content without a second approval. The skill searches for existing related
+knowledge, avoids duplicates, preserves conflicts, and saves under
+`brain/knowledge/` with sources, provenance and a review record. It does not
+silently add interpretations or rewrite existing notes. Doctor checks workspace
+health; it does not infer relationships.
+
+Technical command: `tdt brain save --user-instruction 'User asked to save this'`
+with the capture summary JSON below on stdin. This command needs no hook request.
+Links must refer to existing approved notes or `index`. An identical normalized
+summary (excluding links and the audit instruction) returns the existing note.
+Sources are part of its identity; semantic duplicates are checked by the skill.
+
+## Scratchpad notes
+
+Use `/tdt-note` (Codex: `$tdt-note`) or say "add a note" or "jot this down".
+The skill saves the idea under `brain/notes/` with `status: scratchpad`, title,
+kind, timestamps, sources, provenance and 1–8 subject tags. If your intent to
+save is unclear, the agent asks. Notes are not automatically promoted or treated
+as approved knowledge. Normal knowledge search excludes them.
+
+Tags use lowercase letters/digits and hyphens, up to 64 characters. Reuse
+specific entity and topic tags, not generic words such as `idea` or `plan`.
+Two ideas about the same product share its product tag even when one concerns
+a module investigation and the other UI colours. An unrelated travel idea has
+separate tags. The agent chooses tags from the user's content and existing tag
+usage; exact shared tags drive the relationships. There is no embedding model
+or automatic synonym inference in the CLI. Related notes are computed in both
+directions at lookup time, without rewriting old notes.
+
+Use `/tdt-search-notes` or ask it "what did I want to investigate about this
+product?" It searches specific phrases and tags, distinguishes the answer from
+other related ideas, and cites the notes. Results describe intentions, not proof
+that the work happened. Explicit save skills suppress automatic candidate
+capture for the same turn using the current request-hook token.
+
+Technical commands (JSON on stdin for `note`):
+
+```sh
+tdt brain note --user-instruction 'User asked to add a note'
+tdt brain notes
+tdt brain notes --tag example-product
+tdt brain related NOTE_ID
+tdt brain search example-product --scope notes
+tdt brain search example-product --scope all
+```
+
+The note payload uses the summary schema below plus `"tags":
+["example-product", "audio-mastering"]`. Links can reference existing scratchpad
+or approved notes, or `index`. Notes with identical normalized content and tags
+return the existing path. Related results list shared tags and up to 50 notes.
+Search is literal and bounded; `--scope all` returns approved knowledge first,
+then scratchpad results up to the total limit. Scratchpad results are labelled.
+Optional search providers currently support only the default knowledge scope.
+Refresh an existing installation with `tdt init` after upgrading to install the
+folder and skills. Existing brain files are preserved.
+
+## Reminders
+
+Use `/tdt-remind` for one-time time-based intentions. Records in
+`brain/reminders/` have their own task and notification lifecycle; they are
+excluded from knowledge/candidate capture and all brain search scopes. Use
+`/tdt-check-reminders` for due items. See [reminders](reminders.md) for opt-in
+chat delivery and external scheduler setup.
+
 ## Review proposals
 
 Use `/tdt-review-brain` in Claude or `$tdt-review-brain` (or `/skills`) in Codex.
+The skill suppresses automatic candidate capture on each review turn, including
+follow-up decisions, so reviewing knowledge does not create more candidates.
+Normal capture resumes on the next non-review turn.
 Show proposals first; only the user's explicit decision permits approval or
 rejection. Edits remain pending until the edited proposal is approved.
 
@@ -60,7 +131,11 @@ rename an existing file. Commands still accept the full ID, and candidate listin
 prints the actual candidate path and proposed approval destination. Existing
 hash filenames remain readable and reviewable.
 Approval always creates a separate canonical note; it never overwrites an
-existing fact or silently resolves conflicting evidence. Rejected candidates
+existing fact or silently resolves conflicting evidence. After saving the approved
+knowledge, approval deletes its candidate file. The knowledge note retains sources,
+provenance and the complete review history. If saving fails, the candidate stays
+available; if deletion fails, retry the same approval to finish cleanup.
+Previously approved candidate files are not automatically removed. Rejected candidates
 remain for audit. `tdt brain search QUERY` searches approved canonical notes
 and project registration notes, plus bounded outgoing approved links.
 Use `--limit 10 --depth 1` (limit 1–50, depth 0–3). Literal case-insensitive
@@ -88,7 +163,7 @@ tdt brain migrate-names --apply
 
 The first command previews the renames without writing. The second recomputes and
 applies them under the workspace lock. Migration covers hash-named notes under
-`candidates/`, `knowledge/`, `projects/` and `sessions/`, updates their current
+`candidates/`, `knowledge/`, `notes/`, `projects/` and `sessions/`, updates their current
 link/canonical metadata, wikilinks in those notes and `brain/index.md`, and stack
 candidate references. Wikilink aliases and heading suffixes are retained. IDs,
 approval states, timestamps, provenance and historical review entries stay intact.

@@ -132,6 +132,15 @@ def request_hook(root):
         if not in_scope(root, event['cwd']):
             return 0
         value = context(root)
+        from .capture import begin_turn
+        value += "\n\n" + begin_turn(root, event)
+        from .reminders import hook_context
+        try:
+            reminder_context = hook_context(root)
+        except (OSError, ValueError, WorkspaceError) as exc:
+            reminder_context = f"ThisDamnThing reminders could not be checked: {exc}. Report the issue; do not claim delivery."
+        if reminder_context:
+            value += "\n\n" + reminder_context
         print(json.dumps({'hookSpecificOutput': {
             'hookEventName': 'UserPromptSubmit', 'additionalContext': value}}))
         return 0

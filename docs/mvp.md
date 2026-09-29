@@ -76,7 +76,6 @@ directory through the ordinary optional templates list.
   brain/
     index.md
     projects/
-    sessions/
     knowledge/
     candidates/              pending user review; excluded from default retrieval
   .tdt/

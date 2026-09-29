@@ -15,6 +15,10 @@ The summary stays pending until reviewed. Full transcripts remain with the host,
 and a turn with nothing useful to retain can be skipped. Capture runs after
 supported turns; no pre-compaction capture hook is installed.
 
+Session references are stored in each captured note's provenance; separate session
+summary notes are not created. New workspaces do not include a `sessions/` folder.
+Existing `brain/sessions/` notes remain supported and are preserved during refresh.
+
 ## Review proposals
 
 Use `/tdt-review-brain` in Claude or `$tdt-review-brain` (or `/skills`) in Codex.

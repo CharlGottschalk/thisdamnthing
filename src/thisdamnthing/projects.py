@@ -1,4 +1,4 @@
-"""External directory identities and bounded, read-only onboarding evidence."""
+"""Working directory identities and bounded, read-only onboarding evidence."""
 import json
 from pathlib import Path
 import stat
@@ -40,15 +40,28 @@ def status(entry):
 
 
 def add(root, directory):
+    supplied = Path(directory).expanduser().absolute()
+    if root in supplied.parents:
+        if any(part == ".." for part in supplied.parts):
+            raise WorkspaceError("Project path must not contain traversal")
+        managed_path(root, supplied.relative_to(root))
     try:
-        path = Path(directory).expanduser().resolve(strict=True)
+        path = supplied.resolve(strict=True)
     except (OSError, RuntimeError) as exc:
         raise WorkspaceError(f'Project path is missing or invalid: {directory}') from exc
     if not path.is_dir():
         raise WorkspaceError('Project must be an existing directory')
-    if path == root or root in path.parents or path in root.parents:
-        raise WorkspaceError('Project cannot be the workspace, inside it, or its ancestor')
+    internal = root in path.parents
+    if internal:
+        relative = path.relative_to(root)
+        if relative.parts[0] != 'work' or len(relative.parts) < 2:
+            raise WorkspaceError('Internal projects must be below work/')
+        managed_path(root, relative)
+    if path == root or path in root.parents:
+        raise WorkspaceError('Project cannot be the workspace or its ancestor')
     for parent in (path, *path.parents):
+        if internal and parent == root:
+            break
         if any((parent / name).exists() or (parent / name).is_symlink()
                for name in ('.tdt', '.dryft')):
             raise WorkspaceError('Cannot register an installed ThisDamnThing workspace as a project')
@@ -63,7 +76,7 @@ def add(root, directory):
                     or brain.named_path(root, 'projects', key, path.name))
         target = managed_path(root, relative)
         entry = {'id': key, 'path': str(path), 'created': brain.now()}
-        body = 'Registered external directory: ' + str(path) + '\n\nPurpose and entry points are not yet approved. Related: [[index]]'
+        body = ('Registered internal directory: ' if internal else 'Registered external directory: ') + str(path) + '\n\nPurpose and entry points are not yet approved. Related: [[index]]'
         meta = {'format_version': 1, 'id': key, 'title': path.name,
                 'kind': 'fact', 'status': 'approved', 'created': entry['created'],
                 'updated': entry['created'], 'project': key, 'links': ['index'],
@@ -84,8 +97,12 @@ def add(root, directory):
 
 
 def find(root, key):
-    brain.identifier(key)
-    entry = next((e for e in registry(root) if e['id'] == key), None)
+    entries = registry(root)
+    matches = [e for e in entries if key in (e['id'], e['path'], Path(e['path']).name)
+               or (root in Path(e['path']).parents and key == str(Path(e['path']).relative_to(root / 'work')))]
+    if len(matches) > 1:
+        raise WorkspaceError('Ambiguous project name; choose a path or id from project list')
+    entry = matches[0] if matches else None
     if entry is None:
         raise WorkspaceError('Unknown project id; run tdt project list')
     if status(entry) != 'available':
@@ -95,6 +112,7 @@ def find(root, key):
 
 def inspect(root, key):
     entry = find(root, key)
+    key = entry['id']
     path = Path(entry['path'])
     # No recursive inventory; stop after 101 entries even in a very large folder.
     names = []
@@ -135,6 +153,7 @@ def inspect(root, key):
 def propose(root, key, data):
     """Agent interpretations enter the ordinary explicit-review queue."""
     entry = find(root, key)
+    key = entry['id']
     value = brain.summary(data)
     value['project'] = key
     with brain.locked(root):
@@ -160,3 +179,80 @@ def propose(root, key, data):
                 'provenance': {'operation': 'project propose', 'path': entry['path']}, **value}
         brain.atomic(root, relative, brain.note_text(meta, body))
     return 'pending: ' + proposal
+
+
+def create(root, relative):
+    """Create a user-owned internal directory, then register it; never replace files."""
+    parts = relative.split('/')
+    if (not relative or relative.startswith('/') or '\\' in relative
+            or any(p in ('', '.', '..') or p.startswith('.') for p in parts)):
+        raise WorkspaceError('Use a relative folder below work/, without dot or hidden components')
+    target = managed_path(root, 'work/' + relative)
+    for parent in (target, *target.parents):
+        if parent == root:
+            break
+        if parent.exists() and not parent.is_dir():
+            raise WorkspaceError('Existing file conflicts with project directory')
+        if any((parent / name).exists() or (parent / name).is_symlink()
+               for name in ('.tdt', '.dryft')):
+            raise WorkspaceError('Cannot create a project inside another workspace')
+    brain.clean_text(str(target), 'project path', 400)
+    registry(root)
+    target.mkdir(parents=True, exist_ok=True)
+    return add(root, target)
+
+
+def search_work(root, query):
+    """Bounded discovery of user files; no symlinks, hidden files or binary reads."""
+    work = managed_path(root, 'work')
+    if not work.exists():
+        return {'results': [], 'truncated': False}
+    if not work.is_dir():
+        raise WorkspaceError('work must be a directory')
+    terms = query.lower().split()
+    if not terms:
+        raise WorkspaceError('Provide a search query')
+    results, count, truncated = [], 0, False
+    for directory, folders, names in os.walk(work, followlinks=False):
+        count += 1
+        if count > 2000:
+            truncated = True
+            break
+        folders[:] = sorted(n for n in folders if not n.startswith('.')
+                            and not (Path(directory) / n).is_symlink())
+        # Do not search nested workspace contents.
+        if (Path(directory) / '.tdt').exists():
+            folders[:] = []
+            continue
+        for name in sorted(names):
+            count += 1
+            if count > 2000:
+                truncated = True
+                break
+            path = Path(directory) / name
+            if name.startswith('.') or path.is_symlink():
+                continue
+            text = ''
+            try:
+                fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
+                with os.fdopen(fd, 'rb') as stream:
+                    if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                        continue
+                    raw = stream.read(32769)
+                if path.suffix.lower() in ('.md', '.txt', '.csv', '.json'):
+                    text = raw[:32768].decode('utf-8')
+                if brain.SECRET.search(text):
+                    continue
+            except (OSError, UnicodeError):
+                continue
+            relative = str(path.relative_to(work))
+            if all(term in (relative + ' ' + text).lower() for term in terms):
+                results.append({'path': str(path), 'relative': relative,
+                                'content_truncated': len(raw) > 32768})
+                if len(results) >= 50:
+                    truncated = True
+                    break
+        if truncated:
+            break
+    return {'results': results, 'truncated': truncated,
+            'notice': 'Working files, not approved knowledge. Read current matches before answering.'}

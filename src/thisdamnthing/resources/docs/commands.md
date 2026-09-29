@@ -70,3 +70,11 @@ and `cancel` require an ID, current `--revision` and `--user-instruction`; edit 
 snooze accept JSON on stdin. `check --channel manual|chat|scheduled [--limit N]`
 claims due items; `ack ID --token TOKEN` records notification, not completion.
 See [reminders](reminders.md) for the schema, setup and delivery recovery.
+
+## Working files
+
+- `tdt project create <relative-folder>` creates below work/ and registers the project.
+- `tdt project inspect <name-or-id>` resolves a unique project name or registered path.
+- `tdt work search <query>` discovers internal working files separately from knowledge.
+
+Read WORK.md before choosing new locations; CLI paths are explicit and do not parse conventions.

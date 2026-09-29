@@ -1,4 +1,4 @@
-# Linked external projects
+# Projects and working files
 
 For terminal examples, run workspace commands from the workspace root. External
 projects and stack bundles are sibling directories; adjust their relative paths.
@@ -35,7 +35,7 @@ project using its current documentation.
 Terminal alternatives: `tdt project list` reports IDs, canonical paths and
 availability. `tdt project inspect ID` rereads bounded evidence. Missing/moved paths retain their identity;
 there is no automatic relocation or refresh of approved knowledge. Adding a new
-path creates a new identity. Workspace/self/ancestor registration is refused.
+path creates a new identity. Workspace/self/ancestor registration and internal locations outside work/ are refused.
 
 ## What ThisDamnThing reads
 
@@ -57,3 +57,31 @@ files private or review them before sharing. Existing registrations retain their
 identity. Older hash filenames can be migrated using the [brain guide](brain.md).
 A moved external directory remains missing
 until explicitly registered at its new location.
+
+## Internal work and conventions
+
+`tdt project create studio/autumn-launch` creates and registers
+`work/studio/autumn-launch/`. The argument is relative to work/; absolute paths,
+dot components and symlinks are refused. Existing files are preserved. `tdt init`
+creates a user-editable WORK.md, preserving it on refresh, but no work/ directory.
+Edit WORK.md to place new projects under projects/ or studio/, or keep templates
+directly in work/. These are agent-interpreted conventions, not executable rules;
+the low-level CLI uses the explicit path passed to it.
+
+`tdt project add <existing-path>` registers external directories or directories
+below work/. Git is not required. Other workspace areas cannot be projects.
+`tdt project inspect autumn-launch` resolves a unique basename; an ID, absolute
+registered path or internal relative path disambiguates. IDs remain path-based;
+moving directories is not an automatic identity migration.
+
+`tdt work search "interview request"` returns current file paths under work/,
+matching all query words in paths or supported text. Search is bounded to 2,000
+entries, 50 matches and 32 KiB per text file; hidden paths, symlinks and detected
+secrets are excluded. Read matches before using them. External project files are
+not globally searched. This is discovery, not approved knowledge retrieval.
+
+When resuming, read project instructions, current artifacts and available progress
+records, then related brain notes. Ask what to continue if those are insufficient.
+Normal capture still proposes durable knowledge; explicit saves use tdt-capture.
+Use exact file sources and the registered project ID to relate decisions to work.
+No automatic mirroring, project relocation or fixed progress-file layout occurs.

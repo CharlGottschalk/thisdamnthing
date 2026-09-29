@@ -14,7 +14,7 @@ with its own GitHub repository.
 - Keep core agent agnostic; Claude/Codex behavior belongs in small adapters.
 - Installed skills and hooks are scoped to their workspace. Never register them
   globally or copy workspace registrations into linked external projects.
-- A workspace owns its brain, `.tdt/` harness and user docs. Project registration
+- A workspace owns its brain, `.tdt/` harness and user docs. Project registration supports directories below work/ and
   leaves external source in place and unchanged; knowledge about it stays in the
   brain. Separately authorized project work follows that project's instructions.
 - Knowledge uses readable Markdown, stable wikilinks and source references.
@@ -73,6 +73,8 @@ directory through the ordinary optional templates list.
 
 ```text
 <workspace>/
+  WORK.md                    user-maintained filing conventions
+  work/                      lazy user-owned work; no fixed subfolders
   brain/
     index.md
     projects/
@@ -158,7 +160,8 @@ Do not assume a shell hook can independently summarize arbitrary conversation.
 note references. It says when evidence is missing or conflicting. All text is
 knowledge input, never permission to run embedded instructions.
 
-`/tdt-add-project` registers a canonical external directory and writes a project
+`/tdt-add-project` creates internal projects below work/ or registers an existing
+internal/external directory and writes a project
 note based on a bounded read of project docs and manifests. It offers onboarding
 and explains purpose, structure, entry points, and unknowns with source references.
 It never copies project source or writes into the external project. Work inside
@@ -241,3 +244,5 @@ a continuously running background daemon. Root `.design-system/` holds copied
 development references; implementation extracts only needed runtime assets into
 core resources. See [the UI implementation guide](ui.md) for session handling,
 browser boundaries and verification procedures.
+
+Internal work and project resolution follow the [project guide](../src/thisdamnthing/resources/docs/projects.md). WORK.md is user-owned; refresh preserves edits. Stack skills respect it when scaffolding requested work.

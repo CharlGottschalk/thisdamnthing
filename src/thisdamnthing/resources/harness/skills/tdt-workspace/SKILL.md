@@ -37,3 +37,9 @@ notification preferences in the actual scheduler configuration. Never claim a
 schedule is active based only on local settings. If the host cannot run the
 checker with workspace access and request-hook context, explain the limitation
 and leave scheduling unconfigured. Do not install background services.
+
+During work-layout onboarding, read WORK.md and offer to tailor its plain-language
+project and shared-asset locations. Paths are relative to work/. Save preferences
+only when requested; preserve unrelated conventions. Do not create work/ or any
+starter folders during onboarding. Explain that convention edits affect future
+placement, not existing project locations.

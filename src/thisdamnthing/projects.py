@@ -144,7 +144,8 @@ def propose(root, key, data):
         actual_link = actual[6:-3] if actual else link
         value['links'] = [link] + [v for v in value['links'] if v not in (link, actual_link)][:7]
         proposal = brain.digest('project:' + key + json.dumps(value, sort_keys=True))
-        relative = brain.find_note(root, 'candidates', proposal)
+        relative = (brain.find_note(root, 'candidates', proposal)
+                    or brain.find_note(root, 'knowledge', proposal))
         if relative:
             prior, _ = brain.read_note(root, relative)
             if prior['provenance'] != {'operation': 'project propose', 'path': entry['path']}:

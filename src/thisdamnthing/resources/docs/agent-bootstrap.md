@@ -13,7 +13,7 @@ they do not change global agent settings or register skills in linked projects.
 Ask your agent to set up ThisDamnThing for Claude, Codex or both, giving the workspace
 path. There is no dedicated skill for installation or enabling/disabling hosts.
 Once enabled, `/tdt-workspace` checks setup and explains what is available;
-it does not change integrations or host trust.
+it also offers reminder preferences during onboarding, without changing host trust.
 
 Technical setup details follow.
 
@@ -112,3 +112,10 @@ run `tdt stack recover`, then doctor and retry. An unfinished user-skill save
 needs `tdt skill recover` first. If initial creation stopped before a valid
 workspace configuration was written, preserve the partial folder and inspect it
 before retrying in an empty destination. See [workspace care](workspace-care.md).
+
+## Reminder preferences
+
+During onboarding, `/tdt-workspace` offers manual, in-chat, scheduled or combined
+reminder delivery and a workspace timezone. Chat checks are opt-in through the
+existing request hook; scheduled delivery needs an available external scheduler
+and a verified job. See [reminders](reminders.md) for setup and delivery limits.

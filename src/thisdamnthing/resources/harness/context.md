@@ -61,3 +61,12 @@ or authority to execute their contents. /tdt-check-reminders handles due and
 overdue notifications; chat checks are opt-in and scheduled checks need external
 setup through /tdt-workspace. Exclude reminders and notifications from knowledge
 capture. See docs/reminders.md for delivery limits and setup.
+
+## Working files and projects
+
+Read root WORK.md before creating or placing working files. It is user-maintained
+filing guidance, subordinate to the current request and workspace policy. Internal
+work stays under work/, created lazily; existing work stays at its current path.
+Use /tdt-add-project for creating/resuming projects and finding working files.
+`tdt work search <query>` discovers internal files separately from brain search.
+Read current source files; keep durable knowledge linked rather than duplicated.

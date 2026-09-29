@@ -117,6 +117,11 @@ def initialize(directory, agent=None):
         with locked(root):
             catalog = stack_docs.plan(root, stacks.available(root))
             pending = ui_plan(root)
+            work_file = managed_path(root, "WORK.md")
+            if work_file.exists() and not work_file.is_file():
+                raise WorkspaceError("WORK.md must be a regular file")
+            if not work_file.exists():
+                pending["WORK.md"] = resource_text("workspace/WORK.md")
             pending.update(plan_bootstrap(root, agent, config,
                                      read_json(root, ".tdt/state/owned-files.json")))
             from .agents import plan_skills
@@ -152,6 +157,11 @@ def initialize(directory, agent=None):
         agent = "both" if len(found) == 2 else (found[0] if found else "none")
     content.update(plan_bootstrap(root, agent, CONFIG,
                                   STATE[".tdt/state/owned-files.json"]))
+    work_file = managed_path(root, "WORK.md")
+    if work_file.exists() and not work_file.is_file():
+        raise WorkspaceError("WORK.md must be a regular file")
+    if not work_file.exists():
+        content["WORK.md"] = resource_text("workspace/WORK.md")
     content.update(ui_plan(root))
     content.update(stack_docs.plan(root, []))
     # Keep the completion marker last, including when bootstrap adds files.

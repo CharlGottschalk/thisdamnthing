@@ -63,11 +63,17 @@ def main(argv=None):
     index = actions.add_parser("index", help="reconcile selected provider indexes")
     index.add_argument("--provider", action="append", required=True)
     index.add_argument("--rebuild", action="store_true")
-    project = commands.add_parser("project", help="link external projects without modifying them")
+    project = commands.add_parser("project", help="create, find and register working projects")
     project_actions = project.add_subparsers(dest="action", required=True)
     project_add = project_actions.add_parser("add")
     project_add.add_argument("path")
+    project_create = project_actions.add_parser("create", help="create below work/; path is relative to work")
+    project_create.add_argument("path")
     project_actions.add_parser("list")
+    work = commands.add_parser("work", help="discover internal working files")
+    work_actions = work.add_subparsers(dest="action", required=True)
+    work_search = work_actions.add_parser("search")
+    work_search.add_argument("query")
     for action in ("inspect", "propose"):
         command = project_actions.add_parser(action)
         command.add_argument("id")
@@ -227,10 +233,14 @@ def main(argv=None):
         if args.command == "skill":
             print(json.dumps(skills.cli(root, args, input_json() if args.action in ("propose", "history") else None), indent=2, ensure_ascii=False))
             return 0
+        if args.command == "work":
+            from . import projects
+            print(json.dumps(projects.search_work(root, args.query), indent=2, ensure_ascii=False))
+            return 0
         if args.command == "project":
             from . import projects
-            if args.action == "add":
-                entry, created = projects.add(root, args.path)
+            if args.action in ("add", "create"):
+                entry, created = (projects.create if args.action == "create" else projects.add)(root, args.path)
                 print(("Registered: " if created else "Already registered: ") + entry["id"])
                 print(json.dumps(projects.inspect(root, entry["id"]), indent=2, ensure_ascii=False))
                 print("Onboarding available: use /tdt-add-project. Interpretations require candidate review.")

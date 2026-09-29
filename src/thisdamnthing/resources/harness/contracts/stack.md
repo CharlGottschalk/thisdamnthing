@@ -277,3 +277,14 @@ releases, tags or digests. Listing/feed categories contain the selected category
 Public tags come only from the latest approved active release; with no active
 release they are empty, even when the page shows an older approved release.
 Staff must compare indexed tags with the pinned manifest before approval.
+
+## User-owned working outputs
+
+Skills may create requested working files using bundled templates. Read the user's
+WORK.md first; internal destinations are below work/, with no fixed subfolders.
+Respect the current request and existing locations before conventions; conventions
+precede stack suggestions. Create only needed folders and preserve existing files.
+Templates remain installed in .tdt/stacks/<id>/; generated outputs belong to the
+user, outside bundle ownership. Stack update/removal must not rewrite or delete
+those outputs. Disclose skill file writes in marketplace capabilities. This uses
+the existing contract; there are no installer destination mappings or setup scripts.

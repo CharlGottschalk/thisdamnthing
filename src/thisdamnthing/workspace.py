@@ -10,7 +10,7 @@ class WorkspaceError(Exception):
 
 
 DIRECTORIES = (
-    "brain", "brain/projects", "brain/sessions", "brain/knowledge",
+    "brain", "brain/projects", "brain/knowledge",
     "brain/candidates", ".tdt", ".tdt/contracts", ".tdt/skills",
     ".tdt/hooks", ".tdt/stacks", ".tdt/state", "docs",
 )

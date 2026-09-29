@@ -103,6 +103,8 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
         raise WorkspaceError(f"Cannot scan brain: {error}")
     for category in categories:
         directory = managed_path(root, f"brain/{category}")
+        if category == "sessions" and not directory.exists():
+            continue  # Optional legacy notes; new workspaces do not create this folder.
         for current, directories, filenames in os.walk(directory, followlinks=False, onerror=failed):
             directories.sort()
             count += len(directories) + len(filenames)
@@ -302,6 +304,8 @@ def eligible_notes(root):
     count = 0
     for category in ("knowledge", "projects", "sessions"):
         directory = managed_path(root, f"brain/{category}")
+        if category == "sessions" and not directory.exists():
+            continue
         for current, directories, filenames in os.walk(directory, followlinks=False, onerror=scan_error):
             count += len(directories)
             if count > 2000:

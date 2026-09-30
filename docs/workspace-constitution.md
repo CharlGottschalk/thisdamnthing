@@ -24,10 +24,12 @@ writer can still race the final check and replacement.
 
 ## Load current rules
 
-Workspace-local UserPromptSubmit hooks read fresh policy for each invocation.
-SessionStart also supplies it when the host emits startup, resume or compaction
-context. Scope checks exclude outside sessions and nested independent workspaces.
-Root instructions provide a `constitution show` fallback when hooks are unavailable.
+Workspace-local UserPromptSubmit hooks read and supply fresh policy for each
+invocation. SessionStart validates expected policy state without repeating the
+policy text when the host emits startup, resume or compaction context. Scope
+checks exclude outside sessions and nested independent workspaces.
+Root instructions provide a `constitution show` fallback when request hooks are
+unavailable.
 
 Once policy is activated, an expectation marker makes unexpected deletion an error.
 An expected missing, malformed or oversized policy blocks the request hook. Restore

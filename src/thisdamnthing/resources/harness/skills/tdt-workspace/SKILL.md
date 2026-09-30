@@ -1,7 +1,18 @@
 ---
 name: tdt-workspace
-description: Onboard or orient the user in a ThisDamnThing workspace, diagnose setup, and offer reminder delivery preferences.
+description: Create/register/resume projects; workspace setup, policy, files, UI, reminder settings.
 ---
+
+For a focused request, read and follow only the matching specialist below, then
+return to the task. Use paths relative to the workspace root (the ancestor
+containing .tdt/config.json):
+
+- Workspace permission rules: `.tdt/skills/tdt-constitution/SKILL.md`.
+- Create, register or resume projects; find working files or templates:
+  `.tdt/skills/tdt-add-project/SKILL.md`.
+- “Use UI”, browser questions or interactive pages: `.tdt/skills/tdt-ui/SKILL.md`.
+
+For workspace onboarding, orientation, diagnosis or preferences, continue below.
 
 Read .tdt/context.md and docs/agent-bootstrap.md relative to the workspace root
 (the ancestor containing .tdt/config.json). Run `tdt doctor --workspace`

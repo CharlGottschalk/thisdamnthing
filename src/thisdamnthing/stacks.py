@@ -269,7 +269,7 @@ def recover(root):
 
 
 def bridge(name):
-    return (f'---\nname: {name}\ndescription: Use the installed {name} stack workflow.\n---\n\n'
+    return (f'---\nname: {name}\ndescription: Run the {name} workflow.\n---\n\n'
             f'Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n')
 
 

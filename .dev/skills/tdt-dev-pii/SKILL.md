@@ -8,6 +8,8 @@ this canonical `.dev/skills/tdt-dev-pii/SKILL.md`, not the host bridge or shell
 cwd. Follow [review.md](review.md) for every invocation. Run its companion
 `scripts/review.py` with `--repo` pointing to the intended Git worktree and
 `--message-file` pointing to the complete literal proposed message when available.
+Always supply `--report-file` with a new private local `.md` path for the
+standard exact-value, severity-labeled findings report described in `review.md`.
 Use Python 3.11+ and Git. Do not use an installed ThisDamnThing workspace as the source.
 The repository Git hooks remain separate safeguards; do not bypass them or assume
 hook approval supplies the semantic review described here.

@@ -1,6 +1,6 @@
 ---
 name: tdt-note
-description: Save a tagged scratchpad idea when the user says add a note, take a note, or jot this down; connect notes about the same subject.
+description: Save tagged scratchpad ideas and find related notes.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Save rough ideas,

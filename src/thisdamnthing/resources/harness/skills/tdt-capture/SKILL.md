@@ -1,6 +1,6 @@
 ---
 name: tdt-capture
-description: Save knowledge explicitly supplied by the user, including requests to remember this or save this as knowledge.
+description: Save knowledge on explicit user request.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Save the user's

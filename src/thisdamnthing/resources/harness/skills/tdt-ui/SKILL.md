@@ -1,6 +1,6 @@
 ---
 name: tdt-ui
-description: Use UI for local browser interviews, standard questions and custom interactive pages; consume submitted events and continue the work.
+description: Use local browser questions and custom interactive pages.
 ---
 
 Honor “use ui” without asking the preference again. Otherwise offer UI or

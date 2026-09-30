@@ -1,6 +1,6 @@
 ---
 name: tdt-check-reminders
-description: Check and display due or overdue TDT reminders, when asked what is due, invoked by an opted-in chat hook, or run by a configured scheduler.
+description: Display due and overdue reminders, manually or on schedule.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json), or use the

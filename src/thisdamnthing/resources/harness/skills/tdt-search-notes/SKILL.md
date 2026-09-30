@@ -1,6 +1,6 @@
 ---
 name: tdt-search-notes
-description: Search saved scratchpad ideas and intentions, such as what did I want to investigate about a project, and find related tagged notes.
+description: Recall scratchpad ideas, intentions and related tagged notes.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Search scratchpad

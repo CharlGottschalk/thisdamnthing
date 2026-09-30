@@ -1,6 +1,6 @@
 ---
 name: tdt-review-brain
-description: Present pending knowledge candidates and apply explicit user approval, edits or rejection.
+description: Review pending knowledge; approve, edit or reject with user consent.
 ---
 
 At the start of EVERY user turn handled by this skill (including listing, follow-up

@@ -12,7 +12,9 @@ from .workspace import WorkspaceError, managed_path, read_json, resource_text
 MANIFEST = ".tdt/state/bootstrap.json"
 PROVIDERS = {"claude": ("CLAUDE.md", ".claude/skills", ".claude/settings.json"),
              "codex": ("AGENTS.md", ".agents/skills", ".codex/hooks.json")}
-SKILLS = ("tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-constitution", "tdt-workspace", "tdt-review-brain", "tdt-search", "tdt-add-project", "tdt-ui", "tdt-install-stack", "tdt-find-skills", "tdt-update-stack", "tdt-remove-stack")
+SPECIALIST_SKILLS = ("tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-constitution", "tdt-workspace", "tdt-review-brain", "tdt-search", "tdt-add-project", "tdt-ui", "tdt-install-stack", "tdt-find-skills", "tdt-update-stack", "tdt-remove-stack")
+ROUTER_SKILLS = ("tdt-brain", "tdt-reminders", "tdt-stacks", "tdt-skills")
+SKILLS = SPECIALIST_SKILLS + ROUTER_SKILLS
 LEGACY_SKILLS = {name.replace('tdt-', 'tdt.', 1): name for name in SKILLS}
 LEGACY_SKILLS.update({'tdt.ask-brain': 'tdt-search', 'tdt-ask-brain': 'tdt-search'})
 # Original core-only templates had no bootstrap ownership manifest. Adopt only
@@ -33,6 +35,8 @@ RESOURCES = {
     "docs/stacks.md": "docs/stacks.md",
     **{f".tdt/skills/{name}/SKILL.md": f"harness/skills/{name}/SKILL.md"
        for name in ("tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-search", "tdt-add-project", "tdt-install-stack", "tdt-update-stack", "tdt-remove-stack")},
+    **{f".tdt/skills/{name}/SKILL.md": f"harness/skills/{name}/SKILL.md"
+       for name in ROUTER_SKILLS},
     ".tdt/skills/tdt-find-skills/SKILL.md": "harness/skills/tdt-find-skills/SKILL.md",
     "docs/skills.md": "docs/skills.md",
     "docs/projects.md": "docs/projects.md",
@@ -111,6 +115,8 @@ def load_manifest(root):
     for old, new in LEGACY_SKILLS.items():
         allowed_files.update(path.replace('/' + new + '/', '/' + old + '/')
                              for path in tuple(allowed_files) if '/' + new + '/' in path)
+    allowed_files.update(f".agents/skills/{name}/agents/openai.yaml"
+                         for name in SPECIALIST_SKILLS if name != "tdt-workspace")
     if (set(data["files"]) - allowed_files
             or set(data["instructions"]) - {"README.md", *(p[0] for p in PROVIDERS.values())}
             or set(data["hooks"]) - {p[2] for p in PROVIDERS.values()}
@@ -152,23 +158,40 @@ def plan_bootstrap(root, agent, config, owned):
             if legacy.exists():
                 raise WorkspaceError("Claude command name conflict: .claude/commands/tdt-workspace.md")
         generated[f"{skills}/tdt-workspace/SKILL.md"] = (
-            "---\nname: tdt-workspace\ndescription: Onboard or orient the user in a ThisDamnThing workspace, "
-            "diagnose setup, and offer reminder delivery preferences.\n---\n\n"
+            "---\nname: tdt-workspace\ndescription: "
+            + 'Create/register/resume projects; workspace setup, policy, files, UI, reminder settings.'
+            + "\n---\n\n"
             "Read and follow .tdt/skills/tdt-workspace/SKILL.md from the\n"
             "workspace root (the ancestor containing .tdt/config.json).\n")
         if host == "claude" and managed_path(root, ".claude/commands/tdt-review-brain.md").exists():
             raise WorkspaceError("Claude command name conflict: tdt-review-brain")
         generated[f"{skills}/tdt-review-brain/SKILL.md"] = (
-            "---\nname: tdt-review-brain\ndescription: Review pending knowledge candidates "
-            "and apply explicit user approval, edits or rejection.\n---\n\n"
+            "---\nname: tdt-review-brain\n"
+            + ("disable-model-invocation: true\n" if host == "claude" else "")
+            + 'description: Review pending knowledge; approve, edit or reject with user consent.\n---\n\n'
             "Read and follow .tdt/skills/tdt-review-brain/SKILL.md from the workspace root.\n")
-        for name, description in (("tdt-remind", "Save and manage one-time reminders; remind me to do something at a specified time."), ("tdt-check-reminders", "Check and display due reminders manually or from a scheduler."), ("tdt-search-notes", "Search scratchpad notes and related ideas; recall what the user wanted to investigate."), ("tdt-capture", "Save knowledge explicitly supplied by the user; remember this or save this as knowledge."), ("tdt-note", "Save a tagged scratchpad idea when the user says add a note or jot this down; find related notes."), ("tdt-update-stack", "Inspect and approve a newer installed stack version."), ("tdt-remove-stack", "Uninstall a selected stack while preserving user work."), ("tdt-constitution", "Define or update workspace permission rules in natural language."), ("tdt-find-skills", "Find reusable workflows in completed workspace sessions and propose skills for approval."), ("tdt-install-stack", "Discover, inspect and install optional workflow stacks."), ("tdt-ui", "Use UI for local browser questions and custom interactive interviews."), ("tdt-search", "Answer using approved linked knowledge with references and honest gaps."),
-                                  ("tdt-add-project", "Register an external project and offer bounded onboarding.")):
+        for name, description in (('tdt-remind', 'Save and manage one-time reminders.'), ('tdt-check-reminders', 'Display due and overdue reminders, manually or on schedule.'), ('tdt-search-notes', 'Recall scratchpad ideas, intentions and related tagged notes.'), ('tdt-capture', 'Save knowledge on explicit user request.'), ('tdt-note', 'Save tagged scratchpad ideas and find related notes.'), ('tdt-update-stack', 'Inspect and apply user-approved stack updates.'), ('tdt-remove-stack', 'Uninstall stacks; preserve user knowledge and work.'), ('tdt-constitution', 'Define or update workspace permission rules, not project rules.'), ('tdt-find-skills', 'Propose reusable skills from completed sessions or current workflows for approval.'), ('tdt-install-stack', 'Find, inspect and install optional workflow stacks.'), ('tdt-ui', 'Use local browser questions and custom interactive pages.'), ('tdt-search', 'Answer from approved linked knowledge; cite evidence and gaps.'),
+                                  ('tdt-add-project', 'Create, register or resume internal/external projects; find files and templates.')):
             if host == "claude" and managed_path(root, f".claude/commands/{name}.md").exists():
                 raise WorkspaceError(f"Claude command name conflict: {name}")
             generated[f"{skills}/{name}/SKILL.md"] = (
+                f"---\nname: {name}\n"
+                + ("disable-model-invocation: true\n" if host == "claude" else "")
+                + f"description: {description}\n---\n\n"
+                f"Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n")
+        for name, description in (
+                ('tdt-brain', 'Search, save and review approved knowledge or scratchpad notes.'),
+                ('tdt-reminders', 'Create, manage or check one-time reminders.'),
+                ('tdt-stacks', 'Find, install, update or remove workflow stacks.'),
+                ('tdt-skills', 'Propose reusable skills from past sessions or current workflows.')):
+            generated[f"{skills}/{name}/SKILL.md"] = (
                 f"---\nname: {name}\ndescription: {description}\n---\n\n"
                 f"Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n")
+        if host == "codex":
+            for name in SPECIALIST_SKILLS:
+                if name != "tdt-workspace":
+                    generated[f"{skills}/{name}/agents/openai.yaml"] = (
+                        "policy:\n  allow_implicit_invocation: false\n")
         current = existing_text(root, instruction) or ""
         previous = state["instructions"].get(instruction)
         if previous is not None:
@@ -321,6 +344,7 @@ def diagnose_adapters(root, config):
                 lines.append(f"{host.capitalize()} integration: disabled; use tdt agent enable {host}")
                 continue
             adapter = config["adapters"].get(host)
+            host_skills = SKILLS if host == "claude" else SPECIALIST_SKILLS
             if not isinstance(adapter, dict) or adapter.get("bootstrap_version") != 1:
                 raise WorkspaceError(f"{host} ownership recognized but adapter needs refresh; run tdt agent enable {host}")
             if (instruction not in state["instructions"] or settings not in state["hooks"]
@@ -328,7 +352,7 @@ def diagnose_adapters(root, config):
                     or settings not in state["policy_hooks"]
                     or f"{skills}/tdt-review-brain/SKILL.md" not in state["files"]
                     or f"{skills}/tdt-workspace/SKILL.md" not in state["files"]
-                    or any(f"{skills}/{name}/SKILL.md" not in state["files"] for name in SKILLS)
+                    or any(f"{skills}/{name}/SKILL.md" not in state["files"] for name in host_skills)
                     or not set(RESOURCES).issubset(state["files"])):
                 raise WorkspaceError(f"Incomplete {host} bootstrap ownership record")
             lines.append(f"{host.capitalize()} integration: enabled; files installed; runtime unverified")

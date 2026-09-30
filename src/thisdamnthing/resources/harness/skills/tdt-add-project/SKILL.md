@@ -1,6 +1,6 @@
 ---
 name: tdt-add-project
-description: Create or register internal and external projects, resume a named project, or find working files and templates.
+description: Create, register or resume internal/external projects; find files and templates.
 ---
 
 Find the ThisDamnThing workspace root. Read WORK.md before placing new work.

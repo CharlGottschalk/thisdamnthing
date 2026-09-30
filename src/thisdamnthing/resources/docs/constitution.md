@@ -46,10 +46,11 @@ truncation. Avoid editing it concurrently with a save.
 
 ## Make sure your agent loads it
 
-Request hooks read current rules on each invocation. Startup also supplies them
-when the host emits a SessionStart event, including supported resume or compaction
-events. Review hook trust in your agent and restart when needed. Approved policy
-edits do not require new hook registrations.
+Request hooks read and supply current rules on each invocation. SessionStart
+validates expected policy state, including supported resume or compaction events,
+without repeating the policy text before the first request. Review hook trust in
+your agent and restart when needed. Approved policy edits do not require new hook
+registrations.
 
 If request hooks are unavailable, workspace instructions tell the agent to run
 `tdt constitution show` before each request. Ask the agent to report any failure

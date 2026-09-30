@@ -54,7 +54,7 @@ def decode(data):
         return None
 
 
-def scan(data, ref, location, existing, binding):
+def scan(data, ref, location, existing, binding, evidence=None, file=None):
     findings = []
     for number, line in enumerate(data.splitlines(), 1):
         for category, pattern in PATTERNS.items():
@@ -65,10 +65,13 @@ def scan(data, ref, location, existing, binding):
                         'excerpt': '[redacted]'}
                 item['id'] = sha(binding + json.dumps(item, sort_keys=True).encode())
                 findings.append(item)
+                if evidence is not None:
+                    evidence.append({**item, 'file': file or 'Proposed commit message',
+                                     'strings': [match.group() for match in re.finditer(pattern, line)]})
     return findings
 
 
-def review(repo, message):
+def review(repo, message, evidence=None):
     root = git(repo, 'rev-parse', '--show-toplevel').rstrip(b'\n')
     index_path = git(repo, 'rev-parse', '--git-path', 'index').rstrip(b'\n')
     before = git(repo, 'ls-files', '--stage', '-z')
@@ -112,7 +115,7 @@ def review(repo, message):
             path = changes[pos]; pos += 1
         ref = sha(path)[:12]
         file_binding = path + b'\0' + oid
-        findings.extend(scan(os.fsdecode(path), ref, 'path', {os.fsdecode(old_path)} if old_mode != b'000000' else set(), file_binding))
+        findings.extend(scan(os.fsdecode(path), ref, 'path', {os.fsdecode(old_path)} if old_mode != b'000000' else set(), file_binding, evidence, os.fsdecode(path)))
         if status == b'D':
             coverage.append({'ref': ref, 'content': 'deleted; path only'})
             continue
@@ -127,7 +130,7 @@ def review(repo, message):
             coverage.append({'ref': ref, 'content': 'uninspected'})
             continue
         coverage.append({'ref': ref, 'content': 'full staged UTF-8', 'lines': len(content.splitlines())})
-        findings.extend(scan(content, ref, 'file', set((previous or '').splitlines()), file_binding))
+        findings.extend(scan(content, ref, 'file', set((previous or '').splitlines()), file_binding, evidence, os.fsdecode(path)))
     if message_data is not None:
         content = decode(message_data)
         if content is None:
@@ -135,7 +138,7 @@ def review(repo, message):
         elif not content.strip():
             gaps.append('proposed message is empty')
         else:
-            findings.extend(scan(content, 'message', 'message', set(), message_data))
+            findings.extend(scan(content, 'message', 'message', set(), message_data, evidence))
             coverage.append({'ref': 'message', 'content': 'complete subject/body/trailers', 'lines': len(content.splitlines())})
     if before != git(repo, 'ls-files', '--stage', '-z') or head != git(repo, 'rev-parse', '--verify', 'HEAD', optional=True):
         gaps.append('index or HEAD changed during review')
@@ -149,15 +152,65 @@ def review(repo, message):
             'limits': '1 MiB/blob/message; 8 MiB combined old/new blobs; 4 MiB metadata; 20s/Git command. No history/release review. Patterns cannot prove absence of PII.'}
 
 
+SEVERITIES = {
+    'private-key': '🔴 Critical', 'token': '🔴 Critical', 'credential': '🔴 Critical',
+    'email': '🟠 Medium', 'phone-heuristic': '🟠 Medium',
+    'identity-heuristic': '🟠 Medium', 'address-heuristic': '🟠 Medium',
+    'personal-path': '🟠 Medium', 'absolute-path-heuristic': '🟡 Low',
+}
+
+
+def literal(value):
+    # A fence longer than any embedded backtick run preserves literal Markdown.
+    fence = '`' * max(3, 1 + max((len(m.group()) for m in re.finditer(r'`+', value)), default=0))
+    return fence + 'text\n' + value + '\n' + fence
+
+
+def markdown_report(report, evidence):
+    lines = ['# Privacy review', '', '- Status: ' + report['status'],
+             '- Scope: bounded pattern evidence; semantic review pending',
+             '- Snapshot: ' + report.get('snapshot', 'unavailable'), '',
+             '## Findings', '']
+    for number, item in enumerate(evidence, 1):
+        lines.extend([f"### {number}. {SEVERITIES[item['category']]} — {item['category']}", '',
+                      '- ID: ' + item['id'], '- File:', '', literal(item['file']), '',
+                      '- Location: ' + item['location'], '- Line: ' + str(item['line']),
+                      '- Exposure: ' + item['exposure'], '- Decision: pending',
+                      '- Actual flagged strings:', ''])
+        for value in item['strings']:
+            lines.extend([literal(value), ''])
+    if not evidence:
+        lines.extend(['No pattern findings.', ''])
+    lines.extend(['## Coverage and gaps', '', literal(json.dumps(
+        {'coverage': report.get('coverage', []), 'gaps': report.get('gaps', [])}, indent=2)), '',
+        'Severity estimates potential impact, not confidence. Semantic review must confirm context.', ''])
+    return '\n'.join(lines)
+
+
+def write_report(path, content):
+    # Exclusive creation refuses overwrite/symlink targets; evidence stays owner-only.
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+        stream.write(content)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', required=True)
     parser.add_argument('--message-file')
+    parser.add_argument('--report-file', help='New private Markdown file containing exact flagged values')
     args = parser.parse_args()
+    evidence = []
     try:
-        report = review(args.repo, args.message_file)
+        report = review(args.repo, args.message_file, evidence)
     except (OSError, ValueError, IndexError, subprocess.SubprocessError):
         report = {'status': 'incomplete', 'gaps': ['Unable to inspect Git state or message within bounds; no raw diagnostics emitted.']}
+    if args.report_file:
+        try:
+            write_report(args.report_file, markdown_report(report, evidence))
+        except (OSError, UnicodeError):
+            report['status'] = 'incomplete'
+            report.setdefault('gaps', []).append('Unable to create private Markdown report; use a new writable path.')
     print(json.dumps(report, indent=2, ensure_ascii=True))
     return {'pass': 0, 'findings': 1, 'incomplete': 2}[report['status']]
 

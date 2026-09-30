@@ -1,6 +1,6 @@
 ---
 name: tdt-find-skills
-description: Find repeated workflows in completed sessions of this workspace and propose reusable skills for user review. Also save approved live workflow suggestions.
+description: Propose reusable skills from completed sessions or current workflows for approval.
 ---
 
 Read docs/skills.md from the workspace root for the bounded history input and

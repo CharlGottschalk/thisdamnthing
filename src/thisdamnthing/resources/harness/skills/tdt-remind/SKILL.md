@@ -1,6 +1,6 @@
 ---
 name: tdt-remind
-description: Save and manage one-time reminders when the user says remind me to do something at a specified time, or asks to list, edit, snooze, complete or cancel reminders.
+description: Save and manage one-time reminders.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Read

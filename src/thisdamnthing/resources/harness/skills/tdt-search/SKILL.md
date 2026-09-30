@@ -1,6 +1,6 @@
 ---
 name: tdt-search
-description: Answer questions with approved brain evidence, bounded links and note references.
+description: Answer from approved linked knowledge; cite evidence and gaps.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Run

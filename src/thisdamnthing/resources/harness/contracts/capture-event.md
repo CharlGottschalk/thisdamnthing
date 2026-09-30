@@ -54,6 +54,13 @@ capture envelope, or notifying turn-complete stack hooks. Suppression persists
 through repeated Stops and resets on the next user prompt; unrelated sessions
 remain unaffected. No prompt matching or transcript parsing is used.
 
+When the user prohibits saving brain notes or capturing knowledge for the work,
+the active agent uses the same current token to suppress automatic capture.
+If a Stop continuation is still requested, its instructions require submitting
+`{"skip":true}` instead of a candidate. This records only skipped request state,
+not brain content. Recognizing the user's restriction relies on active-agent
+adherence; the hook does not interpret or retain the user's prompt.
+
 Dedicated reminder creation, management and manual/scheduled checking turns also
 use the current suppression token. An opted-in request hook may ask the agent to
 check due reminders alongside unrelated work; that does not suppress the whole

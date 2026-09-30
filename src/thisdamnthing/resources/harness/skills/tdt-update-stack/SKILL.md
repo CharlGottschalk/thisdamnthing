@@ -1,6 +1,6 @@
 ---
 name: tdt-update-stack
-description: Check an installed stack for a newer version and apply only the exact update the user approves.
+description: Inspect and apply user-approved stack updates.
 ---
 
 Read docs/stacks.md. Resolve the stack ID from the request or `tdt stack list`;

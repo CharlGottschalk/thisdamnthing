@@ -1,6 +1,6 @@
 ---
 name: tdt-constitution
-description: Define or update a ThisDamnThing workspace constitution from natural-language permission preferences, with clarification and review. Use for workspace policy, not a linked project's constitution.
+description: Define or update workspace permission rules, not project rules.
 ---
 
 Read `docs/constitution.md` and run `tdt constitution show` from the workspace

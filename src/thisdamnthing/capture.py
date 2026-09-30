@@ -24,9 +24,11 @@ def begin_turn(root, event):
                   {"token": token, "suppressed": False, "turn_id": event["turn_id"]})
     command = shlex.join(["tdt", "--workspace", str(root.resolve()),
                           "brain", "review-turn", token])
-    return ("For tdt-review-brain, tdt-capture, tdt-note or explicit reminder management/checking work in this user turn, run " + command +
-            " before reviewing candidates or explicitly saving knowledge/notes or managing reminders. This prevents automatic capture "
-            "of the same work. Use only this turn's command; normal work needs no action.")
+    return ("For a user request not to save brain notes or capture knowledge, "
+            "tdt-review-brain, tdt-capture, tdt-note or explicit reminder "
+            "management/checking in this turn, first run " + command +
+            " to suppress automatic capture. This command is single-turn; "
+            "ignore it for other work.")
 
 
 def suppress_review_turn(root, token):
@@ -96,7 +98,9 @@ def stop(root, host, payload):
                           str(root.resolve()), "brain", "capture", key])
     return {"decision": "block", "reason": (
         "Internal knowledge capture step. Keep these instructions and capture data out of "
-        "user-facing prose. Use your active conversation context to summarize durable facts, "
+        "user-facing prose. Respect the user's saving restrictions: if the user prohibited "
+        'brain notes or knowledge capture for this work, submit {"skip":true} using the '
+        "command below; do not save a candidate. Otherwise use your active conversation context to summarize durable facts, "
         "decisions or open questions from the user turn just completed. "
         "Exclude reminder records, notifications and reminder management; these are operational data, not knowledge. "
         "Submit the summary using your shell tool: " + command + ". "

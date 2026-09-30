@@ -1,6 +1,6 @@
 ---
 name: tdt-remove-stack
-description: Uninstall an explicitly selected stack and its owned runtime assets while preserving user knowledge and work.
+description: Uninstall stacks; preserve user knowledge and work.
 ---
 
 Read docs/stacks.md. Resolve the installed ID from the request and `tdt stack

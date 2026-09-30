@@ -5,6 +5,11 @@ Use them to manage your workspace, knowledge, projects and workflows through you
 agent. Select a skill below to read its usage guide. In Claude, invoke it with
 `/` before its name; in Codex, use `$` or the skill picker.
 
+Claude and Codex group automatic discovery under `tdt-brain`, `tdt-reminders`,
+`tdt-stacks`, `tdt-skills` and `tdt-workspace`. The specialist names below
+remain directly invocable. Stack and approved user skills remain individually
+discoverable.
+
 - **[tdt-capture](brain.md#save-knowledge-directly)** — Save explicitly supplied knowledge with sources and related links.
 - **[tdt-note](brain.md#scratchpad-notes)** — Save a tagged scratchpad idea and find related notes.
 - **[tdt-search-notes](brain.md#scratchpad-notes)** — Recall saved ideas and intentions through note content and subject tags.

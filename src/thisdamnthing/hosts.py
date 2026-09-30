@@ -48,18 +48,19 @@ def session_start(root):
         if event["event"] != "session_start":
             raise ValueError("This entry point only handles SessionStart")
         cwd = Path(event["cwd"]).resolve()
-        from .constitution import context as policy_context, in_scope
+        from .constitution import load as load_policy, in_scope
         if not in_scope(root, cwd):
             return 0
-        current_policy = policy_context(root)
+        # Validate expected policy state at startup, but leave current policy
+        # delivery to UserPromptSubmit so unchanged rules are not injected twice.
+        load_policy(root)
         path = managed_path(root, ".tdt/context.md")
         with path.open(encoding="utf-8") as stream:
             context = stream.read(12001)
         if len(context) > 12000:
             raise ValueError("Workspace context exceeds 12000 characters")
-        context += "\n\n" + current_policy
         if len(context) > 10000:
-            raise ValueError("Combined workspace context exceeds 10000 characters; nothing loaded")
+            raise ValueError("Workspace context exceeds 10000 characters; nothing loaded")
         from .stacks import notify_hooks
         notify_hooks(root, event)
         print(json.dumps({"hookSpecificOutput": {

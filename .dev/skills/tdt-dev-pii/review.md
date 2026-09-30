@@ -25,16 +25,24 @@ changes, history rewriting or source removal. Preserve the original task intent.
    agent transcripts: use a private local viewer with the user where sensitive
    context is not already safely available. If semantic inspection is unavailable,
    return incomplete and request that bounded local review; do not invent a pass.
-4. Return pass, findings, or incomplete with snapshot, coverage/gaps and masked
-   findings. A file reference is SHA256 of its raw repository-relative path,
-   first 12 hex digits; line numbers are one-based and location `path` refers to
-   the filename. Message line 1 is the subject; later lines cover body/trailers.
-   Keep entire excerpts `[redacted]`, since adjacent text may also be private.
-   Use these references for local resolution; never log raw names/paths/secrets.
-   Existing-context means an identical line exists in the immediate prior version
-   (rename/copy source where Git detects it), not proof of prior public exposure.
-   Duplicated/moved lines can be classified as existing; inspect that distinction
-   semantically. A missing prior version is incomplete, not evidence of newness.
+4. Generate the standard private Markdown report with `--report-file` pointing
+   to a new `.md` file in a private temporary directory or verified ignored
+   `.dev/local/` directory. The helper refuses existing files and creates reports
+   owner-readable/writable only. Keep sanitized JSON for snapshot/ID bookkeeping;
+   the Markdown report is the user-facing evidence. Open or link that local file
+   for review. Do not substitute an HTML viewer, masked table or summary for it.
+   Exact values and repository-relative filenames belong in that local report;
+   do not copy them into terminal output, chat, tracked files or decision records.
+   The user's request to see flagged values authorizes their inclusion here.
+   Use the fixed format below for both pattern and semantic findings. Preserve
+   helper IDs and snapshot, and append semantic findings to the same report.
+   Mark semantic review complete only after the full bounded review in step 3.
+   A file reference in JSON is SHA256 of its raw repository-relative path,
+   first 12 hex digits. Line numbers are one-based; location `path` refers to
+   the filename, `file` to staged content and `message` to the proposed message.
+   Message line 1 is the subject. Existing-context means an identical line exists
+   in the immediate prior version, not proof of public exposure. Duplicated/moved
+   lines can be existing; inspect context. Missing prior versions are incomplete.
 5. Explain heuristics: author/contact attribution may be intentionally public;
    example domains, generic placeholders and ordinary source/URL paths can be
    legitimate. Do not automatically delete or broadly exclude them. Suggest
@@ -72,3 +80,51 @@ changes, history rewriting or source removal. Preserve the original task intent.
 This is agent workflow guidance, not guaranteed manual-commit interception. No
 scan proves absence of private information. Project constitutions should reference this boundary; publication readiness
 checks cover release contents and history separately. These workflows do not authorize either operation.
+
+## Required Markdown finding format
+
+Keep the report title, status, scope/semantic-review state, snapshot, Findings and
+Coverage and gaps sections produced by the helper. Each finding uses this order:
+
+~~~~markdown
+### 1. 🟠 Medium — email
+
+- ID: <full finding digest>
+- File:
+
+```text
+<repository-relative filename, or Proposed commit message>
+```
+
+- Location: file
+- Line: 12
+- Exposure: new
+- Decision: pending
+- Actual flagged strings:
+
+```text
+person@example.org
+```
+~~~~
+
+Include every exact matched substring, without masking, truncation or surrounding
+unflagged context. Multiple matches for the same category/line share the existing
+finding ID and have separate literal blocks. Use longer fences when a value
+contains backticks. For semantic findings include the exact span judged private,
+its category and equivalent bound ID; never invent a string for unreadable bytes.
+Keep coverage gaps visible even when there are no findings. Update decisions only
+from explicit user acceptance of unchanged IDs or verified corrections.
+
+Severity expresses potential disclosure impact, not confidence or commit approval:
+
+- 🔴 Critical: private keys, tokens and credentials.
+- 🟠 High: semantic findings containing highly sensitive personal information
+  such as government identifiers or private financial/medical details.
+- 🟠 Medium: email, phone, identity/address heuristics and personal machine paths.
+- 🟡 Low: generic absolute-path heuristics or likely public/example attribution.
+
+Use these pattern defaults; adjust after semantic inspection only with a short
+reason beneath the finding. Keep the word label as well as the icon because
+Markdown renderers do not consistently support text colors. Low severity still
+requires resolution or acceptance under step 6. Exact-value reports are local
+review artifacts, never commit inputs or retained acceptance records.

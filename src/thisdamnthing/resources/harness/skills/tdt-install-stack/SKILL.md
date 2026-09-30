@@ -1,6 +1,6 @@
 ---
 name: tdt-install-stack
-description: Find, inspect and install an optional ThisDamnThing stack from the marketplace or a local directory when the user requests a workflow.
+description: Find, inspect and install optional workflow stacks.
 ---
 
 Examples below resolve paths from your shell’s current directory. Run workspace

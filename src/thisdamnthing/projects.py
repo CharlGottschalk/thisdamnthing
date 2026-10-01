@@ -9,7 +9,8 @@ from .workspace import WorkspaceError, managed_path, read_json
 
 REGISTRY = '.tdt/state/projects.json'
 DOCUMENTS = ('README.md', 'README.rst', 'README.txt', 'pyproject.toml',
-             'package.json', 'Cargo.toml', 'go.mod', 'Makefile', 'docs/README.md')
+             'package.json', 'Cargo.toml', 'go.mod', 'Makefile', 'docs/README.md',
+             '.tdt-project/project.json')
 
 
 def registry(root):

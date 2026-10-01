@@ -37,8 +37,11 @@ fallback and reuse approved content without repeating interviews.
 
 ## Separate project, workspace and knowledge records
 
-Shared brief, project configuration and work records live in the project's
-`.tdt/` directory. Ignore private developer configuration before populating it.
+Shared identity lives at `.tdt-project/project.json`. Software-production settings,
+brief and work records live under `.tdt-project/tdt-software-production/`.
+The project ID survives renames; core registration IDs remain path-based.
+`.tdt/` is reserved for workspace harnesses, with no legacy project fallback.
+Ignore private developer configuration before populating it.
 Workspace `.tdt/state/software-production` holds project and work-item handoffs.
 These operational records are separate from approved brain notes.
 

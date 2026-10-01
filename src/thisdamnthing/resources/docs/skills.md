@@ -9,11 +9,11 @@ you accept or decline. The proposal names the skill and describes its future
 behavior. Existing skills and remembered declines are checked first. Stack-builder
 remains the separate workflow for authoring distributable stacks.
 
-Use `/tdt-find-skills` with “Save this workflow as a skill I can use again,”
+Use `/tdt-add-skill` with “Save this workflow as a skill I can use again,”
 or ask your agent directly. The skill also handles approved live workflow
 suggestions; a history scan is not needed for a live suggestion. Review the
 proposed steps before approving them, then invoke the saved skill in a fresh
-session. In Codex, use `$tdt-find-skills` or the skill picker.
+session. In Codex, use `$tdt-add-skill` or the skill picker.
 
 For example, unread-email triage takes a mailbox/filter, time range, summary format
 and priority criteria. A proposed output could include subject, short summary,
@@ -22,6 +22,16 @@ sender role, explicit deadlines and user criteria supply evidence. Use the user'
 available authorized Gmail connector. Missing access is a prerequisite to explain,
 not permission to install/connect one. Saving or running a summarization workflow
 does not authorize sending, deleting, archiving or marking messages read.
+
+Choose your own readable name, such as `tdt-unread-triage`, for any discovered or
+new skill. The agent suggests a descriptive name if needed and checks for duplicate
+names before saving. Names do not need a hash suffix: the separate content ID is
+only used to review a proposal. If a name is taken, choose another or explicitly
+request an update to an existing user-owned skill. Core, stack and unmanaged skills
+cannot be overwritten through this flow. Pending proposals are checked too; refine
+the existing candidate instead of creating an unrelated workflow under its name.
+Changing an unsaved proposal's name creates a new review ID; approve only the final
+candidate. This does not rename an already installed skill.
 
 ## Find workflows in previous sessions
 
@@ -32,7 +42,7 @@ instead of claiming a complete scan. Review any suggested skills before saving.
 
 ## Technical reference: propose, review and update a skill
 
-`/tdt-find-skills` handles the following commands for live suggestions and
+`/tdt-add-skill` and `/tdt-find-skills` handle the following commands for live suggestions and
 history-based proposals. Technical users can use the same commands directly.
 
 Agents use this same path for live suggestions and discovered candidates. Run
@@ -61,7 +71,11 @@ instructions 10000; up to 40 source references of 160 characters each. Live
 suggestions may use an empty source list. Do not store raw approval messages;
 use a short user-message reference for the decision.
 
-Show the exact proposal and returned content ID. After actual user approval:
+New proposals refuse names already owned by a user skill. For an intentionally
+requested update, submit the same JSON shape with `tdt skill propose --update`.
+This option requires an existing user-owned skill and retains ownership checks.
+
+Show the exact proposal and returned content ID separately from the skill name. After actual user approval:
 
 ```text
 tdt skill review <id> --decision approve --user-instruction <user-message-reference>
@@ -73,7 +87,7 @@ Select 1–20 distinct IDs, one version per name, per review. Batch preflight re
 all writes if any selected skill conflicts. Refine by submitting a changed proposal
 and displaying it for approval. Repeated identical submissions retain pending/declined decisions. An approved
 version that is still installed remains approved. If a different version is now
-installed, resubmitting the earlier behavior reopens it as pending against current
+installed, resubmitting the earlier behavior with `--update` reopens it as pending against current
 ownership; show it for fresh approval before restoring it. Directly approving the
 old ID without resubmitting is refused. Do not repeatedly offer unchanged declines. If the user explicitly revisits
 a declined proposal, their new approval can select the same ID; do not solicit
@@ -94,7 +108,7 @@ Ownership and up to 100 bounded proposals/decisions live separately in
 references change. At the limit the command refuses new proposals; consciously
 archive decided entries before pruning them, since deleting declines loses that
 memory. Semantic duplicate detection belongs to the active agent. Creation checks
-the selected skill directories and enabled Claude command collisions. Updates to an owned skill use a new
+all three workspace skill directories and Claude command collisions, including disabled hosts. Updates to an owned skill use a new
 proposal and refuse edits/missing files or changed ownership since proposal. Preserve
 and reconcile edited files explicitly before retrying; do not delete edits to force
 an update. Core re-bootstrap and stack removal do not own these skills.

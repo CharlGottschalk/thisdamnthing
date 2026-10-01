@@ -5,7 +5,7 @@ import secrets
 import stat
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from . import brain
+from . import brain, frontmatter
 from .workspace import WorkspaceError, managed_path
 
 SETTINGS = ".tdt/state/reminders.json"
@@ -90,9 +90,12 @@ def inventory(root):
     for path in brain.note_files(root, ("reminders",)):
         text = bounded(root, path)
         if not text.startswith("---\n") or "\n---\n" not in text[4:]:
-            raise WorkspaceError("Expected reminder JSON front matter: " + path)
+            raise WorkspaceError("Expected reminder YAML front matter: " + path)
         head, body = text[4:].split("\n---\n", 1)
-        meta = json.loads(head)
+        try:
+            meta = frontmatter.loads(head)
+        except (ValueError, RecursionError) as exc:
+            raise WorkspaceError(f"Invalid reminder front matter {path}: {exc}") from exc
         if (not isinstance(meta, dict) or type(meta.get("format_version")) is not int or meta["format_version"] != 1
                 or meta.get("kind") != "reminder" or meta.get("status") not in ("pending", "done", "cancelled")
                 or type(meta.get("revision")) is not int or meta["revision"] < 1

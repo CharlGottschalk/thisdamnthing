@@ -288,3 +288,31 @@ Templates remain installed in .tdt/stacks/<id>/; generated outputs belong to the
 user, outside bundle ownership. Stack update/removal must not rewrite or delete
 those outputs. Disclose skill file writes in marketplace capabilities. This uses
 the existing contract; there are no installer destination mappings or setup scripts.
+
+### Project-local stack artifacts
+
+`.tdt/` is reserved exclusively for an installed workspace harness. A stack must
+never create or use `PROJECT/.tdt/` for project-local artifacts, even when the
+directory already exists. Workspace bundle, contract and state paths under
+`WORKSPACE/.tdt/` remain valid. There is no legacy project-layout fallback.
+
+Use `PROJECT/.tdt-project/<stack-id>/` for stack-specific settings, documents,
+tasks and helper state. The namespace must match the normalized manifest ID.
+Preserve other stacks' namespaces; never claim ownership of `.tdt-project/` as a
+whole. Ordinary source and user-requested outputs need not live in this folder.
+
+Shared identity lives at `PROJECT/.tdt-project/project.json`: a JSON object with
+`format_version: 1`, `id` (a canonical lowercase UUID generated once), and `name`
+(a nonempty single-line project name). Create it only during authorized project
+setup, not read-only registration. Reuse a valid existing ID across stack setup,
+renames and moves; never derive it from the name or path. Preserve unknown fields.
+Invalid or conflicting existing metadata must be reported, not overwritten.
+Update the name only when the user requests or confirms a rename. This portable
+identity is distinct from the current core workspace registration ID; it does not
+by itself authorize or perform a registry relink.
+
+Stack settings belong in the stack namespace, not in shared identity metadata.
+Keep private developer settings ignored before populating them. Stack update or
+removal must preserve these user-owned project files. Publication review must
+inspect instructions, templates and helpers for this boundary: manifest validation
+alone cannot prove where agent-authored or executable code will write.

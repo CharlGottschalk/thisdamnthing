@@ -15,6 +15,7 @@ discoverable.
 - **[tdt-search-notes](brain.md#scratchpad-notes)** — Recall saved ideas and intentions through note content and subject tags.
 - **[tdt-add-project](projects.md)** — Link an existing project without moving or changing its files, and get an explanation of its purpose, structure and entry points.
 - **[tdt-constitution](constitution.md)** — Define or update your workspace's working rules and permission preferences, with review before saving changes.
+- **[tdt-add-skill](skills.md)** — Create a skill from your own workflow with a chosen, duplicate-checked name.
 - **[tdt-find-skills](skills.md)** — Find reusable workflows in accessible completed sessions, or save a workflow from your current work as a skill after your approval.
 - **[tdt-install-stack](stacks.md#marketplace-discovery-and-installation)** — Find, inspect and install an optional stack from the marketplace or a local directory, with review of its source, requirements and executable content.
 - **[tdt-remove-stack](stacks.md#approved-updates-and-complete-uninstall)** — Uninstall a selected stack while preserving your brain notes, linked projects and user-created work.

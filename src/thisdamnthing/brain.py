@@ -8,8 +8,10 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import sys
 import unicodedata
 
+from . import frontmatter
 from .workspace import WorkspaceError, managed_path, read_config, read_json
 
 IDENTIFIER = re.compile(r"[a-f0-9]{64}\Z")
@@ -66,31 +68,54 @@ def save_json(root, relative, value):
 
 
 def note_text(meta, body):
-    # JSON is a YAML subset; no YAML parser/dependency is needed.
-    text = "---\n" + json.dumps(meta, indent=2, ensure_ascii=False) + "\n---\n\n" + body.rstrip() + "\n"
+    try:
+        header = frontmatter.dumps(meta)
+    except (ValueError, RecursionError) as exc:
+        raise WorkspaceError(f"Cannot write note metadata: {exc}") from exc
+    text = "---\n" + header + "\n---\n\n" + body.rstrip() + "\n"
     if len(text.encode("utf-8")) > 32768:
         raise WorkspaceError("Note and review history exceed 32 KiB; existing note preserved")
     return text
 
 
+class NoteError(WorkspaceError):
+    """Malformed note content, distinct from unsafe paths or workspace failures."""
+
+
 def read_note(root, relative):
     path = managed_path(root, relative)
-    if path.stat().st_size > 32768:
-        raise WorkspaceError(f"Note too large: {relative}")
-    text = path.read_text(encoding="utf-8")
-    if not text.startswith("---\n") or "\n---\n" not in text[4:]:
-        raise WorkspaceError(f"Expected ThisDamnThing JSON front matter: {relative}")
-    head, body = text[4:].split("\n---\n", 1)
-    meta = json.loads(head)
-    if (not isinstance(meta, dict) or meta.get("format_version") != 1
-            or not isinstance(meta.get("id"), str) or not IDENTIFIER.fullmatch(meta["id"])
-            or meta.get("status") not in ("pending", "approved", "rejected", "scratchpad")
-            or not isinstance(meta.get("title"), str)
-            or not isinstance(meta.get("review"), list)
-            or any(not isinstance(item, dict) for item in meta["review"])
-            or not isinstance(meta.get("provenance"), dict)):
-        raise WorkspaceError(f"Invalid note metadata: {relative}")
+    try:
+        if path.stat().st_size > 32768:
+            raise ValueError("note exceeds 32 KiB")
+        text = path.read_text(encoding="utf-8")
+        if not text.startswith("---\n") or "\n---\n" not in text[4:]:
+            raise ValueError("expected YAML front matter between --- delimiters")
+        head, body = text[4:].split("\n---\n", 1)
+        meta = frontmatter.loads(head)
+        if (not isinstance(meta, dict) or type(meta.get("format_version")) is not int
+                or meta["format_version"] != 1
+                or not isinstance(meta.get("id"), str) or not IDENTIFIER.fullmatch(meta["id"])
+                or meta.get("status") not in ("pending", "approved", "rejected", "scratchpad")
+                or not isinstance(meta.get("title"), str)
+                or not isinstance(meta.get("review"), list)
+                or any(not isinstance(item, dict) for item in meta["review"])
+                or not isinstance(meta.get("provenance"), dict)
+                or (meta.get("project") is not None and not isinstance(meta["project"], str))):
+            raise ValueError("invalid note metadata")
+    except (ValueError, RecursionError) as exc:
+        raise NoteError(f"Invalid note {relative}: {exc}") from exc
     return meta, body.strip()
+
+
+def scan_notes(root, categories):
+    """Skip content failures with visible diagnostics; keep path/IO safeguards strict."""
+    for relative in note_files(root, categories):
+        try:
+            meta, body = read_note(root, relative)
+        except NoteError as exc:
+            print(f"tdt: warning: skipping {exc}", file=sys.stderr)
+            continue
+        yield relative, meta, body
 
 
 def note_files(root, categories=("candidates", "knowledge", "projects", "sessions", "notes")):
@@ -120,8 +145,8 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
 
 def find_note(root, category, key):
     identifier(key)
-    matches = [relative for relative in note_files(root, (category,))
-               if read_note(root, relative)[0]["id"] == key]
+    matches = [relative for relative, meta, _ in scan_notes(root, (category,))
+               if meta["id"] == key]
     if len(matches) > 1:
         raise WorkspaceError(f"Duplicate note identity in {category}: {key}")
     return matches[0] if matches else None
@@ -235,8 +260,7 @@ def capture(root, key, data):
 
 def candidates(root, status="pending"):
     result = []
-    for relative in note_files(root, ("candidates",)):
-        meta, body = read_note(root, relative)
+    for relative, meta, body in scan_notes(root, ("candidates",)):
         if status == "all" or meta.get("status") == status:
             result.append((meta, body))
     return result
@@ -303,36 +327,12 @@ def eligible_notes(root):
     from .projects import registry
     project_ids = {p['id'] for p in registry(root)}
     notes = {}
-    # Bound both filesystem work and output. Never traverse symlink directories.
-    def scan_error(error):
-        raise WorkspaceError(f"Cannot scan brain: {error}")
-    count = 0
-    for category in ("knowledge", "projects", "sessions"):
-        directory = managed_path(root, f"brain/{category}")
-        if category == "sessions" and not directory.exists():
-            continue
-        for current, directories, filenames in os.walk(directory, followlinks=False, onerror=scan_error):
-            count += len(directories)
-            if count > 2000:
-                raise WorkspaceError("Brain scan exceeds 2000 entries")
-            directories.sort()
-            for name in directories:
-                managed_path(root, str((Path(current) / name).relative_to(root)))
-            for name in sorted(filenames):
-                count += 1
-                if count > 2000:
-                    raise WorkspaceError("Brain scan exceeds 2000 files; narrow the stored corpus")
-                if not name.endswith(".md"):
-                    continue
-                path = Path(current) / name
-                relative = str(path.relative_to(root))
-                meta, body = read_note(root, relative)
-                if meta.get("project") is not None and not isinstance(meta["project"], str):
-                    raise WorkspaceError(f"Invalid project identity in note: {relative}")
-                if (meta["status"] == "approved"
-                        and (not meta.get("project") or meta["project"] in project_ids)
-                        and (category != "projects" or meta["id"] in project_ids)):
-                    notes[relative[6:-3]] = (relative, meta["title"], body + "\n\nSources: " + json.dumps(meta.get("sources", []), ensure_ascii=False))
+    for relative, meta, body in scan_notes(root, ("knowledge", "projects", "sessions")):
+        category = relative.split("/")[1]
+        if (meta["status"] == "approved"
+                and (not meta.get("project") or meta["project"] in project_ids)
+                and (category != "projects" or meta["id"] in project_ids)):
+            notes[relative[6:-3]] = (relative, meta["title"], body + "\n\nSources: " + json.dumps(meta.get("sources", []), ensure_ascii=False))
     return notes
 
 

@@ -1,6 +1,7 @@
 """Explicit user saves and tagged scratchpad retrieval."""
 import json
 import re
+import sys
 
 from . import brain
 from .workspace import WorkspaceError
@@ -21,11 +22,14 @@ def tags(value):
 
 def inventory(root):
     result = []
-    for relative in brain.note_files(root, ("notes",)):
-        meta, body = brain.read_note(root, relative)
-        if meta["status"] != "scratchpad":
-            raise WorkspaceError("Expected scratchpad status: " + relative)
-        tags(meta.get("tags"))
+    for relative, meta, body in brain.scan_notes(root, ("notes",)):
+        try:
+            if meta["status"] != "scratchpad":
+                raise WorkspaceError("expected scratchpad status")
+            tags(meta.get("tags"))
+        except WorkspaceError as exc:
+            print(f"tdt: warning: skipping invalid note {relative}: {exc}", file=sys.stderr)
+            continue
         result.append((relative, meta, body))
     return result
 

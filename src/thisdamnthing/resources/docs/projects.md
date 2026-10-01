@@ -18,6 +18,13 @@ use in proposals. Full project IDs remain stable and are still used in commands.
 
 ## Get oriented
 
+Project-local stack artifacts use `.tdt-project/<stack-id>/`; `.tdt/` is reserved
+for installed workspace harnesses and remains refused during registration.
+Shared `.tdt-project/project.json` can hold a portable UUID and project name.
+Inspection reads it as evidence without writing to the project. That UUID is
+separate from the workspace registration ID and does not automatically reconnect
+a moved project. There is no legacy project `.tdt/` lookup or migration.
+
 Use `/tdt-add-project` in Claude or `$tdt-add-project` (or `/skills`) in Codex
 to explain purpose, structure, entry points and unknowns with source references.
 The skill can propose useful project knowledge for your review. Approve through
@@ -40,7 +47,8 @@ path creates a new identity. Workspace/self/ancestor registration and internal l
 ## What ThisDamnThing reads
 
 Inspection reads only README.md, README.rst, README.txt, pyproject.toml,
-package.json, Cargo.toml, go.mod, Makefile and docs/README.md, up to 4096 bytes
+package.json, Cargo.toml, go.mod, Makefile, docs/README.md and
+.tdt-project/project.json, up to 4096 bytes
 each, plus at most 100 top-level names. Symlinks and nonregular files are skipped;
 likely secret-bearing documents are omitted. Files can change after inspection;
 this is a snapshot, not a sandbox against concurrent hostile filesystem changes.

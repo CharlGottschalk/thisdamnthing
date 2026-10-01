@@ -12,10 +12,15 @@ Use the stack's constitution workflow to clarify and approve project rules, then
 preview the generated files before writing. Registration itself must leave project
 source unchanged.
 
+Project rules and their loader live under `.tdt-project/tdt-software-production/`;
+shared portable identity lives at `.tdt-project/project.json`. Keep `.tdt/`
+exclusive to workspace harnesses, without a legacy project-layout fallback.
+
 Preserve unrelated settings and SessionStart entries. Repeated setup with identical
 content should be stable; replacing owned content requires the expected prior
 hash. Scope the loader to the project so outside directories and nested independent
 Git projects do not receive its instructions.
+Nested projects with their own `.tdt-project/project.json` also form a boundary.
 
 Project policy can coexist with the workspace Constitution. Do not silently copy
 ThisDamnThing's development rules into a user's project. Keep machine-specific developer

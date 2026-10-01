@@ -11,6 +11,9 @@ with its own GitHub repository.
 
 - Core works with zero stacks. Domain workflows belong in optional stacks;
   first-party and community stacks use the same public contract and installer.
+- `.tdt/` is reserved for workspace harnesses. Project-local stack artifacts use
+  `.tdt-project/<stack-id>/`, with shared identity at `.tdt-project/project.json`;
+  stacks do not read or migrate a legacy project `.tdt/` layout.
 - Keep core agent agnostic; Claude/Codex behavior belongs in small adapters.
 - Installed skills and hooks are scoped to their workspace. Never register them
   globally or copy workspace registrations into linked external projects.

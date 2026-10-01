@@ -12,6 +12,12 @@ repeating on every prompt. Snoozing or changing its due time makes it eligible
 again. Editing only its text does not repeat a prior notification. Completed and
 cancelled records remain available in the full list. Recurrence is not supported.
 
+Reminder files use YAML front matter with quoted string values and the same
+YAML parsing rules as other notes. Revision and
+delivery-claim revision fields remain integers; empty delivery state stays null.
+Malformed reminder files still stop reminder operations with an error, rather
+than silently omitting a due item. CLI input and workspace settings remain JSON.
+
 ## Choose delivery during workspace onboarding
 
 `/tdt-workspace` offers reminder preferences during onboarding or on request:

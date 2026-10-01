@@ -49,3 +49,43 @@ actual host delivery. Distinguish a local registry fixture from a public downloa
 
 An unavailable prerequisite leaves that check unverified. Report it plainly and
 limit feature or platform claims to the behavior actually checked.
+
+## Obsidian-style brain front matter (manual regression)
+
+In a disposable workspace initialized with `tdt init <directory> --agent none`:
+
+1. Create and register two directories below `work/`. Keep one project note's
+   front matter as a JSON-shaped YAML flow mapping. Rewrite the other's YAML header,
+   preserving its full ID, project ID, status and timestamps. Use `links` and
+   `sources` block lists, a `provenance` map, and a `review` list of maps. Include
+   a quoted value containing a colon and an unquoted numeric-looking string.
+2. Run `tdt project inspect <name>` for both projects and `tdt brain search
+   <title>`. Check that the YAML note retains its brain link and appears in search.
+3. Add `brain/projects/broken.md` with an unterminated front-matter list. Repeat
+   both inspections and search. Each command should succeed, print a warning
+   naming `brain/projects/broken.md` on stderr, and retain valid results.
+4. Check candidate and scratchpad listings with valid YAML and malformed neighbors.
+   Direct reads of malformed notes must raise an error naming the relative file.
+5. Confirm a YAML write/read round trip preserves nested review history and the
+   body. Confirm unsafe symlinks still stop scans, and filename migration refuses
+   malformed notes. No command should rewrite the skipped file.
+
+Also check multiline values, inline maps, duplicate-key refusal and alias refusal.
+This verifies YAML parsing, not a live Obsidian/plugin session.
+
+### YAML writes and reminder lifecycle
+
+- Save a note containing numeric-looking IDs, date/boolean-looking strings,
+  Unicode, empty strings, nulls, multiline text and nested review history. Confirm
+  strings are quoted, field order is stable and a write/read/write cycle is identical.
+- Edit and approve a candidate; confirm the saved YAML retains previous review
+  history. Check project registration and scratchpad save/search too.
+- Create a due reminder, claim it, acknowledge it, edit it with the current
+  revision and mark it done. Check that both revision fields are integers and
+  acknowledged reminders are not delivered again. Repeat an edit from a YAML flow-mapping
+  header and confirm it saves as YAML. Settings and CLI payloads stay JSON.
+- Migrate a hash-named YAML note: preview writes nothing; apply writes YAML for
+  changed notes, preserves unrelated files and body/history, and is idempotent.
+
+- Verify block and JSON-shaped flow mappings use identical scalar typing and
+  duplicate-key checks; no JSON-specific parsing path remains.

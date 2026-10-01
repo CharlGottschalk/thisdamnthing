@@ -118,7 +118,18 @@ for project onboarding.
 
 ### Technical search and note format
 
-Notes use JSON front matter between `---` delimiters, followed by Markdown.
+TDT writes block YAML front matter between `---` delimiters, followed by Markdown,
+using PyYAML. String values are quoted and field order is preserved. Supported
+forms include plain and quoted strings, multiline values, block and inline lists
+and maps, and lists of maps. Unquoted IDs, dates, numbers and booleans stay
+strings; `format_version: 1` and reminder revision fields are integers, and
+unquoted YAML null/empty values represent absence. Quoted empty strings remain strings. Duplicate mapping keys,
+aliases, explicit type tags and nesting beyond 16 levels are rejected.
+All front matter uses the same YAML parsing rules, including JSON-shaped flow
+mappings. There is no separate JSON reader or JSON scalar typing. Opening a
+vault or reading notes does not rewrite them.
+Filename migration writes YAML only for notes it changes. Unsupported metadata
+types are refused on write rather than silently converted.
 Metadata includes format_version, stable id, title, kind, created/updated UTC
 timestamps, status, sources, host/session/turn provenance, optional project id,
 links and review history. Links are brain-relative without `.md`, e.g.
@@ -142,7 +153,10 @@ Use `--limit 10 --depth 1` (limit 1–50, depth 0–3). Literal case-insensitive
 matching seeds retrieval; direct matches precede linked notes and cycles are
 deduplicated. Pending/rejected notes never become link targets. Brain scans are
 limited to 2000 entries and each note to 32 KiB. Missing links are ignored;
-malformed notes or unsafe symlinks produce an error.
+malformed notes are skipped with a warning naming the brain-relative file on
+stderr, leaving other notes searchable. Project lookup, candidate listing and
+scratchpad retrieval use the same isolation. Direct reads still report the bad
+file as an error. Unsafe paths and symlinks still stop the operation.
 
 ### Browse your brain and migrate older filenames
 
@@ -150,7 +164,11 @@ Open `brain/` as your vault when using Obsidian so brain-relative links start at
 the vault root. Use its [Absolute path in vault](https://obsidian.md/help/settings)
 link format when creating links. Candidates remain visible files in the vault; their presence does
 not mean they are approved. TDT retrieval still excludes pending/rejected notes.
-Obsidian integration has not been verified end to end.
+Project inspection and brain search have been manually verified with front matter
+rewritten in Obsidian-style block YAML, including a malformed neighboring note.
+Live Obsidian Properties/plugin editing has not been exercised; the supported
+YAML forms and limits are described above. The shared format also covers reminder
+notes, whose delivery state and revision checks remain separate from knowledge.
 
 With TDT 0.1.3 or newer, refresh the workspace with `tdt init <workspace>` to update
 the installed skills and guides. Existing notes keep their filenames until you

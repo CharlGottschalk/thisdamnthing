@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import re
 
-from . import brain, stacks
+from . import brain, frontmatter, stacks
 from .workspace import WorkspaceError, managed_path
 
 
@@ -41,11 +41,13 @@ def migrate(root, apply=False):
             if isinstance(meta.get('canonical'), str):
                 updated['canonical'] = links.get(meta['canonical'], meta['canonical'])
             # Review snapshots and source/provenance references are historical evidence.
-            header = json.dumps(updated, indent=2, ensure_ascii=False) if updated != meta else head
-            content = '---\n' + header + '\n---\n' + wikilinks(body)
+            destination = renames.get(path, path)
+            rewritten_body = wikilinks(body)
+            changed = updated != meta or rewritten_body != body or destination != path
+            header = frontmatter.dumps(updated) if changed else head
+            content = '---\n' + header + '\n---\n' + rewritten_body
             if len(content.encode('utf-8')) > 32768:
                 raise WorkspaceError(f'Migrated note exceeds 32 KiB: {path}')
-            destination = renames.get(path, path)
             if destination != path:
                 changes[destination] = content
                 changes[path] = None

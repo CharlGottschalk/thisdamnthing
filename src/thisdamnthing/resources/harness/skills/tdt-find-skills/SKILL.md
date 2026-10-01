@@ -31,6 +31,15 @@ overlapping skills. Show an honest empty result when none qualify. Do not save r
 history, credentials, private content or incidental values. Keep raw history at its
 host and retain only bounded generalized proposals and source references.
 
+Offer readable descriptive names without hash or proposal-ID suffixes. Let the
+user supply or change each candidate's name before saving. Show the final `tdt-`
+name and check it against the inventory and pending proposals; never silently
+suffix a collision or treat it as permission to overwrite. Use `--update` only
+for an explicitly intended update to a user-owned skill. A changed proposal name
+gets a new review ID; that ID is bookkeeping, not the skill's invocation name.
+For direct skill authoring without discovery, follow
+`.tdt/skills/tdt-add-skill/SKILL.md`.
+
 Invocation approves discovery only. Let the user approve individual candidates or
 a selected group, refine or decline. Use the shared `skill propose`/`skill review`
 path in docs/skills.md for live and historical proposals. Show the exact proposed

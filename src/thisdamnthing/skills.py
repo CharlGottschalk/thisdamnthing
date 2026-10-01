@@ -113,7 +113,7 @@ def inventory(root):
     return {'skills': results, 'proposals': data['proposals']}
 
 
-def propose(root, value):
+def propose(root, value, update=False):
     if not isinstance(value, dict) or set(value) - {'name', 'description', 'instructions', 'sources'}:
         raise WorkspaceError('Proposal requires name, description, instructions and optional sources')
     proposal = {'name': name_checked(value.get('name')),
@@ -127,6 +127,11 @@ def propose(root, value):
     with locked(root):
         ready(root)
         data = state(root)
+        if proposal['name'] in data['skills'] and not update:
+            raise WorkspaceError(f"Skill name already exists: {proposal['name']}; choose another name or use --update for an intentional update")
+        if update and proposal['name'] not in data['skills']:
+            raise WorkspaceError('Cannot update a skill that is not user-owned')
+        check_targets(root, proposal['name'], data['skills'].get(proposal['name']))
         previous = data['proposals'].get(key)
         if previous is not None:
             if previous['status'] != 'approved' and previous.get('before') == data['skills'].get(proposal['name']):
@@ -158,14 +163,18 @@ def check_targets(root, name, owned):
         raise WorkspaceError("Skill integrations changed; propose again before approval")
     if any(set(paths(name)) & set(entry['files']) for entry in available(root)):
         raise WorkspaceError(f'Stack owns skill name: {name}')
-    for relative in (owned if owned is not None else paths(name, root)):
+    for relative in paths(name):
+        if owned is not None and relative not in owned:
+            if managed_path(root, str(Path(relative).parent)).exists():
+                raise WorkspaceError(f'Skill directory collision: {relative}')
+            continue
         current = existing_text(root, relative)
         if owned is None:
             if managed_path(root, str(Path(relative).parent)).exists():
                 raise WorkspaceError(f'Skill directory collision: {relative}')
         elif current is None or digest(current) != owned[relative]:
             raise WorkspaceError(f'User skill edited or missing; preserve and reconcile: {relative}')
-    if any(p.startswith('.claude/') for p in paths(name, root)) and managed_path(root, f'.claude/commands/{name}.md').exists():
+    if managed_path(root, f'.claude/commands/{name}.md').exists():
         raise WorkspaceError(f'Claude command collision: {name}')
 
 
@@ -253,8 +262,11 @@ def review(root, keys, decision, instruction):
 def add_parser(commands):
     parser = commands.add_parser('skill', help='review and save workspace-local user skills')
     actions = parser.add_subparsers(dest='action', required=True)
-    for name in ('list', 'propose', 'recover'):
+    for name in ('list', 'recover'):
         actions.add_parser(name)
+    proposal_parser = actions.add_parser('propose')
+    proposal_parser.add_argument('--update', action='store_true',
+                                 help='intentionally update an existing user-owned skill')
     review_parser = actions.add_parser('review')
     review_parser.add_argument('ids', nargs='+')
     review_parser.add_argument('--decision', choices=('approve', 'decline'), required=True)
@@ -269,7 +281,7 @@ def cli(root, args, value=None):
     if args.action == 'list':
         return inventory(root)
     if args.action == 'propose':
-        return propose(root, value)
+        return propose(root, value, update=args.update)
     if args.action == 'review':
         return review(root, args.ids, args.decision, args.user_instruction)
     if args.action == 'recover':

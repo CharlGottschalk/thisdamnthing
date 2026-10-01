@@ -12,6 +12,11 @@ Default to `<project-name>/`, using readable lowercase hyphen-separated names.
 Ask internal or external when the request and existing preferences do not say.
 For external projects, ask for the directory; keep existing projects in place.
 
+## Notes and reminders
+
+Core scratchpad notes use `notes/` and reminders use `reminders/`. These folders
+are created on first save. Keep project files in separate locations.
+
 ## Other working files
 
 Use the location requested by the user. When no convention covers a new type of

@@ -156,7 +156,8 @@ Staff must compare indexed tags with the pinned manifest before approval.
 ## User-owned working outputs
 
 Skills may create requested working files using bundled templates. Read the user's
-WORK.md first; internal destinations are below work/, with no fixed subfolders.
+WORK.md first; internal destinations are below work/. Core reserves work/notes/ and work/reminders/ for its stores;
+choose other locations for project artifacts.
 Respect the current request and existing locations before conventions; conventions
 precede stack suggestions. Create only needed folders and preserve existing files.
 Templates remain installed in .tdt/stacks/<id>/; generated outputs belong to the

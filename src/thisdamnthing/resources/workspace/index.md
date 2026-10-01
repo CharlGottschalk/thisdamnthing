@@ -5,8 +5,8 @@ wikilinks without `.md`, such as `[[projects/example]]`.
 
 - `projects/` — knowledge about projects that remain at their original paths.
 - `knowledge/` — approved facts, decisions, and open questions.
-- `reminders/` — one-time reminders; separate task and notification state.
-- `notes/` — tagged scratchpad ideas and intentions; not approved knowledge.
+- `../work/reminders/` — one-time reminders; separate task and notification state.
+- `../work/notes/` — tagged scratchpad ideas and intentions; not approved knowledge.
 - `candidates/` — pending user review; not authoritative knowledge.
 
 Approve captured candidates before promoting them. Do not store secrets or treat

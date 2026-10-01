@@ -15,7 +15,7 @@ from . import frontmatter
 from .workspace import WorkspaceError, managed_path, read_config, read_json
 
 IDENTIFIER = re.compile(r"[a-f0-9]{64}\Z")
-LINK = re.compile(r"(?:index|(?:knowledge|projects|sessions|notes)/[a-z0-9][a-z0-9/_-]*)\Z")
+LINK = re.compile(r"(?:index|(?:knowledge|projects|sessions|work/notes)/[a-z0-9][a-z0-9/_-]*)\Z")
 SECRET = re.compile(r"-----BEGIN .*PRIVATE KEY-----|\b(?:sk-[A-Za-z0-9_-]{16,}|AKIA[A-Z0-9]{16}|gh[pousr]_[A-Za-z0-9]{20,})|(?:password|api[_ -]?key|access[_ -]?token|secret)\s*[:=]\s*\S+", re.I)
 
 
@@ -118,6 +118,18 @@ def scan_notes(root, categories):
         yield relative, meta, body
 
 
+def category_path(category):
+    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders"):
+        raise WorkspaceError("Invalid note category")
+    base = "work" if category in ("notes", "reminders") else "brain"
+    return f"{base}/{category}"
+
+
+def note_link(relative):
+    """Knowledge links are brain-relative; work links include their workspace path."""
+    return relative[6:-3] if relative.startswith("brain/") else relative[:-3]
+
+
 def note_files(root, categories=("candidates", "knowledge", "projects", "sessions", "notes")):
     """Bounded, symlink-safe inventory shared by naming and migration."""
     if managed_path(root, ".tdt/state/stack-transaction.json").exists():
@@ -125,16 +137,18 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
     result = []
     count = 0
     def failed(error):
-        raise WorkspaceError(f"Cannot scan brain: {error}")
+        raise WorkspaceError(f"Cannot scan notes: {error}")
     for category in categories:
-        directory = managed_path(root, f"brain/{category}")
+        directory = managed_path(root, category_path(category))
         if category in ("sessions", "notes", "reminders") and not directory.exists():
-            continue  # Legacy sessions and workspaces not yet refreshed with scratchpad support.
+            continue  # Optional stores are created on first write.
+        if not directory.is_dir():
+            raise WorkspaceError(f"Expected a note directory: {directory}")
         for current, directories, filenames in os.walk(directory, followlinks=False, onerror=failed):
             directories.sort()
             count += len(directories) + len(filenames)
             if count > 2000:
-                raise WorkspaceError("Brain scan exceeds 2000 entries")
+                raise WorkspaceError("Note scan exceeds 2000 entries")
             for name in directories + sorted(filenames):
                 relative = str((Path(current) / name).relative_to(root))
                 managed_path(root, relative)
@@ -161,7 +175,7 @@ def named_path(root, category, key, title, reserved=()):
     slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"
     occupied = {p.casefold() for p in note_files(root, (category,))} | {p.casefold() for p in reserved}
     for length in range(8, 65, 4):
-        relative = f"brain/{category}/{slug}-{key[:length]}.md"
+        relative = f"{category_path(category)}/{slug}-{key[:length]}.md"
         if relative.casefold() not in occupied and not managed_path(root, relative).exists():
             return relative
     raise WorkspaceError("Note filename conflict; existing content preserved")
@@ -199,10 +213,10 @@ def summary(data):
     sources = [clean_text(s, "source", 400) for s in sources]
     links = data.get("links", ["index"])
     if not isinstance(links, list) or not 1 <= len(links) <= 8:
-        raise WorkspaceError("Include 1–8 brain-relative links (use index if no related note exists)")
+        raise WorkspaceError("Include 1–8 note links (use index if no related note exists)")
     for link in links + re.findall(r"\[\[([^\]]+)\]\]", body):
         if not isinstance(link, str) or not LINK.fullmatch(link) or ".." in link or "//" in link:
-            raise WorkspaceError("Invalid wikilink; use brain-relative paths without .md")
+            raise WorkspaceError("Invalid wikilink; use brain-relative or work/notes paths without .md")
     project = data.get("project")
     if project is not None and (not isinstance(project, str) or not re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,79}", project)):
         raise WorkspaceError("Invalid project id")

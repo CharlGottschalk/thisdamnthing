@@ -4,7 +4,7 @@ description: Save tagged scratchpad ideas and find related notes.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Save rough ideas,
-intentions and things to investigate in brain/notes, separate from approved
+intentions and things to investigate in work/notes, separate from approved
 knowledge. A clear "add a note" request is sufficient authorization. If "note"
 seems to mean an observation rather than a request to save, ask whether to save
 it. Do not turn ordinary conversation into scratchpad entries automatically.
@@ -31,7 +31,9 @@ sensitive personal details in tags unnecessarily.
 Preserve what the user actually said, including tentative wording and questions.
 Use the summary schema in docs/brain.md plus a required `tags` array. Use kind
 question for something to investigate or fact for a stated intention; do not
-recast an intention as a completed action. Use `index` as the fallback link.
+recast an intention as a completed action. Scratchpad links use the returned
+`work/notes/<filename>` path without `.md`; approved links remain brain-relative.
+Use `index` as the fallback link.
 Submit JSON on stdin via a quoted heredoc to
 `tdt --workspace <root> brain note --user-instruction <actual-request-or-reference>`.
 The CLI writes metadata and returns the saved path and related notes sharing

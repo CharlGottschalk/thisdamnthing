@@ -77,14 +77,14 @@ directory through the ordinary optional templates list.
 ```text
 <workspace>/
   WORK.md                    user-maintained filing conventions
-  work/                      lazy user-owned work; no fixed subfolders
+  work/                      user-owned work; created on demand
+    notes/                   tagged scratchpad ideas; created on first save
+    reminders/               one-time reminders; created on first save
   brain/
     index.md
     projects/
     knowledge/
     candidates/              pending user review; excluded from default retrieval
-    notes/                   tagged scratchpad ideas; searched explicitly
-    reminders/               one-time reminders; excluded from knowledge search
   .tdt/
     config.json
     contracts/
@@ -172,14 +172,14 @@ that project still follows its own instructions and the user's authorization.
 
 Explicit user saves use `/tdt-capture` to write approved knowledge with source,
 provenance and an approval record. `/tdt-note` saves tagged scratchpad ideas in
-`brain/notes/`, with no promotion. `/tdt-search-notes` retrieves scratchpad content
+`work/notes/`, with no promotion. `/tdt-search-notes` retrieves scratchpad content
 and subject tags, labels it as unapproved, and follows shared-tag relationships.
 Default knowledge search still excludes scratchpad notes. Explicit saving uses
 the turn suppression guard to avoid duplicate automatic candidates.
 
 ## Reminders
 
-`/tdt-remind` saves explicit one-time reminders directly to `brain/reminders/`,
+`/tdt-remind` saves explicit one-time reminders directly to `work/reminders/`,
 without candidates or knowledge promotion. `/tdt-check-reminders` claims due and
 overdue records and announces them once; notification and task completion are
 separate. List, edit, snooze, done and cancel use the same small CLI/store.

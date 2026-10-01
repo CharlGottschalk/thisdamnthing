@@ -2,8 +2,8 @@
 
 Say “Remind me to review the checklist tomorrow at 15:00”, or use `/tdt-remind`.
 The agent confirms the resolved date, time and timezone. It asks when the time or
-timezone is unclear. Reminders are readable Markdown under `brain/reminders/`,
-separate from scratchpad notes, candidates and approved knowledge. They never
+timezone is unclear. Reminders are readable Markdown under `work/reminders/`,
+created on first save, separate from scratchpad notes, candidates and approved knowledge. They never
 appear in knowledge or scratchpad search and never authorize the reminded action.
 
 Ask to list, edit, snooze, mark done or cancel a reminder. Notification does not
@@ -122,7 +122,8 @@ checks or a healthy doctor report do not prove delivery.
 
 Settings live in `.tdt/state/reminders.json`; reminder files contain task and
 delivery state. Refresh with `tdt init` after upgrading to install the skills,
-guide and folder, preserving existing records and preferences. No extra hook is
+and guide, preserving existing records and preferences. The folder is created on
+first save. No extra hook is
 registered: the existing request adapter checks only when chat delivery is opted
 in. Reminder failures are reported without blocking constitution context. Core
 starts with manual delivery and no configured timezone or scheduler.

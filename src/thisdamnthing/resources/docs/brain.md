@@ -37,8 +37,12 @@ Sources are part of its identity; semantic duplicates are checked by the skill.
 
 ## Scratchpad notes
 
+Scratchpad storage lives under `work/`; the existing `tdt brain note`, `notes`,
+`related` and `search --scope notes` commands remain unchanged. Scratchpad
+links use `work/notes/<filename>` without `.md`; knowledge links remain brain-relative.
+
 Use `/tdt-note` (Codex: `$tdt-note`) or say "add a note" or "jot this down".
-The skill saves the idea under `brain/notes/` with `status: scratchpad`, title,
+The skill saves the idea under `work/notes/` with `status: scratchpad`, title,
 kind, timestamps, sources, provenance and 1–8 subject tags. If your intent to
 save is unclear, the agent asks. Notes are not automatically promoted or treated
 as approved knowledge. Normal knowledge search excludes them.
@@ -76,13 +80,13 @@ return the existing path. Related results list shared tags and up to 50 notes.
 Search is literal and bounded; `--scope all` returns approved knowledge first,
 then scratchpad results up to the total limit. Scratchpad results are labelled.
 Optional search providers currently support only the default knowledge scope.
-Refresh an existing installation with `tdt init` after upgrading to install the
-folder and skills. Existing brain files are preserved.
+The scratchpad folder is created on first save; listing and searching an empty
+workspace do not create it.
 
 ## Reminders
 
 Use `/tdt-remind` for one-time time-based intentions. Records in
-`brain/reminders/` have their own task and notification lifecycle; they are
+`work/reminders/` have their own task and notification lifecycle; they are
 excluded from knowledge/candidate capture and all brain search scopes. Use
 `/tdt-check-reminders` for due items. See [reminders](reminders.md) for opt-in
 chat delivery and external scheduler setup.
@@ -181,7 +185,8 @@ tdt brain migrate-names --apply
 
 The first command previews the renames without writing. The second recomputes and
 applies them under the workspace lock. Migration covers hash-named notes under
-`candidates/`, `knowledge/`, `notes/`, `projects/` and `sessions/`, updates their current
+`brain/candidates/`, `brain/knowledge/`, `work/notes/`, `brain/projects/` and
+`brain/sessions/`, updates their current
 link/canonical metadata, wikilinks in those notes and `brain/index.md`, and stack
 candidate references. Wikilink aliases and heading suffixes are retained. IDs,
 approval states, timestamps, provenance and historical review entries stay intact.

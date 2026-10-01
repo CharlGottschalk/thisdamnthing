@@ -77,7 +77,8 @@ directly in work/. These are agent-interpreted conventions, not executable rules
 the low-level CLI uses the explicit path passed to it.
 
 `tdt project add <existing-path>` registers external directories or directories
-below work/. Git is not required. Other workspace areas cannot be projects.
+below work/, excluding the core stores `work/notes/` and `work/reminders/`
+and their descendants. Git is not required. Other workspace areas cannot be projects.
 `tdt project inspect autumn-launch` resolves a unique basename; an ID, absolute
 registered path or internal relative path disambiguates. IDs remain path-based;
 moving directories is not an automatic identity migration.

@@ -70,7 +70,7 @@ def save(root, data, instruction, *, scratchpad=False):
                 raise WorkspaceError("Unknown registered project id")
         allowed = set(brain.eligible_notes(root)) | {"index"}
         if scratchpad:
-            allowed.update(path[6:-3] for path, _, _ in inventory(root))
+            allowed.update(brain.note_link(path) for path, _, _ in inventory(root))
         if any(link not in allowed for link in value["links"] + re.findall(r"\[\[([^\]]+)\]\]", value["body"])):
             raise WorkspaceError("Links must reference existing eligible notes")
         existing = brain.find_note(root, category, key)

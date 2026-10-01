@@ -84,7 +84,7 @@ def configure(root, tz=None, chat=None, schedule=None, clear_schedule=False):
 
 
 def inventory(root):
-    if not managed_path(root, "brain/reminders").exists():
+    if not managed_path(root, "work/reminders").exists():
         return []
     result, identities = [], set()
     for path in brain.note_files(root, ("reminders",)):

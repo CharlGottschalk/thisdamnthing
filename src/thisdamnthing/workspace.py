@@ -11,7 +11,7 @@ class WorkspaceError(Exception):
 
 DIRECTORIES = (
     "brain", "brain/projects", "brain/knowledge",
-    "brain/candidates", "brain/notes", "brain/reminders", ".tdt", ".tdt/contracts", ".tdt/skills",
+    "brain/candidates", ".tdt", ".tdt/contracts", ".tdt/skills",
     ".tdt/hooks", ".tdt/stacks", ".tdt/state", "docs",
 )
 TEMPLATES = {
@@ -109,10 +109,6 @@ def initialize(directory, agent=None):
         # Reinitialization preserves edits and state; the derived catalog is rebuildable.
         for relative in [*DIRECTORIES, *TEMPLATES, *STATE]:
             managed_path(root, relative)
-        extra_directories = [managed_path(root, "brain/" + name) for name in ("notes", "reminders")]
-        for directory in extra_directories:
-            if directory.exists() and not directory.is_dir():
-                raise WorkspaceError(f"Expected a directory: {directory}; existing file preserved")
         from .brain import locked
         with locked(root):
             catalog = stack_docs.plan(root, stacks.available(root))
@@ -129,8 +125,6 @@ def initialize(directory, agent=None):
             pending.update(catalog)
             stacks.transaction(root, pending)
             stacks.prune(root, [p for p, content in pending.items() if content is None])
-            for directory in extra_directories:
-                directory.mkdir(exist_ok=True)
         return root, False
 
     # Reserve the managed files and harness before making any changes. Other

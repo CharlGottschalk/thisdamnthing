@@ -57,6 +57,8 @@ def add(root, directory):
         relative = path.relative_to(root)
         if relative.parts[0] != 'work' or len(relative.parts) < 2:
             raise WorkspaceError('Internal projects must be below work/')
+        if relative.parts[1] in ('notes', 'reminders'):
+            raise WorkspaceError('work/notes and work/reminders are reserved for core stores')
         managed_path(root, relative)
     if path == root or path in root.parents:
         raise WorkspaceError('Project cannot be the workspace or its ancestor')
@@ -188,6 +190,8 @@ def create(root, relative):
     if (not relative or relative.startswith('/') or '\\' in relative
             or any(p in ('', '.', '..') or p.startswith('.') for p in parts)):
         raise WorkspaceError('Use a relative folder below work/, without dot or hidden components')
+    if parts[0] in ('notes', 'reminders'):
+        raise WorkspaceError('work/notes and work/reminders are reserved for core stores')
     target = managed_path(root, 'work/' + relative)
     for parent in (target, *target.parents):
         if parent == root:

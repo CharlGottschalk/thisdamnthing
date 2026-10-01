@@ -22,7 +22,7 @@ def migrate(root, apply=False):
             seen.add(identity)
             if Path(path).stem == meta['id']:
                 renames[path] = brain.named_path(root, category, meta['id'], meta['title'], renames.values())
-        links = {old[6:-3]: new[6:-3] for old, new in renames.items()}
+        links = {brain.note_link(old): brain.note_link(new) for old, new in renames.items()}
 
         def wikilinks(text):
             # Preserve optional aliases, headings and embed markers verbatim.

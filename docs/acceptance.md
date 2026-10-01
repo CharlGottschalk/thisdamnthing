@@ -89,3 +89,15 @@ This verifies YAML parsing, not a live Obsidian/plugin session.
 
 - Verify block and JSON-shaped flow mappings use identical scalar typing and
   duplicate-key checks; no JSON-specific parsing path remains.
+
+## Notes and reminders under work
+
+In a disposable workspace initialized with both hosts, confirm `work/` is absent
+until needed and doctor succeeds. Save a scratchpad and reminder; confirm their
+paths are under `work/notes/` and `work/reminders/`, with no corresponding brain
+folders. Check scratchpad search, shared tags, duplicate saves and links using
+`work/notes/<filename>`; default knowledge search must exclude both stores.
+Exercise reminder claim/acknowledgement and confirm no repeat delivery. Refresh
+the workspace and compare store bytes. Preview/apply a scratchpad hash-filename
+rename and check current links and repeat idempotence. Refuse symlink/file store
+conflicts and project creation/registration in either reserved store.

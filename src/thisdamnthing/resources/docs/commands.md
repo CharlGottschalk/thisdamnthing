@@ -103,8 +103,9 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has eighteen tools:
+The default `read-only` catalog has twenty tools:
 
+- `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
@@ -146,7 +147,43 @@ as core candidate review. Read the full candidate before reviewing it through th
 existing CLI; a list summary is insufficient. Reading never approves content.
 Duplicate IDs require an exact path. Neither category enters approved retrieval.
 
-The opt-in `--profile everyday` adds eight reminder tools (26 tools total):
+The opt-in `--profile everyday` adds two capture tools and eight reminder tools (30 tools total).
+
+`tdt_capture_requests` accepts `status` (`requested` by default, `captured`,
+`skipped` or `all`), `limit` and `cursor`. Scans refuse malformed state and exceedances
+of 2000 entries or 32768 bytes per request. Cursors expire when inventory changes.
+`tdt_capture_request_read` accepts an exact `request_id`; neither reader reads the
+transcript path stored in provenance. Inventory order never identifies the active
+conversation.
+
+`tdt_capture_submit` requires the existing `request_id` delivered by the current
+host hook and a discriminated `payload`: `{"action":"skip"}` or
+`{"action":"summary","summary":{"title":"...","kind":"fact","body":"...",
+"sources":["user message with locator"],"links":["index"],"project":null}}`.
+Kinds are fact, decision, question or inference; shared core summary limits and
+secret checks apply. Provenance comes from the saved request. Capture creates a
+pending candidate only. Replays return the saved captured/skipped status without
+accepting replacement content. After a lost response, read request status before
+retrying or using CLI fallback; a partial candidate write can be reconciled by
+resubmitting the original request.
+
+`tdt_capture_suppress` requires the exact current request-hook `token`. Use it for
+user saving restrictions or explicit save/review/reminder work. Repeats are safe
+within that turn; stale tokens fail. Tokens and request IDs are explicit context,
+not authenticated host identity. MCP does not create hook requests or turn tokens,
+register hooks, or enable automatic capture. Existing hooks still instruct CLI
+submission. Both writes share core
+locking, refuse stack recovery state, and return receipts within the minimum
+1024-byte budget. Live Codex CLI and Claude Code checks verified submission,
+skip, status-before-retry, token suppression and preserved pending provenance
+using disposable hook-generated fixtures. Real lifecycle capture and suppression
+also passed on both hosts with explicit per-run instructions to use MCP; default
+MCP selection by hooks is not implemented. Forced server termination before/after
+candidate writes and after capture/skip/suppression state saves recovered through
+fresh-server status reads and retries in both SDK modes. Live model-client
+automatic reconnect/fallback and power-loss recovery remain unverified.
+
+The reminder tools are:
 
 - `tdt_reminder_create` requires `title`, `body`, `due_at`, an explicit IANA
   `timezone`, and `user_instruction`. Resolve the intended date/time with the user;

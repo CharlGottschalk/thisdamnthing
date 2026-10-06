@@ -8,6 +8,7 @@ import secrets
 
 from .brain import capture, digest, locked, now, read_request, request_path, save_json
 from .hosts import normalize_event
+from .constitution import bounded
 from .workspace import WorkspaceError, managed_path, read_json
 
 
@@ -36,8 +37,10 @@ def suppress_review_turn(root, token):
         raise ValueError("Expected the current review-turn token from request context")
     relative = ".tdt/state/capture-turns/" + token[:64] + ".json"
     with locked(root):
-        state = read_json(root, relative)
-        if state.get("token") != token:
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
+        state = json.loads(bounded(managed_path(root, relative), 32768))
+        if not isinstance(state, dict) or state.get("token") != token:
             raise ValueError("Stale review-turn token; use the current request context")
         state["suppressed"] = True
         save_json(root, relative, state)

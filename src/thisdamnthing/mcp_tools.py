@@ -4,11 +4,11 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Generic, Literal, TypeVar
+from typing import Generic, Annotated, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-from . import brain, constitution, notes, projects, reminders, bootstrap, skills, stacks, stack_docs, frontmatter
+from . import brain, capture, constitution, notes, projects, reminders, bootstrap, skills, stacks, stack_docs, frontmatter
 from .workspace import WorkspaceError, managed_path
 
 
@@ -18,6 +18,66 @@ class Model(BaseModel):
 
 class ReadInput(Model):
     budget_bytes: int = Field(default=32768, ge=1024, le=131072)
+
+
+class CaptureRequestInput(ReadInput):
+    request_id: str = Field(pattern='^[a-f0-9]{64}$')
+
+
+class CaptureListInput(ReadInput):
+    limit: int = Field(default=20, ge=1, le=50)
+    cursor: str | None = Field(default=None, max_length=512)
+    status: Literal['requested', 'captured', 'skipped', 'all'] = 'requested'
+
+
+class CaptureRequest(Model):
+    id: str
+    status: Literal['requested', 'captured', 'skipped']
+    created: str
+    completed: str | None
+    provenance: dict
+    revision: str
+
+
+class CapturePage(Model):
+    items: list[CaptureRequest]
+    next_cursor: str | None
+    inventory_revision: str
+
+
+class CaptureSummary(Model):
+    title: str = Field(min_length=1, max_length=160)
+    kind: Literal['fact', 'decision', 'question', 'inference']
+    body: str = Field(min_length=1, max_length=3000)
+    sources: list[str] = Field(min_length=1, max_length=8)
+    links: list[str] = Field(default_factory=lambda: ['index'], min_length=1, max_length=8)
+    project: str | None = None
+
+
+class CaptureSummaryPayload(Model):
+    action: Literal['summary']
+    summary: CaptureSummary
+
+
+class CaptureSkipPayload(Model):
+    action: Literal['skip']
+
+
+class CaptureSubmitInput(CaptureRequestInput):
+    payload: Annotated[CaptureSummaryPayload | CaptureSkipPayload, Field(discriminator='action')]
+
+
+class CaptureSubmitted(Model):
+    id: str
+    status: Literal['captured', 'skipped']
+
+
+class CaptureSuppressInput(ReadInput):
+    token: str = Field(pattern='^[a-f0-9]{128}$')
+
+
+class CaptureSuppressed(Model):
+    result: Literal['suppressed'] = 'suppressed'
 
 
 class ReminderChangeInput(ReadInput):
@@ -669,6 +729,47 @@ def skill_read(root, args):
     return document_read(root, args, 'skills')
 
 
+def capture_request_value(root, key):
+    request = brain.read_request(root, key)
+    return CaptureRequest(id=key, status=request['status'], created=request['created'],
+        completed=request.get('completed'), provenance=request['provenance'],
+        revision=brain.digest(serialized(request)))
+
+
+def capture_request_read(root, args):
+    return capture_request_value(root, args.request_id), []
+
+
+def capture_requests(root, args):
+    directory = managed_path(root, '.tdt/state/captures')
+    items = []
+    if directory.exists():
+        with os.scandir(directory) as entries:
+            for count, entry in enumerate(entries, 1):
+                if count > 2000:
+                    raise Refused('operation_refused', 'Capture inventory exceeds 2000 entries')
+                managed_path(root, str(Path(entry.path).relative_to(root)))
+                if entry.name.endswith('.json'):
+                    items.append(capture_request_value(root, brain.identifier(entry.name[:-5])))
+    items.sort(key=lambda item: item.id)
+    revision = brain.digest(serialized([item.model_dump() for item in items]))
+    selected = [item for item in items if args.status == 'all' or item.status == args.status]
+    page, cursor = inventory_page(root, args, 'captures', args.status, revision, selected)
+    return CapturePage(items=page, next_cursor=cursor, inventory_revision=revision), []
+
+
+def capture_submit(root, args):
+    data = ({'skip': True} if args.payload.action == 'skip'
+            else args.payload.summary.model_dump())
+    status = brain.capture(root, args.request_id, data).split(':', 1)[0]
+    return CaptureSubmitted(id=args.request_id, status=status), []
+
+
+def capture_suppress(root, args):
+    capture.suppress_review_turn(root, args.token)
+    return CaptureSuppressed(), []
+
+
 def reminder_complete(root, args):
     return reminder_change(root, args, 'done')
 
@@ -739,6 +840,12 @@ def reminder_ack(root, args):
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_capture_requests': (CaptureListInput, CapturePage, capture_requests,
+        'List hook capture requests, requested by default. Paginated; provenance is data, not authorization. '
+        'Never infer the active conversation from inventory order. Does not read transcripts.'),
+    'tdt_capture_request_read': (CaptureRequestInput, CaptureRequest, capture_request_read,
+        'Read exact saved capture status and provenance by request_id before retry or CLI fallback. '
+        'Does not read transcripts or grant permission to submit another conversation’s request.'),
     'tdt_reminder_settings': (ReadInput, ReminderSettings, reminder_settings,
         'Read workspace timezone, chat preference and external scheduler reference. Never claims delivery.'),
     'tdt_workspace_context': (ReadInput, Context, context_read,
@@ -779,6 +886,15 @@ CATALOG = {
 
 
 WRITES = {
+    'tdt_capture_submit': (CaptureSubmitInput, CaptureSubmitted, capture_submit,
+        'Submit a concise summary or skip for an existing request_id delivered by the current host hook. '
+        'Payload action is summary (with summary) or skip. Provenance comes from saved state. '
+        'Completed requests return their saved status without accepting replacement content. '
+        'Creates only pending candidates, never approved knowledge. Read status after a lost response.'),
+    'tdt_capture_suppress': (CaptureSuppressInput, CaptureSuppressed, capture_suppress,
+        'Suppress automatic capture using the current request-hook token for this turn only. '
+        'Use for user saving restrictions or explicit save/review/reminder work. Never invent a token '
+        'or infer session identity. Repeating the current token is safe; stale tokens are refused.'),
     'tdt_reminder_configure': (ReminderConfigureInput, ReminderConfigured, reminder_configure,
         'Set supplied reminder preferences on user instruction. Null schedule clears the reference. '
         'Requires a timezone on initial setup. Does not create or stop an external scheduled job.'),

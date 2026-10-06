@@ -320,3 +320,72 @@ state changed. Hosts used temporary launch-only configuration, with Codex per-to
 approval for the three authorized writes and Claude's strict MCP allowlist.
 No runtime fix was required. Desktop rendering, scheduled execution and disconnect
 during claim writes remain unverified.
+
+### MCP capture requests and suppression
+
+Both profiles expose `tdt_capture_requests` and `tdt_capture_request_read` (20
+read-only tools). Everyday adds `tdt_capture_submit` and `tdt_capture_suppress`
+(30 tools). Verify existing hook request IDs, saved provenance, pending-only
+candidates, discriminated summary/skip input, completed-request replay and exact
+status reconciliation before CLI fallback. Check current/stale turn tokens,
+independent conversations, shared locks, stack recovery refusal, bounded regular
+state files, inventory cursor invalidation and minimum-budget write receipts.
+Never derive active conversation identity from inventory order.
+
+Packaged manual verification on 2026-10-06 passed SDK auto and legacy stdio:
+20/30 catalogs and output schemas, requested status reads, pagination and
+stale cursor refusal, summary/skip, unchanged completed-request replay, retained
+candidate bytes during partial-completion reconciliation, secret rejection,
+missing request refusal, suppression/repeat/stale token, shared CLI lock and
+stack recovery refusal, malformed/oversized/FIFO request refusal. Direct packaged
+checks covered strict payload variants, two-session suppression isolation,
+malformed/oversized/FIFO suppression state, read-result budgets, symlink refusal
+and the 2000-entry scan bound. Existing reminder delivery checks passed both SDK
+modes, including catalogs/context, preferences, claims, budgets and acknowledgements.
+Dependency and whitespace checks passed. No automated suite added or run.
+
+Synthetic Claude/Codex Stop payloads produced requests, accepted MCP skip, did
+not repeat continuation, and retained completed status through CLI fallback.
+These are core checks, not live host lifecycle evidence; the later lifecycle
+and disconnect checks below cover those paths. Existing hook instructions still
+select CLI submission. No saved host configuration or hook registration changed.
+
+Live capture-tool verification on 2026-10-06: Codex CLI 0.156.1 and Claude Code
+2.1.289 each exited successfully with 19 actual MCP calls. Independent JSONL
+and whole-workspace hash audits passed: 20/30 context catalogs; initial request
+inventory and exact reads; stale-token refusal; current-token suppression/repeat;
+summary submission, status read before identical retry, and one pending candidate;
+skip/read/retry; final statuses and preserved provenance. Only two request files,
+one turn-suppression file and one new candidate changed per host. The control
+request/session and all other workspace files remained unchanged. No runtime fix
+was needed. The lost-response scenario was simulated by reading status before
+retry; no actual transport response was dropped. Requests/tokens were produced
+by shared hook functions in fixtures, not those live hosts' lifecycle events.
+Temporary launch-only MCP settings used the existing signed-in accounts; no
+saved registrations changed. No automated suite was added or run.
+
+Real lifecycle verification on the same host versions also passed on 2026-10-06:
+four noninteractive runs, capture and suppression for each host, all exit code 0.
+Installed SessionStart/UserPromptSubmit/Stop handlers ran from launch-only hook
+settings with a transparent logging wrapper. No capture requests or tokens were
+preseeded. Actual UserPromptSubmit tokens and Stop request IDs matched MCP calls
+and saved provenance. Capture runs each made one context read and one submission,
+created one pending candidate, retained the substantive final answer and capture
+notice, and ended after the second Stop with `stop_hook_active=true`. Suppression
+runs each made one context read and one suppression, saved no request/candidate,
+and ended after one nonblocking Stop. Whole-workspace hashes matched exactly the
+expected lock/turn/request/candidate files. Codex emitted unrelated state-db
+lookup warnings but completed. Per-run instructions explicitly selected MCP over
+the hook's CLI wording; default automatic MCP selection is not implemented.
+
+Forced disconnect recovery passed ten disposable SDK stdio cases (five each in
+auto/legacy modes). A temporary wrapper paused the installed atomic writer before
+candidate save, after candidate save but before request completion, after capture
+completion, after skip completion, or after suppression state save. SIGKILL then
+terminated that server before a tool response reached the client; every call
+failed with MCPError. A fresh unmodified server read saved status and retried.
+Incomplete capture reconciled to one candidate without replacing existing bytes;
+completed capture/skip/suppression remained replay-safe. Repeating each operation
+left hashes unchanged. These checks cover controlled process-death boundaries,
+not power loss, every filesystem instruction, or a live model client's automatic
+reconnect/fallback. No product fixes or automated suite were needed.

@@ -286,5 +286,10 @@ snoozing, completion and cancellation on explicit user instruction, using the sh
 core lock. Settings are readable in both profiles; everyday also configures
 preferences, claims due reminders with expiring leases, and acknowledges delivery
 without completing tasks. Claim responses are budget-checked before writing.
+Both profiles also provide bounded capture request inventories and exact status reads,
+without reading transcripts. Everyday submits summary/skip to existing hook requests
+and suppresses capture using current hook turn tokens through shared core locking;
+candidates remain pending and completed submissions preserve their saved outcome.
+MCP does not establish host/session identity or enable capture hooks.
 Read-only remains the default. Other writes, host registration, resources and prompts are
 not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

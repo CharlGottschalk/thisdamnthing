@@ -240,7 +240,8 @@ def request_path(key):
 
 
 def read_request(root, key):
-    return validate_request(read_json(root, request_path(key)), key)
+    from .constitution import bounded
+    return validate_request(json.loads(bounded(managed_path(root, request_path(key)), 32768)), key)
 
 
 def validate_request(request, key):
@@ -259,6 +260,8 @@ def validate_request(request, key):
 def capture(root, key, data):
     """Accept only agent summaries tied to a previously delivered host request."""
     with locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         request = read_request(root, key)
         if request.get("status") in ("captured", "skipped"):
             return request["status"] + ": " + key

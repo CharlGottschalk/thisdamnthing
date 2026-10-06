@@ -153,7 +153,7 @@ Use disposable workspaces and external directories; never a personal workspace.
 
 Use a disposable workspace and an installation built with the `mcp` extra.
 Launch `tdt --workspace PATH mcp serve --profile read-only` with a local stdio
-client. Check discovery and JSON input/output schemas for the eight advertised
+client. Check discovery and JSON input/output schemas for the eleven advertised
 tools. Read context and policy, search approved knowledge, and follow a returned
 reference. Compare CLI and MCP search eligibility and link traversal.
 
@@ -179,3 +179,14 @@ Confirm that reads preserve all workspace bytes and reminder/capture state.
 
 Approved search does not paginate. There is no enforced incoming transport-message cap; output budgets cover application JSON,
 which is duplicated in the MCP text block. No automated tests.
+
+
+For MCP workspace status/project reads, create available, missing and archived
+registrations and compare with CLI registry state. Page results, invalidate a cursor
+by changing availability or registry data, and read by exact ID/path/URI. Confirm
+missing/duplicate/invalid registration handling, foreign references and symlink
+refusal. Verify no external project source reads. Check pending captures and due,
+notified, claimed, completed and future reminders without changing delivery state.
+Exercise recovery markers (null blocked counts), malformed/oversized state, bounded
+capture inventory and invalid candidate omissions. Compare workspace and external
+fixture bytes before/after calls. Live host verification remains separate.

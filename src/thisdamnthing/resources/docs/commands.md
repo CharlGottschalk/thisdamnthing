@@ -103,9 +103,12 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The current catalog has eight tools:
+The current catalog has eleven tools:
 
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
+- `tdt_workspace_status`: bounded operational counts and recovery markers.
+- `tdt_project_list`: paginated registered projects, including archived/missing state.
+- `tdt_project_read`: registry details and complete retained registration Markdown.
 - `tdt_constitution_read`: complete constitution and its revision.
 - `tdt_brain_search`: literal search of approved knowledge with bounded links.
 - `tdt_brain_read`: read an eligible note using a path or URI returned by search.
@@ -144,3 +147,23 @@ provider execution and mutations. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Live Claude/Codex host
 compatibility remains unverified. The transport has no incoming message-size cap yet.
+
+Project lists use the same `limit`/`cursor` rules as note inventories. Project reads
+accept an exact registered ID, absolute path or workspace URI from the list; names
+and arbitrary paths are not resolved. They report a missing registration note
+explicitly. Registration revisions hash complete Markdown. Project revisions hash
+returned registry details and availability. External project paths are checked for
+availability; source files are never read. Archived projects keep their archived
+availability label, matching the CLI. Lists include at most 2000 registry entries
+and read at most 256 KiB of registry JSON.
+
+Workspace status reports an observation time, pending candidate count, incomplete
+capture count, project counts, due pending reminders and known recovery markers.
+Due reminders include already announced or currently claimed reminders that remain
+pending; this is a task count, not a delivery queue. Capture scans stop at 2000
+entries and read at most 32 KiB per request without opening transcripts. Malformed
+operational state refuses the call. Invalid candidate notes appear as omissions,
+so candidate counts may be partial. An interrupted stack/project transaction
+leaves candidate/reminder counts null with omissions. Status never recovers,
+claims delivery, executes providers or writes files. These reads are observations,
+not atomic snapshots across concurrent edits.

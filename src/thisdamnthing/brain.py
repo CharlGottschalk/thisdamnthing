@@ -240,7 +240,11 @@ def request_path(key):
 
 
 def read_request(root, key):
-    request = read_json(root, request_path(key))
+    return validate_request(read_json(root, request_path(key)), key)
+
+
+def validate_request(request, key):
+    """Validate capture state without reading transcript or session content."""
     if (not isinstance(request, dict) or request.get("format_version") != 1
             or request.get("id") != key
             or request.get("status") not in ("requested", "captured", "skipped")

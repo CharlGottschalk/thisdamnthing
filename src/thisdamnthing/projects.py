@@ -14,7 +14,11 @@ DOCUMENTS = ('README.md', 'README.rst', 'README.txt', 'pyproject.toml',
 
 
 def registry(root):
-    records = read_json(root, REGISTRY)
+    return validate_registry(read_json(root, REGISTRY))
+
+
+def validate_registry(records):
+    """Validate a registry already read by a bounded caller."""
     if not isinstance(records, list):
         raise WorkspaceError('Invalid project registry')
     ids, paths = set(), set()

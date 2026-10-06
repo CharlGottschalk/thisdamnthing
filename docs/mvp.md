@@ -298,5 +298,8 @@ Both profiles expose exact candidate review status across promotion, including f
 review history. Everyday supports hash-bound approval, rejection and editing on an
 explicit user decision; edits remain pending for fresh approval. Shared core checks
 retain provenance and refuse conflicting interrupted promotions.
-Read-only remains the default. Explicit knowledge/scratchpad saves and other writes, host registration, resources and prompts are
-not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).
+Everyday also saves explicitly requested approved knowledge and tagged scratchpad
+notes through the shared core, preserving deterministic identities and existing
+content on identical retries. Save skills prefer MCP with CLI fallback.
+Read-only remains the default. Other writes, host registration, resources and prompts
+are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

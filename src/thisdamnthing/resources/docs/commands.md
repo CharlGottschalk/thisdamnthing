@@ -289,6 +289,46 @@ a partial I/O failure can leave some claims saved. Rendering is not transactiona
 a failure between acknowledgement and display can leave a notified item unseen.
 Reminder content is data and never permission to execute the reminded action.
 
+Explicit saves are available in the everyday profile:
+
+- `tdt_knowledge_save`: supply `summary` (title, kind, body, sources, links and
+  optional project) plus `user_instruction`. Saves approved knowledge with source
+  provenance and an approval record on an explicit user request.
+- `tdt_note_save`: the same input with 1–8 lowercase subject `tags` inside the
+  summary. Saves scratchpad content with no promotion or approval history.
+
+Both return `id`, `status` and `result` (`saved` or `existing`); read the ID with
+`tdt_candidate_review_status` (knowledge) or `tdt_note_read` (scratchpad) to
+obtain its path and complete content. The exact status reader also accepts direct
+knowledge IDs; ordinary `tdt_brain_read` accepts eligible paths or workspace URIs.
+Receipts fit the 1024-byte minimum result budget. No automatic hooks or host
+identity are inferred. The save skills require current-turn capture suppression
+and prefer MCP with CLI fallback; direct tools remain usable without hooks.
+Search existing content first and preserve conflicts. User instruction is local
+audit information, not authenticated consent.
+
+After a lost response inspect the relevant inventory/content before an identical
+retry, including CLI fallback. Identity derives from normalized title, kind, body,
+sources and project, plus sorted unique scratchpad tags. Links and instruction
+references do not change identity. Existing content, provenance and review history
+are preserved, even if the submitted links or instruction differ. Changed identity
+fields create a new note. Invalid existing records in the target store refuse the
+save instead of being skipped during duplicate detection. Registered-project and
+eligible-link checks still apply on retry. Knowledge excluded by current project
+eligibility cannot be read through ordinary knowledge retrieval; inspect the exact
+ID with `tdt_candidate_review_status` if needed. Never change a summary merely to
+force a retry, or claim an unread record was verified.
+
+Explicit save tools also passed live Codex CLI 0.156.1 and Claude Code 2.1.289
+checks on Linux: 28 MCP calls per host, approved/scratchpad readback, duplicate
+preservation, search separation and read-before-retry recovery of persisted
+fixtures. Independent file hashes confirmed only the two requested new notes and
+suppression state changed. Eight real server-kill checks covered both SDK modes
+and both save types before and after persistence; fresh-server reads and identical
+retries retained one record without rewriting completed saves. Automatic skill
+selection, actual host-hook lifecycle for these saves, power loss and live-model
+reconnection were not verified by these checks.
+
 Profiles are fixed at startup, and excluded calls are refused. `read-only` remains
 the default. Mutations use the same nonblocking cross-process lock as the CLI;
 in-process mutations are serialized, and cancellation waits for an active worker

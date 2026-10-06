@@ -73,7 +73,18 @@ def save(root, data, instruction, *, scratchpad=False):
             allowed.update(brain.note_link(path) for path, _, _ in inventory(root))
         if any(link not in allowed for link in value["links"] + re.findall(r"\[\[([^\]]+)\]\]", value["body"])):
             raise WorkspaceError("Links must reference existing eligible notes")
-        existing = brain.find_note(root, category, key)
+        # A malformed record may be an earlier save. Do not silently skip it and
+        # allocate a duplicate during retry; require inspection of the store.
+        matches = []
+        for path in brain.note_files(root, (category,)):
+            meta, _ = brain.read_note(root, path)
+            if meta['id'] == key:
+                if meta['status'] != ('scratchpad' if scratchpad else 'approved'):
+                    raise WorkspaceError("Existing direct save has an unexpected status")
+                matches.append(path)
+        if len(matches) > 1:
+            raise WorkspaceError("Duplicate direct save identity; inspect existing notes")
+        existing = matches[0] if matches else None
         if existing:
             return {"status": "existing", "id": key, "path": existing}
         relative = brain.named_path(root, category, key, value["title"])

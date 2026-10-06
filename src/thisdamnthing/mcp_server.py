@@ -85,6 +85,8 @@ def serve(root, profile='read-only'):
                                  'suppression requires its current turn token. Never infer session identity. Reminder creation, configuration and edits require user instruction; '
                                  'Candidate review requires an explicit user decision on the complete displayed proposal and its exact hash. '
                                  'Edits remain pending; inspect review status and history after uncertain responses. '
+                                 'Knowledge and scratchpad saves require explicit user instruction; '
+                                 'inspect existing content after uncertain saves before an identical retry. '
                                  'edits and task-status changes require a current revision. Delivery checks '
                                  'require an authorized channel; acknowledge tokens before displaying only '
                                  'newly notified reminders. Notification is not task completion.')

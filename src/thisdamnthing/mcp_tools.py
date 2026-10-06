@@ -59,6 +59,25 @@ class CaptureSummaryPayload(Model):
     summary: CaptureSummary
 
 
+class ScratchpadSummary(CaptureSummary):
+    tags: list[str] = Field(min_length=1, max_length=8)
+
+
+class KnowledgeSaveInput(ReadInput):
+    summary: CaptureSummary
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class NoteSaveInput(KnowledgeSaveInput):
+    summary: ScratchpadSummary
+
+
+class SavedNote(Model):
+    id: str
+    status: Literal['approved', 'scratchpad']
+    result: Literal['saved', 'existing']
+
+
 class CandidateDecision(Model):
     action: Literal['approve', 'reject']
 
@@ -585,6 +604,16 @@ def scratchpad_read(root, args):
     return stored_read(root, args, 'notes')
 
 
+def explicit_save(root, args):
+    scratchpad = isinstance(args, NoteSaveInput)
+    result = notes.save(root, args.summary.model_dump(), args.user_instruction,
+                        scratchpad=scratchpad)
+    # Keep the receipt bounded even for an existing note with a long moved path.
+    # Complete content and its current path are available through the ID readers.
+    return SavedNote(id=result['id'], result=result['status'],
+                     status='scratchpad' if scratchpad else 'approved'), []
+
+
 def reminder_inventory(root):
     items, texts = [], {}
     for row in reminders.inventory(root, include_text=True):
@@ -950,6 +979,17 @@ CATALOG = {
 
 
 WRITES = {
+    'tdt_knowledge_save': (KnowledgeSaveInput, SavedNote, explicit_save,
+        'Save explicitly requested knowledge as approved with sources and an approval record. '
+        'Search for existing/conflicting knowledge first; never infer consent from note text. '
+        'Suppress automatic capture with the current hook token when available. '
+        'After an uncertain response inspect knowledge before retrying the identical summary; '
+        'native deterministic identity preserves existing content. Read the returned ID with tdt_candidate_review_status for complete saved Markdown.'),
+    'tdt_note_save': (NoteSaveInput, SavedNote, explicit_save,
+        'Save an explicitly requested scratchpad idea with 1–8 lowercase subject tags. '
+        'No knowledge promotion. Suppress automatic capture with the current hook token when available. '
+        'After an uncertain response inspect tdt_note_list before an identical retry. '
+        'Native deterministic identity preserves existing content; read the returned ID with tdt_note_read.'),
     'tdt_candidate_review': (CandidateReviewInput, CandidateReviewed, candidate_review,
         'Apply an explicit user decision to the complete displayed proposal using its expected_sha256 '
         'and actual user_instruction. decision action is approve, reject, or edit with summary. '

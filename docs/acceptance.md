@@ -494,3 +494,54 @@ canonical bytes, and completed edit/reject/approve duplicate probes refused
 without changing files or adding history. Each final note had exactly one review.
 These checks cover process termination at those boundaries, not power loss or
 live-model automatic reconnection.
+
+### MCP explicit knowledge and scratchpad saves
+
+In disposable workspaces, verify `tdt_knowledge_save` and `tdt_note_save` are
+available only in everyday (34 tools; read-only remains 21). Check strict summary
+schemas, explicit user instruction, source/secret checks, registered projects,
+eligible links and normalized subject tags. Verify approved knowledge has an
+approval record and scratchpad has tags with no promotion. Read the saved IDs
+through exact review status or scratchpad reads; ordinary knowledge search must
+exclude scratchpad. Check 1024-byte receipts, unchanged duplicate retries,
+CLI parity, changed identity fields and preservation of original links/audit data.
+Refuse concurrent core locks, stack recovery markers, duplicate identities and
+malformed/oversized/FIFO/symlink records without writes. Inspect state after an
+uncertain response before retrying the identical summary.
+
+Packaged manual verification on Linux passed in SDK auto and legacy modes:
+21/34 catalogs, output schemas, profile and invalid-input refusals, explicit save
+metadata/readback, sorted unique tags, knowledge/scratchpad search separation,
+1024-byte receipts, identical retries with changed instructions/links, distinct
+body identities and unchanged CLI retries. Shared lock/recovery marker, missing
+project, secret, invalid link/tag, malformed/oversized/FIFO/symlink and duplicate
+identity refusals preserved note bytes. An injected exception immediately after
+atomic persistence left one saved record; an identical retry returned existing
+without changing any saved bytes. This simulates an uncertain response, not
+process death or power loss. The installed runtime, command guide and save skills
+matched the verified wheel; dependency and whitespace checks passed. Existing
+candidate review checks also passed in both
+SDK modes with the expanded catalog, including stale decisions and interrupted
+approval cleanup. No automated suite added or run.
+
+Live save-tool verification passed on Linux with Codex CLI 0.156.1 and Claude Code
+2.1.289, each exiting 0 after 28 actual MCP calls. Independent transcript and
+whole-workspace hash audits confirmed 21/34 catalogs, both installed save skills,
+fixture current-token suppression, approved and scratchpad saves with correct
+provenance/reviews/tags, complete readback before duplicate retries, unchanged
+Markdown/revisions with reordered tags or new instruction references, knowledge
+search separation and read-before-retry reconciliation of persisted fixtures.
+Exactly two new notes and suppression state changed per host; control and recovery
+records stayed byte-identical. Temporary launch-only configuration left saved
+registrations unchanged. Codex retained a read-only shell and per-tool approvals
+only for the fixture save/suppression writes; Claude had no builtin tools, saved
+settings or hooks. This verifies live tool use, not automatic skill selection or
+an actual host-hook lifecycle. No runtime changes were required.
+
+Eight real SIGKILL disconnect checks also passed: both SDK modes, knowledge and
+scratchpad, before atomic persistence and after persistence before response. The
+client received MCPError without a result. A fresh unmodified server read exact
+state before retry; absent saves produced one record and persisted saves returned
+existing without byte changes. A further retry preserved the same record and one
+knowledge approval or zero scratchpad reviews. Process termination is verified;
+power loss and live-model automatic reconnection are not.

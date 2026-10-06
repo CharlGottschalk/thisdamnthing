@@ -72,6 +72,11 @@ do not bake their source into the core distribution. Stack-builder owns its
 starter templates in its separate repository; they install under its bundle
 directory through the ordinary optional templates list.
 
+MCP transport stays in `mcp_server.py`. The `mcp_tools/` package groups adapters
+by domain, with shared models and helpers, explicit catalog assembly and separate
+dispatch. Its package imports preserve the existing model and operation names;
+domain adapters call the same core functions as the CLI.
+
 ## Installed layout
 
 ```text

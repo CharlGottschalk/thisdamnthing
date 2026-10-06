@@ -781,3 +781,25 @@ excluded it from subsequent search without rebuilding. Changed shipped files
 matched the installed wheel and pip dependency checks passed. These are bounded
 manual checks, not live-model selection, OS/network isolation, interruption or
 malicious-provider containment evidence. No host settings were changed.
+
+## MCP adapter package organization
+
+For the domain-module split, compare both complete ordered tool catalogs with a
+pre-change baseline, including descriptions, input/output schemas and annotations.
+Check that prior model, helper and operation imports remain available from
+`thisdamnthing.mcp_tools`. Build and install a wheel, verify every package module
+matches source, and exclude a stale `mcp_tools.py` from the distribution. Exercise
+representative reads and writes through actual stdio in both SDK modes, including
+refusals, budgets, retry behavior and cancellation serialization.
+
+Verified 2026-10-06: both catalogs remained exactly equal (29 read-only / 46
+everyday). All class and function bodies matched the original syntax trees,
+apart from the deferred context/catalog import. All 13 package files matched the
+installed wheel; dependency and whitespace checks passed. Eight existing
+disposable manual probes passed with SDK auto and legacy: working-file/scratchpad
+discovery, capture, reminder delivery, project onboarding, selected provider
+search, candidate review, explicit saves and stack/document discovery. Historical
+catalog-size assertions were updated to the current counts. The separate held
+worker cancellation probe passed read concurrency, busy-write refusal and lock
+retention until worker completion. No automated suite or live-model verification
+was performed, and no host configuration changed.

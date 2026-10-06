@@ -294,5 +294,9 @@ Enabled hooks prefer workspace-bound MCP capture/suppression tools, with CLI
 fallback. Uncertain capture responses require an exact status read before retry;
 completed outcomes are retained. MCP does not establish host/session identity or
 enable capture hooks.
-Read-only remains the default. Other writes, host registration, resources and prompts are
+Both profiles expose exact candidate review status across promotion, including full
+review history. Everyday supports hash-bound approval, rejection and editing on an
+explicit user decision; edits remain pending for fresh approval. Shared core checks
+retain provenance and refuse conflicting interrupted promotions.
+Read-only remains the default. Explicit knowledge/scratchpad saves and other writes, host registration, resources and prompts are
 not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

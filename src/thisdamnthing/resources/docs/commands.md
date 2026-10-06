@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has twenty tools:
+The default `read-only` catalog has twenty-one tools:
 
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
@@ -119,6 +119,7 @@ The default `read-only` catalog has twenty tools:
 - `tdt_brain_read`: read an eligible note using a path or URI returned by search.
 - `tdt_candidate_list`: paginated summaries; `status` is `pending` (default), `rejected` or `all`.
 - `tdt_candidate_read`: complete candidate Markdown and its core review hash.
+- `tdt_candidate_review_status`: complete candidate or promoted knowledge by exact ID, review history, revision and approval destination.
 - `tdt_note_list`: paginated scratchpad summaries with subject tags.
 - `tdt_note_read`: complete scratchpad Markdown, explicitly labeled unapproved.
 
@@ -144,10 +145,44 @@ Candidate/scratchpad reads accept `reference` as an inventory ID, path or URI.
 They return full Markdown including sources, provenance and review history.
 Their `revision` hashes that complete text with the same newline normalization
 as core candidate review. Read the full candidate before reviewing it through the
-existing CLI; a list summary is insufficient. Reading never approves content.
+review tool or CLI; a list summary is insufficient. Reading never approves content.
 Duplicate IDs require an exact path. Neither category enters approved retrieval.
 
-The opt-in `--profile everyday` adds two capture tools and eight reminder tools (30 tools total).
+The opt-in `--profile everyday` adds candidate review, two capture tools and eight reminder tools (32 tools total).
+
+`tdt_candidate_review_status` accepts `id` and reads the current complete Markdown
+under the shared lock. It follows promotion into knowledge even when project
+eligibility excludes that note from search. It does not grant search eligibility.
+`approval_destination` previews the current allocation; concurrent filename
+collisions can change the eventual path. `pending_cleanup` means both stores
+contain this ID and requires inspection of the saved approval history.
+
+`tdt_candidate_review` requires `id`, `expected_sha256` from the complete displayed
+proposal's `revision`, an actual `user_instruction`, and `decision`:
+`{"action":"approve"}`, `{"action":"reject"}`, or
+`{"action":"edit","summary":{...}}` using the capture summary fields below.
+Approval preserves provenance/history in a separate knowledge note before removing
+the candidate. Rejection remains outside knowledge search. Editing retains the
+previous proposal in history and stays pending until a new explicit approval.
+The small receipt fits the minimum 1024-byte budget. Stale hashes, nonpending
+candidates, secrets, lock conflicts and stack recovery markers refuse writes.
+
+After an uncertain response, read exact review status and compare saved history
+with the original instruction, decision and proposal hash. Do not repeat completed
+edits or rejections with a fresh hash. An interrupted approval may leave
+`pending_cleanup`; only the identical original approval can finish deletion after
+the shared core verifies the saved canonical content. If state is unreadable,
+leave recovery for later. Candidate reads/saves do not authenticate user consent.
+Use the current hook token to suppress automatic capture for review turns.
+
+Live candidate review passed with Codex CLI 0.156.1 and Claude Code 2.1.289
+using temporary configurations: explicit approval/rejection/edit, stale-hash
+refusal, pending edit exclusion from search, and interrupted approval cleanup
+without changing canonical content. Independent file audits confirmed unchanged
+control records. Separate process-termination checks passed before/after approval
+persistence, after cleanup, and after edit/reject persistence in both SDK modes.
+The live runs used displayed fixture proposals and preauthorized decisions; they
+did not verify automatic review-skill routing or a multi-turn human approval flow.
 
 `tdt_capture_requests` accepts `status` (`requested` by default, `captured`,
 `skipped` or `all`), `limit` and `cursor`. Scans refuse malformed state and exceedances

@@ -439,3 +439,58 @@ hooks and per-tool or exact-command permissions. Saved host registrations/settin
 were unchanged. These checks used the packaged default SDK transport; earlier
 manual auto/legacy disconnect checks remain separate evidence. Power-loss and
 arbitrary host failures are not covered.
+
+### MCP candidate review
+
+Both profiles include `tdt_candidate_review_status` (21 read-only tools); everyday
+adds `tdt_candidate_review` (32 tools total). Read full proposal/status by exact ID,
+show provenance and approval destination, then bind the user's decision to its
+`revision` using `expected_sha256`. Editing must retain the previous proposal and
+remain pending. A stale approval must refuse; rejection remains outside knowledge
+retrieval. Status follows promotion into knowledge even for an unregistered project
+whose note is excluded from search. Reading status does not grant eligibility.
+
+After an uncertain response, inspect the saved review history before retrying.
+Verify completed approve/reject/edit retries refuse without changes. Interrupt
+approval after canonical persistence but before candidate deletion: status must
+show `pending_cleanup`; the identical approval must finish without rewriting the
+canonical bytes. Changed instructions, conflicting provenance and attempts to edit
+or reject during interrupted approval must preserve both files. Check shared CLI
+locking, recovery markers, minimum receipt budget, schema/profile restrictions,
+malformed/oversized/FIFO/symlink refusal and CLI review compatibility.
+
+Packaged manual verification on Linux passed with MCP SDK auto and legacy modes:
+21/32 catalogs and output schemas; approve/edit/reject and stale/repeated-decision
+refusal; preserved history and pending edits; approved search; exact status after
+promotion including unregistered projects; shared lock and stack recovery refusal;
+strict action payloads, secret refusal and 1024-byte write receipts. Injected
+candidate-unlink failure exercised partial promotion and byte-preserving recovery,
+changed-instruction/edit/reject refusal and canonical-provenance conflict refusal.
+CLI rejection, malformed/oversized/FIFO/symlink candidate refusal, dependency and
+installed-source parity checks passed. Existing packaged capture/suppression
+checks also passed in both SDK modes after updating only expected catalog counts. This is packaged protocol verification and
+an injected I/O failure, not a live Codex/Claude review conversation or process-death
+verification. No automated test suite was added or run.
+
+Live review verification passed on Linux with Codex CLI 0.156.1 and Claude Code
+2.1.289, each exiting 0 after 24 actual MCP calls. Independent transcript and
+whole-workspace hash audits confirmed 21/32 catalogs, installed skill retrieval,
+current fixture-token suppression, full status reads before decisions, approval
+and approved search, rejection, pending edit with previous proposal retained,
+stale-hash refusal without another review, and interrupted approval cleanup with
+unchanged canonical revision/bytes. The control remained pending with empty
+history; only the six expected files changed per host. Both hosts used temporary
+launch-only MCP configuration; saved registrations and user workspaces were not
+changed. The requests supplied explicit decisions on displayed fixture proposals.
+This verified live tool use, not automatic host-hook routing or a multi-turn human
+approval exchange. No runtime fixes were needed.
+
+Ten real server SIGKILL checks also passed: before approval persistence, after
+canonical persistence, after candidate cleanup, after edit persistence, and after
+rejection persistence, each in SDK auto and legacy modes. The client received
+MCPError without a result. A fresh unmodified server read exact status before
+reconciliation; requested approval completed, partial approval cleanup preserved
+canonical bytes, and completed edit/reject/approve duplicate probes refused
+without changing files or adding history. Each final note had exactly one review.
+These checks cover process termination at those boundaries, not power loss or
+live-model automatic reconnection.

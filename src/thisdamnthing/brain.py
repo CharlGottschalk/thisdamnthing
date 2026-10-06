@@ -305,16 +305,19 @@ def review(root, key, decision, instruction, expected, edited=None):
     if decision not in ("approve", "reject", "edit"):
         raise WorkspaceError("Expected approve, reject or edit")
     with locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         relative = find_note(root, "candidates", key)
         if relative is None:
             raise WorkspaceError("Unknown candidate id")
         path = managed_path(root, relative)
-        original = path.read_text(encoding="utf-8")
+        meta, body, original = read_note(root, relative, include_text=True)
         if digest(original) != expected:
             raise WorkspaceError("Candidate changed; show it again before review")
-        meta, body = read_note(root, relative)
         if meta.get("id") != key or meta.get("status") != "pending":
             raise WorkspaceError("Only pending candidates can be reviewed")
+        if decision != "approve" and find_note(root, "knowledge", key) is not None:
+            raise WorkspaceError("Canonical note already exists; inspect interrupted approval before review")
         record = {"at": now(), "decision": decision, "user_instruction": instruction,
                   "proposal_sha256": expected}
         if decision == "edit":
@@ -333,13 +336,16 @@ def review(root, key, decision, instruction, expected, edited=None):
             meta["canonical"] = target[6:-3]
             content = note_text(meta, body)
             destination = managed_path(root, target)
-            if destination.exists() and destination.read_text(encoding="utf-8") != content:
+            if destination.exists():
                 # Recovery after canonical write uses the stored approval, not a new timestamp.
                 prior, prior_body = read_note(root, target)
                 if (prior.get("id") != key or prior.get("status") != "approved"
                         or prior_body != body or not prior.get("review")
                         or prior["review"][-1].get("proposal_sha256") != expected
-                        or prior["review"][-1].get("user_instruction") != instruction):
+                        or prior["review"][-1].get("user_instruction") != instruction
+                        or prior != {**meta, "updated": prior.get("updated"),
+                            "review": meta["review"][:-1] + [
+                                {**record, "at": prior["review"][-1].get("at")}]}):
                     raise WorkspaceError("Canonical note conflict; existing evidence preserved")
                 meta = prior
             else:

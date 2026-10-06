@@ -49,7 +49,12 @@ history from retained notes. For retained reminders, use the reminder workflow
 to edit/cancel them and preserve delivery state.
 
 For requested cleanup, prepare small exact edits/deletions using the JSON format
-in docs/projects.md and preview `tdt project cleanup <id>` with it on stdin. Show
+in docs/projects.md. Prefer `tdt_project_cleanup_preview` with the exact project
+ID and changes; otherwise preview `tdt project cleanup <id>` with JSON on stdin.
+Read the complete replacements and coverage, increasing the budget if needed.
+Cleanup apply remains CLI-only with identical JSON, preview hash and instruction.
+Cleanup outcomes are not indexed: after uncertainty inspect files and CLI backups
+before retrying. Show
 the affected paths and actual edits; whole-file deletions must be explicit. Apply
 only the exact changes the user authorized with the preview hash and instruction.
 A permanent removal request alone does not authorize cleanup. Keep the removed

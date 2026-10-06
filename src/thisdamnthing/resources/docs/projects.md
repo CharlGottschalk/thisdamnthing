@@ -165,7 +165,7 @@ Everyday also offers `tdt_project_remove_apply`, `tdt_project_restore_apply` and
 `user_instruction`. Receipts include the resulting `project_id`, operation, hash
 and backup path. This is historical state; read current registration separately.
 MCP project arguments are exact IDs and relink destinations are absolute paths.
-Reference cleanup remains CLI-only. Indexed lifecycle backups are bounded to
+Reference cleanup apply remains CLI-only. Indexed lifecycle backups are bounded to
 8 MiB; oversized operations refuse before writing.
 
 ### Review and clean references
@@ -210,3 +210,14 @@ Keep the removed registration note until the final cleanup batch so later scans
 can still resolve its ID. Before deleting a note, review and repair incoming links.
 Operation backups retain old content and paths after cleanup; this is recoverable
 editing, not secure erasure. Backup deletion is never implied by project removal.
+
+
+Both MCP profiles expose `tdt_project_cleanup_preview` with an exact project ID
+and 1–20 changes (`path`, current `expected_sha256`, complete `content`, or
+explicit null for whole-file deletion). It uses the shared CLI cleanup validation
+and returns complete replacements, proposal hash and scan coverage without writes
+or backups. Preview reads share the workspace lock; CLI applies remain exclusive.
+Output budgets allow up to 1 MiB and refuse oversized results without partial
+review content. Apply the identical JSON through `tdt project cleanup ID` only
+for the separately authorized changes, using the preview hash and instruction.
+Cleanup backups remain unindexed; inspect files and CLI backups after uncertainty.

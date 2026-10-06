@@ -1080,3 +1080,24 @@ persistence. Codex state-database warnings did not affect results; Claude stderr
 was empty. This verifies live MCP workflow/tool selection, not native slash or
 skill-picker activation. No runtime changes were needed; no saved host settings,
 automated tests, staging, commit or push.
+
+### MCP reference-cleanup preview — 2026-10-06
+
+Both profiles expose `tdt_project_cleanup_preview` (38 read-only / 67 everyday).
+Verify complete edit/deletion replacements, exact CLI proposal hashes, reported
+scan omissions/truncation, strict 1–20 changes, and no partial output on budget
+refusal. Preview shares read locks; CLI apply retains the exclusive lock.
+Registered notes and retained-note provenance remain guarded by shared core.
+Cleanup apply and its unindexed UUID backups remain CLI-only.
+
+Source and packaged SDK auto/legacy × both profiles passed 56 calls each:
+input/output schemas, read-only annotations, repeat parity, shared/exclusive locks,
+extra/missing/invalid fields, duplicate paths, stale hashes, traversal, UTF-8 byte
+limits, output budget refusal, journal refusal and unchanged workspace hashes.
+CLI previews matched and core accepted the exact MCP hash. Separate source and
+packaged probes passed Unicode complete output, symlink/outside-control safety,
+registered-note protection, and actual CLI application of the MCP hash for edits
+plus deletion of an unregistered note. A 5001-file scan-cap probe verified both
+nested and envelope truncation, with an unchanged index after preview.
+All 97 package files matched source/wheel/install; pip check passed.
+No live-model routing check or automated test suite was run.

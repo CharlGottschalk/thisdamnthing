@@ -243,3 +243,35 @@ def project_relink_apply(root, args):
     return lifecycle_receipt(project_lifecycle.relink(
         root, args.id, args.path, apply=True,
         expected=args.expected_sha256, instruction=args.user_instruction))
+
+
+class ProjectCleanupChange(Model):
+    path: str = Field(min_length=1, max_length=512)
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    content: str | None = Field(max_length=262144)
+
+
+class ProjectCleanupPreviewInput(ProjectLifecycleInput):
+    changes: list[ProjectCleanupChange] = Field(min_length=1, max_length=20)
+
+
+class ProjectCleanupCoverage(Model):
+    truncated: bool
+    skipped: list[SkippedReference]
+
+
+class ProjectCleanupPreview(Model):
+    operation: Literal['cleanup']
+    project: ReferenceProject
+    coverage: ProjectCleanupCoverage
+    proposal_sha256: str
+    replacements: dict[str, str | None]
+    applied: Literal[False] = False
+
+
+def project_cleanup_preview(root, args):
+    proposal = {'changes': [change.model_dump() for change in args.changes]}
+    result = project_lifecycle.cleanup(root, args.id, proposal)
+    omissions = ([f"{len(result['coverage']['skipped'])} entries skipped; inspect coverage.skipped"]
+                 if result['coverage']['skipped'] else [])
+    return ProjectCleanupPreview(**result), omissions

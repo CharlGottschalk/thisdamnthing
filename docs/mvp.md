@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 37 tools; everyday has 66.
+Read-only has 38 tools; everyday has 67.
 
 Both MCP profiles expose `tdt_project_references` for explicit project IDs through
 the shared lifecycle scanner, including retained removed registrations. Reference
@@ -366,4 +366,15 @@ completed retries return historical success without resolving the old registrati
 or overwriting later changes. Prepared outcomes require inspection; interrupted
 journals require CLI recovery and a fresh status read. Unknown is not proof an
 operation never ran; legacy UUID backups and cleanup are not indexed. Indexed
-backups are bounded to 8 MiB before writes. Reference cleanup remains CLI-only.
+backups are bounded to 8 MiB before writes. Reference cleanup apply remains CLI-only.
+
+
+Both MCP profiles expose `tdt_project_cleanup_preview` with an exact project ID
+and 1–20 changes (`path`, current `expected_sha256`, complete `content`, or
+explicit null for whole-file deletion). It uses the shared CLI cleanup validation
+and returns complete replacements, proposal hash and scan coverage without writes
+or backups. Preview reads share the workspace lock; CLI applies remain exclusive.
+Output budgets allow up to 1 MiB and refuse oversized results without partial
+review content. Apply the identical JSON through `tdt project cleanup ID` only
+for the separately authorized changes, using the preview hash and instruction.
+Cleanup backups remain unindexed; inspect files and CLI backups after uncertainty.

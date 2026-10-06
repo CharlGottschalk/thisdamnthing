@@ -307,7 +307,7 @@ def cleanup(root, key, proposal, *, apply=False, expected=None, instruction=None
     items = proposal['changes']
     if not isinstance(items, list) or not 1 <= len(items) <= 20:
         raise WorkspaceError('Provide 1–20 reference edits per batch')
-    with brain.locked(root):
+    with brain.locked(root, shared=not apply):
         stacks.available(root)
         entry = reference_entry(root, key)
         registered_ids = {e['id'] for e in projects.registry(root)}

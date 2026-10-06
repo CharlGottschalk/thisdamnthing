@@ -90,6 +90,7 @@ from .models import (
     WorkspaceStatus,
 )
 from .projects import (
+    ProjectCleanupPreviewInput, ProjectCleanupPreview, project_cleanup_preview,
     ProjectOperationStatusInput, ProjectOperationOutcome, project_operation_status,
     ProjectApplyInput, ProjectRemoveApplyInput, ProjectRelinkApplyInput,
     project_remove_apply, project_restore_apply, project_relink_apply,
@@ -124,6 +125,16 @@ from .workspace import context_read, policy_read, workspace_status
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_project_cleanup_preview': (ProjectCleanupPreviewInput, ProjectCleanupPreview, project_cleanup_preview,
+        'Preview separately requested reference cleanup for an exact project id, including removed registrations. '
+        'Provide 1–20 exact changes with path, current expected_sha256 and complete content; explicit null means '
+        'whole-file deletion. Choose paths from tdt_project_references; matches do not establish ownership. '
+        'Returns complete replacements, scan omissions and the shared CLI proposal hash without writes or backups. '
+        'Preserves retained note identity/provenance and registered project notes. Never edits external source. '
+        'Review all replacements and coverage; increase budget_bytes up to 1 MiB for complete output. '
+        'Apply remains CLI-only using identical changes, preview hash and actual user instruction. '
+        'Keep removed registration notes until the final batch. Cleanup outcomes are not indexed; '
+        'inspect actual files and CLI backups after uncertainty before retrying.'),
     'tdt_project_operation_status': (ProjectOperationStatusInput, ProjectOperationOutcome, project_operation_status,
         'Read retained lifecycle outcome by exact preview proposal_sha256 before retry after uncertainty. '
         'completed is historical success, not proof current registry or notes still match. '

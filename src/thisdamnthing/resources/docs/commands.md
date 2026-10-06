@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 37 tools; `everyday` has 66 in total.
+The default `read-only` catalog has 38 tools; `everyday` has 67 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
@@ -120,6 +120,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.
 - `tdt_project_remove_preview`: exact registered `id` and explicit `mode` (`archive` or `unregister`); complete replacements and the CLI proposal hash, without writes or source deletion.
 - `tdt_project_restore_preview`: exact registered `id`; preview restoring active status, even with a missing source directory. Unregistered entries cannot be restored this way.
+- `tdt_project_cleanup_preview`: exact project `id` and 1–20 `changes` with `path`, current `expected_sha256`, and complete `content` (explicit null deletes the whole file). Returns full replacements, scan coverage and CLI proposal hash; up to 1 MiB output budget, shared read lock, no writes. Apply remains CLI-only with identical JSON and separately authorized changes. Cleanup outcomes are not indexed.
 - `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Everyday apply tools use identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
 - `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.

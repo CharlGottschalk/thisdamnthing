@@ -389,3 +389,53 @@ completed capture/skip/suppression remained replay-safe. Repeating each operatio
 left hashes unchanged. These checks cover controlled process-death boundaries,
 not power loss, every filesystem instruction, or a live model client's automatic
 reconnect/fallback. No product fixes or automated suite were needed.
+
+### Hook MCP preference and CLI reconciliation
+
+Enabled request/Stop hooks prefer capture tools on the MCP server bound to their
+workspace. Verify exact hook-issued token/request identity, MCP skip versus CLI
+skip shapes, and unavailable-tool fallback. For uncertain submission, read the
+exact request with MCP or `tdt --workspace <root> brain request <request-id>`:
+captured/skipped must end submission, requested allows one identical CLI retry,
+and an unreadable status must leave recovery for later. Permission/validation
+refusals must not be bypassed. Suppression retries reuse only the current token.
+
+Packaged manual checks passed on Linux for Claude and Codex synthetic lifecycle
+payloads: capture/skip via the MCP adapter, exact CLI status reads without writes,
+CLI fallback for requested state, partial candidate completion with unchanged
+candidate bytes, completed replay with unchanged files, Stop replay/recursion,
+MCP suppression followed by same-token CLI retry and stale-token refusal. The
+new CLI reader refused missing/malformed/oversized requests, escaping IDs, FIFO
+and symlink inputs. A workspace containing spaces and a quote was exercised.
+Dependency and whitespace checks passed. These initial checks used manual
+fixtures; live host evidence follows.
+
+Live verification passed with Codex CLI 0.156.1 and Claude Code 2.1.289 on Linux.
+Ten successful runs covered capture and suppression with both transports
+available, unavailable-write-tool CLI fallback using a read-only MCP catalog,
+and actual server exits immediately before capture or after saving but before
+returning a response. Prompts did not select a transport; current tokens and
+requests came from actual UserPromptSubmit and Stop hooks, with no preseeded state.
+Both hosts preferred MCP. Codex read exact status through CLI after the dead
+transport also refused its MCP read; Claude reconnected and used the MCP reader.
+Before-save cases retried the identical summary once through CLI; after-save
+cases performed no further mutation, confirmed by complete workspace hashes.
+
+Two additional Claude runs were denied CLI execution by the fixture allowlist.
+They left requested state, no candidates, no capture success claim and no
+additional retry. Fresh fixtures passed with a temporary PreToolUse approval
+restricted to the literal workspace command, same-session requested ID and
+validated JSON inside a quoted heredoc. No broad permission bypass was enabled.
+Every run exited 0; an independent transcript/hook/state audit verified identities,
+pending-only candidates, provenance, empty review history, exactly expected file
+changes, preserved substantive answers and nonrecursive Stop completion. No
+runtime change was needed. Claude emitted a short recovery commentary in one
+denial run despite the hook's internal-only instruction; final answers remained
+intact. Codex made some extra guide reads (including a refused context-file guide
+lookup) and emitted unrelated state-db warnings without affecting capture.
+
+Launch-only configurations used existing signed-in accounts, reviewed fixture
+hooks and per-tool or exact-command permissions. Saved host registrations/settings
+were unchanged. These checks used the packaged default SDK transport; earlier
+manual auto/legacy disconnect checks remain separate evidence. Power-loss and
+arbitrary host failures are not covered.

@@ -46,6 +46,7 @@ def main(argv=None):
     listing = actions.add_parser("candidates", help="show candidate proposals and review hashes")
     listing.add_argument("--status", choices=("pending", "approved", "rejected", "all"), default="pending")
     actions.add_parser("requests", help="list incomplete capture request ids for recovery")
+    actions.add_parser("request", help="read exact saved capture request status as JSON").add_argument("id")
     actions.add_parser("audit", help="inspect brain links, metadata and disconnected notes")
     repair = actions.add_parser("repair", help="preview reviewed note replacements from JSON stdin")
     repair.add_argument("--apply", action="store_true")
@@ -314,6 +315,8 @@ def main(argv=None):
                 print(suppress_review_turn(root, args.token))
             elif args.action == "capture":
                 print(brain.capture(root, args.id, input_json()))
+            elif args.action == "request":
+                print(json.dumps(brain.read_request(root, args.id), indent=2, ensure_ascii=False))
             elif args.action == "candidates":
                 with brain.locked(root):
                     for meta, body in brain.candidates(root, args.status):

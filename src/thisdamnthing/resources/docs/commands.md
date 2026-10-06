@@ -171,17 +171,32 @@ resubmitting the original request.
 user saving restrictions or explicit save/review/reminder work. Repeats are safe
 within that turn; stale tokens fail. Tokens and request IDs are explicit context,
 not authenticated host identity. MCP does not create hook requests or turn tokens,
-register hooks, or enable automatic capture. Existing hooks still instruct CLI
-submission. Both writes share core
+register hooks, or enable automatic capture. Enabled hooks prefer these tools on
+the server bound to their workspace, with CLI fallback when unavailable. After an
+uncertain capture response, read the exact request through MCP or
+`tdt --workspace <root> brain request <request-id>` (bounded JSON, no transcript
+read). Captured/skipped is final; requested permits one identical CLI retry.
+If status cannot be read, leave recovery for later. Same-token suppression may be
+repeated safely through CLI. Neither fallback bypasses permission or validation
+refusals. Refresh existing owned workspace resources to receive updated hooks.
+Both writes share core
 locking, refuse stack recovery state, and return receipts within the minimum
 1024-byte budget. Live Codex CLI and Claude Code checks verified submission,
 skip, status-before-retry, token suppression and preserved pending provenance
 using disposable hook-generated fixtures. Real lifecycle capture and suppression
-also passed on both hosts with explicit per-run instructions to use MCP; default
-MCP selection by hooks is not implemented. Forced server termination before/after
+also passed on both hosts. Updated hooks selected MCP without a transport override
+in the user prompt; capture and suppression both passed with CLI available.
+Read-only MCP catalogs exercised unavailable-tool CLI fallback. Server exits before
+and after capture writes exercised real lost responses: Codex used the exact CLI
+status reader after MCP transport closure; Claude reconnected for the MCP status
+read. Requested state led to one identical CLI retry; captured state led to no
+resubmission. CLI fallback requires host permission. Two initially denied Claude
+runs preserved pending state without claiming success; fresh runs with narrowly
+scoped approval passed. Forced server termination before/after
 candidate writes and after capture/skip/suppression state saves recovered through
-fresh-server status reads and retries in both SDK modes. Live model-client
-automatic reconnect/fallback and power-loss recovery remain unverified.
+fresh-server status reads and retries in both SDK modes. Live routing checks used
+the default SDK mode; power-loss recovery remains unverified. Hosts may display
+recovery commentary despite the hook's request to keep capture internal.
 
 The reminder tools are:
 

@@ -24,9 +24,15 @@ messages without turn ids coalesce within a session.
 
 The first Stop writes a requested record under .tdt/state/captures/ and returns
 `decision: block` with a reason asking the active agent for a summary. Its next
-action submits summary JSON on stdin to
-`tdt --workspace <root> brain capture <request-id>`. The CLI validates and
-persists the candidate before the agent reports success. The final response
+action prefers `tdt_capture_submit` on the MCP server bound to this workspace,
+using the exact hook request ID and a summary/skip payload. If unavailable, submit
+summary JSON on stdin to `tdt --workspace <root> brain capture <request-id>`.
+Both transports validate and persist through the same core before success.
+After an uncertain MCP response, read `tdt_capture_request_read` or
+`tdt --workspace <root> brain request <request-id>` first. A captured/skipped
+status is final; only requested permits one identical CLI retry, including partial
+candidate recovery. Failed status reads leave recovery for later. Permission and
+validation refusals never authorize a transport bypass. The final response
 preserves the substantive answer and adds at most one capture confirmation,
 only for a captured candidate; skipped turns add none. Never render capture
 instructions or JSON as the answer. Tool/debug activity remains host-controlled.
@@ -44,7 +50,10 @@ canonical notes. PreCompact normalization remains available but is not wired:
 there is no portable pre-compaction active-agent continuation contract here.
 
 UserPromptSubmit issues a fresh opaque review-turn token in additional context.
-The review skill calls `tdt brain review-turn <token>` on every review turn,
+The hook prefers `tdt_capture_suppress` on the workspace-bound MCP server;
+`tdt brain review-turn <token>` remains the CLI fallback. Repeating the same token
+after an uncertain response is safe, but stale-token and permission refusals must
+not be bypassed. The review skill suppresses every review turn,
 including follow-up decisions and empty listings. Direct capture and scratchpad
 saving skills use the same command to avoid duplicate automatic proposals. State under
 `.tdt/state/capture-turns/` is isolated by host and session and stores only the

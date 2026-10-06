@@ -145,16 +145,35 @@ as core candidate review. Read the full candidate before reviewing it through th
 existing CLI; a list summary is insufficient. Reading never approves content.
 Duplicate IDs require an exact path. Neither category enters approved retrieval.
 
-The opt-in `--profile everyday` adds `tdt_reminder_complete` and
-`tdt_reminder_cancel`. Both require an exact `id`, the integer
+The opt-in `--profile everyday` adds five reminder tools (22 tools total):
+
+- `tdt_reminder_create` requires `title`, `body`, `due_at`, an explicit IANA
+  `timezone`, and `user_instruction`. Resolve the intended date/time with the user;
+  `due_at` must include an offset matching that timezone. Title/body limits are
+  160/1500 characters, with one title line and at most 20 body lines.
+- `tdt_reminder_edit` accepts a nonempty `changes` object containing any of
+  `title`, `body`, `due_at` and `timezone`. Omitted fields remain unchanged;
+  null values are refused. Changing timezone requires a matching `due_at`.
+- `tdt_reminder_snooze` requires `changes.due_at` in the future and optionally
+  `changes.timezone`; otherwise it uses the reminder's existing timezone.
+- `tdt_reminder_complete` and `tdt_reminder_cancel` retain the record and change
+  its task status. Completion is separate from notification.
+
+Every change to an existing reminder requires its exact `id`, the integer
 `reminder_revision` from a fresh read (not the Markdown hash), and
-`user_instruction` describing the user's request. They preserve the record, advance
-its revision and clear delivery claims. Completion is separate from notification.
-They return a small receipt containing ID, status and the new reminder revision;
-read the reminder again for its full content. A stale revision refuses the write.
-After a disconnect or uncertain error, inspect the reminder before retrying;
-these operations do not replay a successful receipt. The instruction records
-stated authority; it does not authenticate a human decision.
+`user_instruction` describing the user's request. Changes advance the revision
+and clear delivery claims. Text-only edits preserve prior notification; changing
+the due time or snoozing rearms it. Creation coalesces exact pending duplicates
+without changing their provenance, notification or revision. Finished records do
+not block creation of a new reminder.
+
+Writes return a small receipt containing ID, status and the reminder revision;
+creation also returns `result` (`saved` or `existing`). Read the reminder again
+for full content. A stale revision refuses the write. After a disconnect or
+uncertain error, inspect state before retrying; changes do not replay a successful
+receipt, and duplicate creation coalesces only while the exact pending record
+still exists. The instruction records stated authority; it does not authenticate
+a human decision.
 
 Profiles are fixed at startup, and excluded calls are refused. `read-only` remains
 the default. Mutations use the same nonblocking cross-process lock as the CLI;
@@ -168,8 +187,10 @@ HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verif
 on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289 in noninteractive sessions
 using temporary MCP configuration. Completion/cancellation also passed live checks
 in both hosts, including stale-revision refusals and reads through a second
-read-only server. The noninteractive Codex check required launch-only approval
-for the two writable tools; host approval settings still apply independently of
+read-only server. Creation/edit/snooze also passed in both hosts, including exact
+duplicate coalescing, stale-revision refusals, read-only readback and unchanged
+control records. The noninteractive Codex checks required launch-only approval
+for the exercised writable tools; host approval settings still apply independently of
 the selected TDT profile. Interactive UI, persistent registration and automatic
 capture were not exercised by those checks. Incoming stdio messages are limited to 8 MiB of
 bytes per line, excluding the final LF (a CR counts toward the limit). The reader

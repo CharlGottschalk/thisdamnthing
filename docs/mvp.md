@@ -281,7 +281,8 @@ provide complete, bounded reads without executing instructions. Reminder lists a
 complete reads expose task and delivery state without claiming or acknowledging
 notifications. Workspace selection is explicit
 and fixed for the process. Incoming stdio messages are bounded to 8 MiB before
-decoding or parsing; oversized frames close the connection. The opt-in `everyday` profile adds revision-checked reminder completion and
-cancellation on explicit user instruction, using the shared core lock. Read-only
+decoding or parsing; oversized frames close the connection. The opt-in `everyday` profile adds reminder creation and revision-checked editing,
+snoozing, completion and cancellation on explicit user instruction, using the shared
+core lock. Read-only
 remains the default. Other writes, host registration, resources and prompts are
 not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

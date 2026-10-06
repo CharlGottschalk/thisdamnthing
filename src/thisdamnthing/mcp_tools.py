@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Generic, Literal, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from . import brain, constitution, notes, projects, reminders, bootstrap, skills, stacks, stack_docs, frontmatter
 from .workspace import WorkspaceError, managed_path
@@ -29,7 +29,45 @@ class ReminderChangeInput(ReadInput):
 class ReminderChanged(Model):
     id: str
     reminder_revision: int
-    status: Literal['done', 'cancelled']
+    status: Literal['pending', 'done', 'cancelled']
+
+
+class ReminderCreateInput(ReadInput):
+    title: str = Field(min_length=1, max_length=160)
+    body: str = Field(min_length=1, max_length=1500)
+    due_at: str = Field(min_length=1, max_length=100)
+    timezone: str = Field(min_length=1, max_length=100)
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class ReminderCreated(ReminderChanged):
+    result: Literal['saved', 'existing']
+
+
+class ReminderSnoozeFields(Model):
+    due_at: str = Field(min_length=1, max_length=100)
+    timezone: str | None = Field(default=None, min_length=1, max_length=100)
+
+    @model_validator(mode='after')
+    def supplied_fields(self):
+        values = self.model_dump(exclude_unset=True)
+        if not values or any(value is None for value in values.values()):
+            raise ValueError('Supply at least one non-null changed field')
+        return self
+
+
+class ReminderEditFields(ReminderSnoozeFields):
+    due_at: str | None = Field(default=None, min_length=1, max_length=100)
+    title: str | None = Field(default=None, min_length=1, max_length=160)
+    body: str | None = Field(default=None, min_length=1, max_length=1500)
+
+
+class ReminderEditInput(ReminderChangeInput):
+    changes: ReminderEditFields
+
+
+class ReminderSnoozeInput(ReminderChangeInput):
+    changes: ReminderSnoozeFields
 
 
 class SearchInput(ReadInput):
@@ -580,8 +618,24 @@ def reminder_cancel(root, args):
     return reminder_change(root, args, 'cancel')
 
 
+def reminder_create(root, args):
+    data = args.model_dump(include={'title', 'body', 'due_at', 'timezone'})
+    row = reminders.create(root, data, args.user_instruction)
+    return ReminderCreated(id=row['id'], reminder_revision=row['revision'],
+                           status=row['status'], result=row['result']), []
+
+
+def reminder_edit(root, args):
+    return reminder_change(root, args, 'edit')
+
+
+def reminder_snooze(root, args):
+    return reminder_change(root, args, 'snooze')
+
+
 def reminder_change(root, args, action):
-    row = reminders.change(root, args.id, action, args.reminder_revision, args.user_instruction)
+    data = args.changes.model_dump(exclude_unset=True) if action in ('edit', 'snooze') else None
+    row = reminders.change(root, args.id, action, args.reminder_revision, args.user_instruction, data)
     # A fixed, small receipt fits even the minimum budget. No post-write reread.
     return ReminderChanged(id=row['id'], reminder_revision=row['revision'],
                            status=row['status']), []
@@ -627,6 +681,15 @@ CATALOG = {
 
 
 WRITES = {
+    'tdt_reminder_create': (ReminderCreateInput, ReminderCreated, reminder_create,
+        'Create a one-time reminder on user instruction with a resolved ISO date/time, explicit offset '
+        'and IANA timezone. Exact pending duplicates return existing. Inspect after a lost response.'),
+    'tdt_reminder_edit': (ReminderEditInput, ReminderChanged, reminder_edit,
+        'Edit supplied reminder fields on user instruction using its current reminder_revision. '
+        'Changing timezone requires a matching due_at. Reread after a lost response before retrying.'),
+    'tdt_reminder_snooze': (ReminderSnoozeInput, ReminderChanged, reminder_snooze,
+        'Snooze a pending reminder to a future ISO date/time with explicit offset on user instruction '
+        'using its current reminder_revision. Rearms notification. Reread after a lost response.'),
     'tdt_reminder_complete': (ReminderChangeInput, ReminderChanged, reminder_complete,
         'Mark a pending reminder done on user instruction using its current reminder_revision. '
         'After a lost response, reread before retrying. Does not acknowledge notification.'),

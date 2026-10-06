@@ -233,7 +233,7 @@ The generic result-size diagnostic currently mentions policy rereading for
 non-policy results too; this is a wording follow-up, not a failed read/retry.
 
 For the first writable MCP slice, launch both profiles in disposable workspaces.
-Verify 17 read-only / 19 everyday tools and matching context/annotations; excluded
+Verify 17 read-only / 22 everyday tools and matching context/annotations; excluded
 calls must not mutate. Complete and cancel pending reminders with current integer
 revisions and user instruction; check preserved body/provenance, incremented
 revision and cleared claim. Check stale, finished, missing, malformed and unknown
@@ -254,3 +254,32 @@ No persistent registration or saved host settings changed. Read-only excluded-ca
 refusal was exercised through the SDK; live hosts observed the absent write tools.
 Cancellation serialization was checked with an instrumented held worker, not a
 live-host disconnect. Actual crash/restart during a write remains unverified.
+
+For MCP reminder creation/edit/snooze, verify both SDK modes on the packaged wheel.
+Require explicit creation timezone and matching offset; check ambiguous/gap times,
+past creation, future-only snooze, empty/null/unknown changes and core text bounds.
+Check exact pending duplicate coalescing without provenance or delivery changes,
+and fresh creation after completion. Edits retain ID/path/creation/provenance,
+advance revisions and clear claims; text-only edits preserve notification while
+changed due times and snoozes rearm it. Check stale/finished refusals, 1024-byte
+receipts, profile exclusion, recovery markers and CLI lock conflicts without writes.
+Creation/edit/snooze live-host evidence is recorded below.
+
+Packaged creation/edit/snooze checks passed on Linux in SDK auto and legacy modes:
+17/22 catalogs and context, output schemas, write annotations, profile refusal,
+exact duplicate preservation, finished-record recreation, field validation,
+missing/mismatched offsets and daylight-saving gaps, future snooze, notification
+rearming, preserved identity/path/provenance, stale/finished refusal, shared locks,
+recovery markers and minimum-budget receipts. Existing completion/cancellation
+checks also passed in both modes. No automated suite added or run; temporary
+manual probes used disposable workspaces. Crash/disconnect during writes remains unverified.
+
+Live creation/edit/snooze verification passed on Linux with Codex CLI 0.156.1
+and Claude Code 2.1.289. Each made 14 calls with temporary everyday/read-only
+servers: created one reminder, coalesced an exact duplicate, edited and snoozed
+with 1024-byte receipts, refused two stale revisions, and read back revision 3
+through both servers. Independent transcript/state audit verified UTC conversion,
+retained creation provenance, no delivery claims/acknowledgements and unchanged
+control. Full workspace hashes proved only the new authorized reminder file
+changed. Both hosts exited 0. Codex used launch-only approval for the three
+writable tools; no persistent host settings or registrations changed.

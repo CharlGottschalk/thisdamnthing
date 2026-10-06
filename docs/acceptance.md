@@ -758,3 +758,26 @@ or checking assets. Read-phase workspace hashes and outside controls were
 unchanged. Separate packaged checks passed empty catalogs and core guide/skill
 regression. Installed source/resource parity, dependency checks and diff whitespace
 passed. No live-model selection or provider execution was exercised.
+
+
+## MCP explicitly selected provider search
+
+In a disposable workspace install a reviewed trusted search provider and save
+approved fixture evidence. Verify everyday `tdt_brain_search_providers` requires
+1–8 distinct provider IDs, while read-only excludes it and literal search has no
+provider argument. Check non-read-only, non-idempotent and open-world annotations.
+A query without an index must refuse without creating one. After explicit CLI/core
+indexing, compare evidence with shared core search and hash the workspace/index
+before and after queries. Check missing/duplicate/unsafe provider input, unknown
+providers, missing trust, altered assets, recovery markers, oversized registry,
+result budgets and deleted notes against a stale index. Provider failures must not
+silently become literal-only success.
+
+Verified 2026-10-06 on the packaged wheel with the local SQLite provider. Actual
+SDK auto and legacy each passed 16 calls with output schema validation, 29/46
+catalogs, annotation/input checks, core result parity and the refusals above.
+Query-phase workspace/index hashes were unchanged. Deleting fixture evidence
+excluded it from subsequent search without rebuilding. Changed shipped files
+matched the installed wheel and pip dependency checks passed. These are bounded
+manual checks, not live-model selection, OS/network isolation, interruption or
+malicious-provider containment evidence. No host settings were changed.

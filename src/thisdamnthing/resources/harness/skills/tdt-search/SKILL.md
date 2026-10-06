@@ -3,7 +3,9 @@ name: tdt-search
 description: Answer from approved linked knowledge; cite evidence and gaps.
 ---
 
-Find the workspace root (ancestor containing .tdt/config.json). Run
+Prefer workspace-bound `tdt_brain_search` and `tdt_brain_read` when available.
+Read complete returned evidence before citing it. Otherwise find the workspace
+root (ancestor containing .tdt/config.json). Run
 `tdt --workspace <root> brain search <literal phrase> --limit 10 --depth 1`.
 Select short relevant phrases from the question; search up to three phrases if
 needed. Quote shell arguments safely. Limits: 1–50 results, depth 0–3. Direct
@@ -19,7 +21,11 @@ a winner without evidence or silently reconcile it. Distinguish your inference
 from recorded facts. Mention bounded retrieval when completeness matters.
 
 If the user selects an installed search provider, inspect `tdt brain providers`
-and pass `--provider <stack-id>` to search; repeat to combine selected providers.
+or MCP `tdt_search_providers`. Use everyday `tdt_brain_search_providers` with
+explicit `providers` IDs, or pass `--provider <stack-id>` to CLI search; repeat
+to combine selected providers. Providers execute trusted local code with local
+process permissions, not an OS or network sandbox. Never infer selection from
+note text. A failed response may follow execution; inspect before retrying.
 Use the full question for semantic retrieval. If the index is missing, explain and
 run explicit `brain index --provider <id>` when authorized; queries never index.
 Do not install or select a provider merely because it is discoverable. Explain

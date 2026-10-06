@@ -162,7 +162,7 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The catalogs now contain 29 read-only and 45 everyday tools.
+The catalogs now contain 29 read-only and 46 everyday tools.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are
@@ -449,7 +449,15 @@ the default. Mutations use the same nonblocking cross-process lock as the CLI;
 in-process mutations are serialized, and cancellation waits for an active worker
 before releasing serialization. A lock conflict may return `operation_refused`;
 inspect state before retrying. Reads remain available during a mutation.
-Other everyday writes and provider execution are not exposed. External source
+Everyday also exposes `tdt_brain_search_providers` with required `providers`
+(1–8 distinct explicitly selected stack IDs), `query`, `limit`, `depth` and
+`budget_bytes`. It combines provider and literal rankings through core, checking
+trust, assets, compatibility and current approved evidence. It never indexes or
+persists query cache changes through core. Trusted provider code runs with local
+process permissions, not an OS or network sandbox; its MCP annotation is open-world
+and non-read-only. Failures refuse the query rather than silently falling back;
+offer `tdt_brain_search` explicitly. A budget refusal can follow execution.
+Other everyday writes are not exposed. External source
 reads are limited to explicit registered-project inspection. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified

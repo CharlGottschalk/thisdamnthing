@@ -320,5 +320,7 @@ Both profiles expose paginated installed stack provenance, declared stack guides
 and search provider metadata through bounded registry reads. Provider trust is
 the recorded installation decision; discovery does not verify assets or runtime
 readiness, execute provider code, index content or fetch sources. Full stack guide
-reads use the existing guide reader. Selected provider execution remains future
-MCP work.
+reads use the existing guide reader. Everyday also exposes `tdt_brain_search_providers` for 1–8 explicitly selected
+providers through shared core search. It validates trust/assets/compatibility,
+rechecks current approved evidence, and never implicitly indexes. Provider code
+runs with local process permissions, outside any OS or network sandbox.

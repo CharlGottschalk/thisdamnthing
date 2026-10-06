@@ -301,5 +301,9 @@ retain provenance and refuse conflicting interrupted promotions.
 Everyday also saves explicitly requested approved knowledge and tagged scratchpad
 notes through the shared core, preserving deterministic identities and existing
 content on identical retries. Save skills prefer MCP with CLI fallback.
-Read-only remains the default. Other writes, host registration, resources and prompts
+Everyday also registers existing directories and creates internal project folders,
+returning small receipts through shared locked core operations. The add-project
+skill prefers these tools with CLI fallback; source inspection and onboarding
+proposals remain CLI operations. Retries preserve exact interrupted registration
+notes and existing identities. Read-only remains the default. Other writes, host registration, resources and prompts
 are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

@@ -4,8 +4,8 @@ from pathlib import Path
 import stat
 import os
 
-from . import brain
-from .workspace import WorkspaceError, managed_path, read_json
+from . import brain, constitution
+from .workspace import WorkspaceError, managed_path
 
 REGISTRY = '.tdt/state/projects.json'
 DOCUMENTS = ('README.md', 'README.rst', 'README.txt', 'pyproject.toml',
@@ -14,7 +14,7 @@ DOCUMENTS = ('README.md', 'README.rst', 'README.txt', 'pyproject.toml',
 
 
 def registry(root):
-    return validate_registry(read_json(root, REGISTRY))
+    return validate_registry(json.loads(constitution.bounded(managed_path(root, REGISTRY), 262144)))
 
 
 def validate_registry(records):
@@ -80,39 +80,59 @@ def project_path(root, directory):
     return path
 
 
+def registration_state(root):
+    """Strict reads before registration so retry never skips a damaged prior note."""
+    records = registry(root)
+    known = {}
+    for relative in brain.note_files(root, ('projects',)):
+        meta, _ = brain.read_note(root, relative)
+        key = meta['id']
+        if key in known or meta['status'] != 'approved' or meta.get('project') != key:
+            raise WorkspaceError('Invalid or duplicate project registration note')
+        known[key] = relative
+    return records, known
+
+
 def add(root, directory):
     path = project_path(root, directory)
-    internal = root in path.parents
     with brain.locked(root):
-        records = registry(root)
-        key = brain.digest(str(path))
-        existing = next((e for e in records if e['id'] == key), None)
-        if existing:
-            if existing.get('status') == 'archived':
-                raise WorkspaceError('Project is archived; use project restore')
-            return existing, False
-        relative = (brain.find_note(root, 'projects', key)
-                    or brain.named_path(root, 'projects', key, path.name))
-        target = managed_path(root, relative)
-        entry = {'id': key, 'path': str(path), 'created': brain.now()}
-        body = ('Registered internal directory: ' if internal else 'Registered external directory: ') + str(path) + '\n\nPurpose and entry points are not yet approved. Related: [[index]]'
-        meta = {'format_version': 1, 'id': key, 'title': path.name,
-                'kind': 'fact', 'status': 'approved', 'created': entry['created'],
-                'updated': entry['created'], 'project': key, 'links': ['index'],
-                'sources': [str(path)], 'provenance': {'operation': 'project add'},
-                'review': [{'decision': 'approve', 'user_instruction': 'Explicit project add instruction; directory registration only'}]}
-        content = brain.note_text(meta, body)
-        if target.exists():
-            # Recover only our exact registration facts after an interrupted registry write.
-            prior, prior_body = brain.read_note(root, relative)
-            meta['created'] = meta['updated'] = prior.get('created')
-            if prior != meta or prior_body != body:
-                raise WorkspaceError('Project note conflict; existing content preserved')
-            entry['created'] = prior['created']
-        else:
-            brain.atomic(root, relative, content)
-        brain.save_json(root, REGISTRY, records + [entry])
-        return entry, True
+        return register(root, path, *registration_state(root))
+
+
+def register(root, path, records, known):
+    """Persist registration while the caller holds the shared lock."""
+    internal = root in path.parents
+    key = brain.digest(str(path))
+    existing = next((e for e in records if e['id'] == key), None)
+    if existing:
+        if existing.get('status') == 'archived':
+            raise WorkspaceError('Project is archived; use project restore')
+        return existing, False
+    relative = (known.get(key)
+                or brain.named_path(root, 'projects', key, path.name))
+    target = managed_path(root, relative)
+    entry = {'id': key, 'path': str(path), 'created': brain.now()}
+    body = ('Registered internal directory: ' if internal else 'Registered external directory: ') + str(path) + '\n\nPurpose and entry points are not yet approved. Related: [[index]]'
+    meta = {'format_version': 1, 'id': key, 'title': path.name,
+            'kind': 'fact', 'status': 'approved', 'created': entry['created'],
+            'updated': entry['created'], 'project': key, 'links': ['index'],
+            'sources': [str(path)], 'provenance': {'operation': 'project add'},
+            'review': [{'decision': 'approve', 'user_instruction': 'Explicit project add instruction; directory registration only'}]}
+    content = brain.note_text(meta, body)
+    updated = records + [entry]
+    if len((json.dumps(updated, indent=2, ensure_ascii=False) + '\n').encode('utf-8')) > 262144:
+        raise WorkspaceError('Project registry exceeds 256 KiB')
+    if target.exists():
+        # Recover only our exact registration facts after an interrupted registry write.
+        prior, prior_body = brain.read_note(root, relative)
+        meta['created'] = meta['updated'] = prior.get('created')
+        if prior != meta or prior_body != body:
+            raise WorkspaceError('Project note conflict; existing content preserved')
+        entry['created'] = prior['created']
+    else:
+        brain.atomic(root, relative, content)
+    brain.save_json(root, REGISTRY, updated)
+    return entry, True
 
 
 def resolve(root, key):
@@ -225,9 +245,13 @@ def create(root, relative):
                for name in ('.tdt', '.dryft')):
             raise WorkspaceError('Cannot create a project inside another workspace')
     brain.clean_text(str(target), 'project path', 400)
-    registry(root)
-    target.mkdir(parents=True, exist_ok=True)
-    return add(root, target)
+    with brain.locked(root):
+        records, known = registration_state(root)
+        if any(e['id'] == brain.digest(str(target)) and e.get('status') == 'archived'
+               for e in records):
+            raise WorkspaceError('Project is archived; use project restore')
+        target.mkdir(parents=True, exist_ok=True)
+        return register(root, project_path(root, target), records, known)
 
 
 def search_work(root, query):

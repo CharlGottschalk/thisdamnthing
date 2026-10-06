@@ -545,3 +545,52 @@ state before retry; absent saves produced one record and persisted saves returne
 existing without byte changes. A further retry preserved the same record and one
 knowledge approval or zero scratchpad reviews. Process termination is verified;
 power loss and live-model automatic reconnection are not.
+
+### MCP project registration
+
+Everyday exposes `tdt_project_add` for an absolute existing directory and
+`tdt_project_create` for a relative folder below work/. Read-only retains 21 tools;
+everyday now has 36. Confirm explicit user intent and WORK.md placement before
+creation. Both receipts contain only id/result and fit the minimum result budget;
+read registration facts through project read. Source inspection and onboarding
+proposals remain CLI operations. Registration never edits external project files.
+
+Packaged manual verification on Linux passed in SDK auto and legacy modes:
+output schemas, profile/input refusals, external registration, internal creation,
+1024-byte receipts, read-only readback, identical retries and CLI duplicate parity.
+Invalid/reserved/traversal/symlink paths, archived records, lock contention and
+pending recovery refused. Malformed, oversized, FIFO and symlink registries/notes
+and duplicate note identities refused without changing workspace file contents.
+Create under lock/recovery/invalid registry did not create the requested directory.
+External fixture files remained byte-identical.
+
+Injected I/O failures before note persistence, after note persistence and after
+registry persistence covered both operations in both modes. Read-before-retry and
+identical retries finished registration, preserving existing note bytes and a
+single identity. Further retries changed no file contents. Additional direct-core
+checks preserved user files, refused recreating a missing archived folder, and
+preserved conflicting partial registration notes and registry bytes.
+Runtime, command guide and add-project skill matched the installed wheel;
+package dependencies and whitespace checks passed. No automated suite added/run.
+Live verification also passed with Codex CLI 0.156.1 and Claude Code 2.1.289:
+30 actual MCP calls per host, both exit 0. Independent transcript audits confirmed
+21/36 catalogs, installed add-project skill reads, external registration, internal
+creation, complete readback before duplicate retries, partial-registration recovery,
+completed replay and expected archived/traversal/relative-path refusals. Whole-workspace
+hash audits found exactly two new registration notes and the updated registry;
+preexisting partial/control/completed/archived notes and user files were unchanged.
+External source fixture files remained byte-identical. These runs used temporary
+launch-only configuration and explicit fixture instructions; automatic skill choice
+and a real host-hook lifecycle were not exercised. Codex recovered from a model-service
+stream interruption; this was not an MCP transport failure.
+
+Fourteen actual SIGKILL checks passed across SDK auto/legacy: add before/after note
+persistence and after registry persistence; create at those boundaries plus after
+directory creation. A parent killed only the disposable fault-wrapper server after
+its persistence marker. The client received MCPError without a result. Fresh
+unmodified servers read exact registration state before identical retries; every
+case ended with one note and one registry row, preserving any prior note bytes.
+Completed retries changed no files, and external sources stayed unchanged. This
+verifies process-death recovery, not power loss or live-model automatic reconnection.
+A created folder can remain after a later write failure; inspect the location and
+registration before retrying rather than relocating it.

@@ -11,7 +11,9 @@ Conventions override stack starter layouts and never authorize moving files.
 For a new project, reuse an explicit choice or established preference; otherwise
 ask internal or external. Derive a readable folder slug from the project name.
 Accept natural language such as “under studio”; do not require placeholders.
-For internal work run `tdt --workspace <root> project create <relative-folder>`
+Prefer the workspace-bound everyday MCP tools when available. For internal work
+use `tdt_project_create` with `relative_folder`, or fall back to
+`tdt --workspace <root> project create <relative-folder>`
 (e.g. `studio/autumn-launch`, never `work/studio/autumn-launch`). This lazily
 creates the directory and registers it, preserving existing files. For external
 work obtain the user's directory; registration requires it to exist. Creating a
@@ -36,10 +38,17 @@ candidate capture for durable decisions and lessons, with source file references
 and project IDs where applicable. Explicit knowledge saves use tdt-capture;
 file creation itself does not require knowledge review.
 
-For the user's existing directory run
-`tdt --workspace <root> project add <path>` with safely quoted arguments.
-This registers the canonical directory and emits a bounded inventory plus docs
-and manifests. Duplicate registration preserves its identity and note. Use
+For the user's existing directory use `tdt_project_add` with an absolute `path`,
+or fall back to `tdt --workspace <root> project add <path>` with safely quoted arguments.
+MCP returns `id` and `result` (`registered` or `existing`); use `tdt_project_read`
+with that ID for registration facts. It does not inspect source or approve
+onboarding interpretations. Use the CLI `project inspect <id>` for bounded source
+evidence; the CLI add/create commands include this inspection automatically.
+After an uncertain response inspect `tdt_project_list` and `tdt_project_read`
+(or CLI list/inspect) before retrying the identical location, including CLI fallback.
+An interrupted create can leave a directory, and interrupted registration can leave
+only its registration note. An identical retry can finish registration while
+preserving the note. Never choose a new folder or modify a note to force a retry. Duplicate registration preserves its identity and note. Use
 `project list` for IDs/status and `project inspect <id>` to reread bounded evidence.
 For renamed/moved directories, follow `.tdt/skills/tdt-relink-project/SKILL.md`;
 never register a replacement identity silently. For archived projects, follow

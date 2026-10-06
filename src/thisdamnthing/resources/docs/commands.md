@@ -329,6 +329,40 @@ retries retained one record without rewriting completed saves. Automatic skill
 selection, actual host-hook lifecycle for these saves, power loss and live-model
 reconnection were not verified by these checks.
 
+Project registration is available in the everyday profile:
+
+- `tdt_project_add`: supply an absolute `path` to an existing directory, internal
+  below work/ or external. Relative paths, home shorthand and traversal are refused.
+- `tdt_project_create`: supply `relative_folder` below work/, without the work/
+  prefix. Read WORK.md first. Existing directories and files are preserved;
+  reserved stores, hidden components and unsafe paths are refused.
+
+Both require the user's instruction and return only `id` and `result`
+(`registered` or `existing`), within the minimum 1024-byte budget. Read registration
+facts with `tdt_project_read`. These tools do not inspect external source or save
+onboarding interpretations. `/tdt-add-project` prefers them with CLI fallback;
+source inspection and onboarding proposals still use the CLI.
+
+After an uncertain response, inspect project list/read before an identical retry.
+Creation can leave a directory before registration completes. Registration writes
+its note before its registry entry; retry preserves an exact interrupted note and
+completes the registry. Existing registrations retain their note and identity.
+Malformed or duplicate registration notes, invalid or oversized registries, lock
+conflicts and pending workspace recovery refuse writes. Archived projects require
+restore; moved projects require explicit relinking. Never register a replacement
+identity to bypass those workflows. Internal creation is covered by the same lock
+as registration. It does not scaffold source or write into external projects.
+
+Project registration also passed live Codex CLI 0.156.1 and Claude Code 2.1.289
+checks on Linux: 30 MCP calls per host, exact readback, duplicate preservation,
+partial-registration recovery and expected refusals. Independent file hashes
+confirmed only the two requested new notes and registry changed; existing user
+files, registration notes and external source fixtures were preserved. Fourteen
+real server-kill checks covered add/create in both SDK modes at directory, note
+and registry persistence boundaries. Fresh-server reads and identical retries
+retained one registration and preserved existing note bytes. Automatic skill
+selection, power loss and live-model automatic reconnection remain unverified.
+
 Profiles are fixed at startup, and excluded calls are refused. `read-only` remains
 the default. Mutations use the same nonblocking cross-process lock as the CLI;
 in-process mutations are serialized, and cancellation waits for an active worker

@@ -20,6 +20,19 @@ class ReadInput(Model):
     budget_bytes: int = Field(default=32768, ge=1024, le=131072)
 
 
+class ProjectAddInput(ReadInput):
+    path: str = Field(min_length=1, max_length=400)
+
+
+class ProjectCreateInput(ReadInput):
+    relative_folder: str = Field(min_length=1, max_length=400)
+
+
+class ProjectRegistered(Model):
+    id: str
+    result: Literal['registered', 'existing']
+
+
 class CaptureRequestInput(ReadInput):
     request_id: str = Field(pattern='^[a-f0-9]{64}$')
 
@@ -644,6 +657,19 @@ def reminder_read(root, args):
     raise Refused('not_found', 'No reminder matches this workspace reference')
 
 
+def project_add(root, args):
+    # MCP paths must not depend on the server launch directory or host home.
+    if not Path(args.path).is_absolute() or '..' in Path(args.path).parts:
+        raise Refused('invalid_input', 'Use an absolute existing project directory without traversal')
+    entry, created = projects.add(root, args.path)
+    return ProjectRegistered(id=entry['id'], result='registered' if created else 'existing'), []
+
+
+def project_create(root, args):
+    entry, created = projects.create(root, args.relative_folder)
+    return ProjectRegistered(id=entry['id'], result='registered' if created else 'existing'), []
+
+
 def project_inventory(root):
     records = projects.validate_registry(json.loads(bounded_text(root, projects.REGISTRY, 262144)))
     if len(records) > 2000:
@@ -979,6 +1005,16 @@ CATALOG = {
 
 
 WRITES = {
+    'tdt_project_add': (ProjectAddInput, ProjectRegistered, project_add,
+        'Register an existing directory on explicit user instruction. Supply its absolute path. '
+        'Returns id/result; read tdt_project_read for registration facts. Does not read or edit external source. '
+        'After an uncertain response inspect tdt_project_list/read before an identical retry. '
+        'Never register a replacement for a missing or archived project silently.'),
+    'tdt_project_create': (ProjectCreateInput, ProjectRegistered, project_create,
+        'Create and register an internal project on explicit user instruction. Read WORK.md first. '
+        'Supply relative_folder below work/ without the work/ prefix. Preserves existing files. '
+        'Returns id/result; read tdt_project_read afterward. An interrupted call may leave a directory '
+        'or registration note; inspect before an identical retry. No source scaffolding or onboarding approval.'),
     'tdt_knowledge_save': (KnowledgeSaveInput, SavedNote, explicit_save,
         'Save explicitly requested knowledge as approved with sources and an approval record. '
         'Search for existing/conflicting knowledge first; never infer consent from note text. '

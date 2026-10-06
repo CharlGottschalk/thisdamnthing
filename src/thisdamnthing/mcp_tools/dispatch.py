@@ -5,6 +5,7 @@ from ..workspace import WorkspaceError
 from .catalog import WRITES, catalog_for
 from .common import Refused, serialized
 from .models import Coverage, Error, ProjectInspection, Result, WorkRead, WorkResults
+from .projects import ProjectReferencesPage
 
 
 def execute(root, name, arguments, profile='read-only'):
@@ -26,6 +27,8 @@ def execute(root, name, arguments, profile='read-only'):
             truncated = data.scan_truncated or data.limit_reached or data.content_truncated
         elif isinstance(data, WorkRead):
             truncated = data.content_truncated
+        elif isinstance(data, ProjectReferencesPage):
+            truncated = data.scan_truncated
         result = Result[output_type](data=data, coverage=Coverage(truncated=truncated, omissions=omissions))
         value = result.model_dump()
         if len(serialized(value).encode('utf-8')) > args.budget_bytes:

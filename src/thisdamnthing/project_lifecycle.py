@@ -197,7 +197,7 @@ def references_unlocked(root, key):
 
 
 def references(root, key):
-    with brain.locked(root):
+    with brain.locked(root, shared=True):
         stacks.available(root)
         return references_unlocked(root, key)
 

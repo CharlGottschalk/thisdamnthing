@@ -146,6 +146,8 @@ from .reminders import (
     reminder_ack,
 )
 from .projects import (
+    ProjectReferencesInput, ReferenceProject, ProjectReference, SkippedReference,
+    ProjectReferencesPage, project_references,
     project_add,
     project_create,
     project_inspect,

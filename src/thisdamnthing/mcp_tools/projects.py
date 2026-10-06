@@ -1,9 +1,12 @@
 """Project registration, inspection and proposal adapters."""
 import json
 from pathlib import Path
-from .. import brain, projects
+from typing import Literal
+from pydantic import Field
+from .. import brain, projects, project_lifecycle
 from .common import Refused, bounded_text, inventory_page, serialized, workspace_key
 from .models import (
+    ListInput, Model,
     ProjectInspection,
     ProjectPage,
     ProjectProposed,
@@ -12,6 +15,57 @@ from .models import (
     ProjectSummary,
     Registration,
 )
+
+
+class ProjectReferencesInput(ListInput):
+    id: str = Field(pattern='^[a-f0-9]{64}$')
+    section: Literal['references', 'skipped'] = 'references'
+
+
+class ReferenceProject(Model):
+    id: str
+    path: str
+    created: str | None = None
+    status: Literal['active', 'archived'] | None = None
+
+
+class ProjectReference(Model):
+    path: str
+    sha256: str
+    matched: list[str]
+
+
+class SkippedReference(Model):
+    path: str
+    reason: str
+
+
+class ProjectReferencesPage(Model):
+    project: ReferenceProject
+    section: Literal['references', 'skipped']
+    items: list[ProjectReference | SkippedReference]
+    next_cursor: str | None
+    inventory_revision: str
+    references_total: int
+    skipped_total: int
+    scan_truncated: bool
+    limitations: list[str]
+
+
+def project_references(root, args):
+    report = project_lifecycle.references(root, args.id)
+    revision = brain.digest(serialized(report))
+    page, cursor = inventory_page(root, args, 'project-references',
+                                  [args.id, args.section], revision, report[args.section])
+    item_type = ProjectReference if args.section == 'references' else SkippedReference
+    omissions = ([f"{len(report['skipped'])} entries skipped; read the skipped section for details"]
+                 if report['skipped'] else [])
+    return ProjectReferencesPage(
+        project=ReferenceProject(**report['project']), section=args.section,
+        items=[item_type(**item) for item in page], next_cursor=cursor,
+        inventory_revision=revision, references_total=len(report['references']),
+        skipped_total=len(report['skipped']), scan_truncated=report['truncated'],
+        limitations=report['limitations']), omissions
 
 
 def project_add(root, args):

@@ -26,7 +26,9 @@ is missing. Permanent removal deletes its registry entry and marks the retained
 registration note as removed. Neither mode deletes the project directory or other
 brain/work files. Report that knowledge is retained; unregistering is not an erasure.
 
-Only review or clean references when requested. Run `tdt project references <id>`;
+Only review or clean references when requested. Prefer workspace-bound `tdt_project_references` with the exact `id`, paging both
+`references` and `skipped` sections; use `tdt project references <id>` when MCP is
+unavailable;
 a permanently removed project's full ID remains usable while its registration
 note is retained. Read matching files, distinguish historical evidence from stale
 active references, and report scan omissions. Literal name matches do not establish

@@ -27,7 +27,9 @@ authorizes these mechanical updates; do not ask again. Apply the same command wi
 message reference>`. If stale, preview again and check that the scope still matches
 the request. For an interrupted transaction use `tdt stack recover`, then re-preview.
 
-Run `project list` and `project references <new-id>`. Read relevant matches to
+Run `project list`. Prefer workspace-bound `tdt_project_references` with the new
+exact `id`, paging both `references` and `skipped`; fall back to
+`tdt project references <new-id>` when MCP is unavailable. Read relevant matches to
 identify stale prose or work references; historical provenance is expected to
 retain old paths. Explain coverage gaps and do not claim all references were
 rewritten. If the user wants additional reference edits, use the reviewed cleanup

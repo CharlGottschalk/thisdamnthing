@@ -950,3 +950,35 @@ activation. Suppression context was issued by the real core function for a
 fixture; live host hooks were disabled. Uncertain responses were pre-seeded,
 not actual network disconnects. Saved host configuration was unchanged. No
 staging, commit or push was performed.
+
+## MCP project reference discovery
+
+Verify `tdt_project_references` in both profiles with an exact project ID. Page
+both references and skipped entries and compare the combined rows with shared
+core/CLI output. Every page must retain totals, limitations and scan truncation;
+coverage must flag skipped entries and direct the caller to their detail pages.
+Changing the scan report, section or page size must invalidate old cursors.
+Check archived, restored and retained removed registrations, invalid IDs/fields,
+small-budget refusal, symlink/FIFO/invalid UTF-8/oversized-file skips, scan caps,
+transaction markers and shared versus exclusive brain locks. Preserve external
+source and all workspace content during reads.
+
+Packaged manual verification passed on Linux: MCP SDK auto and legacy modes,
+both profiles, 15 calls per combination. Output schemas and read-only/idempotent
+annotations passed; all reference/skipped pages matched CLI/core. Stale section
+and changed-content cursors, invalid inputs, budget and transaction refusals,
+shared-read coexistence and exclusive-lock exclusion passed. Separate core
+lifecycle changes verified archived/restored/removed reads; a 5001-entry directory
+set both scan and envelope truncation. FIFO, symlink, malformed UTF-8, oversized
+and unsupported files were skipped. Workspace hashes were unchanged by SDK reads
+and external control content was preserved. All 97 packaged files matched source
+and installed bytes; dependency and whitespace checks passed. No live-model
+routing verification or automated tests were performed.
+
+Follow-up verification repeated all 60 packaged SDK calls successfully. Additional
+checks passed page-size/project/omission-change cursor invalidation, malformed
+cursors, Unicode matches, hidden-file/directory exclusion, missing-source reads
+and lifecycle writer refusal under a shared read lock. Existing catalog schemas,
+descriptions and relative ordering matched HEAD in both profiles. Source, wheel
+and installed file sets and bytes matched exactly (97 files). No runtime fixes
+were required; live-model routing remains unverified.

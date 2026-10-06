@@ -116,6 +116,7 @@ The default `read-only` catalog has thirty tools:
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
+- `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
 - `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
@@ -166,7 +167,7 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The catalogs now contain 32 read-only and 58 everyday tools.
+The catalogs now contain 33 read-only and 59 everyday tools.
 
 Brain audits accept `section` (`findings` by default, or `notes`), `limit` (1–50)
 and `cursor`. Follow `next_cursor` until null for each section. Each page includes
@@ -562,3 +563,19 @@ cancel the interview. After uncertain start/present responses inspect retained
 state/current round before retrying; present always creates a new round.
 Close retains answers; cleanup deletes them and requires explicit user instruction.
 These tools do not submit answers on the user's behalf or promote them to knowledge.
+
+### MCP project reference review
+
+`tdt_project_references` is available in both profiles. Supply an exact project
+`id`, optional `section` (`references` by default, or `skipped`), `limit` and
+`cursor`. Removed projects remain addressable while their registration note is
+retained. Every page includes project identity, reference/skipped totals, scan
+truncation and limitations. Cursors bind the entire report, project, section and
+page size; restart after changes. Skipped details have their own paginated section
+so omissions cannot silently disappear behind the reference page.
+
+The shared CLI scan checks at most 5000 entries in brain/work and supported text
+files up to 256 KiB; it skips hidden paths, symlinks, unsupported/unreadable files
+and possible secrets. It does not scan external project source. Literal matches
+are review hints, not ownership or permission to delete. Lifecycle and cleanup
+writes still use the CLI. A result-budget refusal returns no partial page.

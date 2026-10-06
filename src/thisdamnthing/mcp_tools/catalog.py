@@ -90,6 +90,7 @@ from .models import (
     WorkspaceStatus,
 )
 from .projects import (
+    ProjectReferencesInput, ProjectReferencesPage, project_references,
     project_add,
     project_create,
     project_inspect,
@@ -185,6 +186,11 @@ CATALOG = {
         'List registered projects including archived/missing state. Paginated; no external source content.'),
     'tdt_project_read': (NoteInput, ProjectRead, project_read,
         'Read a registered project and retained registration Markdown by exact ID, path or workspace URI.'),
+    'tdt_project_references': (ProjectReferencesInput, ProjectReferencesPage, project_references,
+        'Scan local brain/work literal references to an explicitly selected project ID, including retained '
+        'removed registrations. Page references and skipped sections separately; every page reports totals '
+        'and scan limits. Matches are review hints, never ownership or cleanup authorization. '
+        'No external source scan, edits or deletion. Cursor expires when the report changes.'),
     'tdt_project_inspect': (ProjectInspectInput, ProjectInspection, project_inspect,
         'Inspect an explicitly selected active registered project by exact id, including external source. '
         'Reads at most 100 top-level names and ten allowlisted documents, 4 KiB each. '

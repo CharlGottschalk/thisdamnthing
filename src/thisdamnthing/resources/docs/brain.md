@@ -192,6 +192,15 @@ candidate references. Wikilink aliases and heading suffixes are retained. IDs,
 approval states, timestamps, provenance and historical review entries stay intact.
 Other files and links outside this scope are not rewritten.
 
+On a workspace-bound MCP server, `tdt_brain_names_preview` returns the same
+rename plan plus complete replacement contents; null marks old paths to remove.
+Both profiles support it with a shared read lock and no note or registry writes.
+Read every replacement; increase `budget_bytes` up to 1 MiB if output exceeds
+the budget. Oversized output is refused, never partially presented. This is a
+snapshot of the current plan, not a hash-bound approval or retained outcome.
+Apply remains CLI-only and recomputes current state, so inspect again immediately
+before an explicitly authorized apply.
+
 Close other editors during migration and keep a backup of your workspace.
 Duplicate IDs, unsafe paths or malformed notes refuse the operation; occupied
 filenames are preserved. Interrupted writes use the workspace transaction journal;

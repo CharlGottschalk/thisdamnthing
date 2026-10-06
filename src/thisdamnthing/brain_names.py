@@ -7,8 +7,8 @@ from . import brain, frontmatter, stacks
 from .workspace import WorkspaceError, managed_path
 
 
-def migrate(root, apply=False):
-    with brain.locked(root):
+def migrate(root, apply=False, *, include_replacements=False):
+    with brain.locked(root, shared=not apply):
         entries = stacks.available(root)
         files = brain.note_files(root)
         notes = {path: brain.read_note(root, path) for path in files}
@@ -75,6 +75,14 @@ def migrate(root, apply=False):
             changes[stacks.REGISTRY] = json.dumps(entries, indent=2, ensure_ascii=False) + '\n'
         result = {'renames': renames, 'updated_files': [p for p in changes if p not in renames],
                   'applied': apply}
+        if include_replacements:
+            # The transaction also refreshes owned stack documentation when
+            # candidate paths change. Include those derived writes in review.
+            if registry_changed:
+                from . import stack_docs
+                result['replacements'] = {**changes, **stack_docs.plan(root, entries, changes)}
+            else:
+                result['replacements'] = changes
         if apply and changes:
             stacks.transaction(root, changes)
         return result

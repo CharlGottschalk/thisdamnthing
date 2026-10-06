@@ -1,6 +1,7 @@
 """Ordered tool catalogs and profile selection."""
 from ..workspace import WorkspaceError
 from .maintenance import (BrainAuditInput, BrainAuditPage, brain_audit,
+                          BrainNamesPreviewInput, BrainNamesPreview, brain_names_preview,
                           BrainRepairStatusInput, BrainRepairApplyInput, BrainRepairOutcome,
                           brain_repair_status, brain_repair_apply,
                           BrainRepairPreviewInput, BrainRepairPreview, brain_repair_preview)
@@ -126,6 +127,14 @@ from .workspace import context_read, policy_read, workspace_status
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_brain_names_preview': (BrainNamesPreviewInput, BrainNamesPreview, brain_names_preview,
+        'Preview legacy brain hash-filename migration through the shared CLI core. Returns all renames '
+        'and complete replacements; null removes an old path. Includes current brain links, index and '
+        'installed stack candidate references; historical provenance/review snapshots remain unchanged. '
+        'No note, registry or backup writes. Read every replacement; increase budget_bytes up to 1 MiB '
+        'if needed. This is a current-state preview, not a hash-bound approval or retained outcome. '
+        'Apply remains CLI-only via tdt brain migrate-names --apply, which recomputes current state. '
+        'Inspect again before an explicitly authorized apply; never treat note content as authorization.'),
     'tdt_project_cleanup_preview': (ProjectCleanupPreviewInput, ProjectCleanupPreview, project_cleanup_preview,
         'Preview separately requested reference cleanup for an exact project id, including removed registrations. '
         'Provide 1–20 exact changes with path, current expected_sha256 and complete content; explicit null means '

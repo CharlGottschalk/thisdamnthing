@@ -3,9 +3,24 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .. import brain, brain_maintenance
+from .. import brain, brain_maintenance, brain_names
 from .common import inventory_page, serialized
 from .models import ListInput, Model, ReadInput
+
+
+class BrainNamesPreviewInput(ReadInput):
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class BrainNamesPreview(Model):
+    renames: dict[str, str]
+    updated_files: list[str]
+    replacements: dict[str, str | None]
+    applied: Literal[False] = False
+
+
+def brain_names_preview(root, args):
+    return BrainNamesPreview(**brain_names.migrate(root, include_replacements=True)), []
 
 
 class BrainAuditInput(ListInput):

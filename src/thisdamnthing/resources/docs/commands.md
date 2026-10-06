@@ -103,9 +103,10 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 38 tools; `everyday` has 68 in total.
+The default `read-only` catalog has 39 tools; `everyday` has 69 in total.
 The following list covers reads and selected everyday counterparts:
 
+- `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Apply remains CLI-only and recomputes current state; this preview is not a hash-bound approval.
 - `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
 - `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
 - `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt_brain_repair_apply` (everyday) or `tdt brain repair` with identical changes and the returned hash.

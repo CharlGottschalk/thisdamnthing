@@ -1160,3 +1160,25 @@ persistence disabled. No saved host configuration, automated suite, commit or pu
 This verifies live MCP routing, not native slash activation or actual network-loss
 recovery; uncertain outcomes were pre-seeded. Codex state-database warnings were
 nonfatal and Claude stderr was empty.
+
+### MCP legacy filename migration preview — 2026-10-06
+
+Both profiles expose `tdt_brain_names_preview` with complete renames and
+replacement contents, including old-path deletions and derived stack catalog
+writes. Preview shares the workspace lock; apply remains exclusive and CLI-only.
+The preview is not a hash-bound approval; CLI apply recomputes current state.
+Catalog counts are 39 read-only / 69 everyday.
+
+Focused manual checks passed against source and an installed wheel: CLI/core
+preview parity, actual CLI apply matching every replacement, no-op repeat,
+Unicode and wikilink heading/alias preservation, stack candidate references and
+derived documentation, strict inputs, budget refusal without partial output,
+shared/exclusive lock behavior, transaction marker refusal, malformed/escaping
+notes, outside control preservation and unchanged preview workspace hashes.
+SDK auto and legacy modes passed both profiles on source and installed wheel,
+12 calls each, checking catalog counts, annotations, output schemas and errors.
+All 97 package files matched source/wheel/install; pip check and whitespace passed.
+Initial stack fixture omitted its required top-level version; correcting the
+fixture passed without runtime changes. Sandbox dependency DNS and SDK discovery
+failed; bounded outside-sandbox build/probes passed. No automated test suite or
+live-model routing was run; no saved host configuration changed.

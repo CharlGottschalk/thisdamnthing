@@ -594,3 +594,76 @@ Completed retries changed no files, and external sources stayed unchanged. This
 verifies process-death recovery, not power loss or live-model automatic reconnection.
 A created folder can remain after a later write failure; inspect the location and
 registration before retrying rather than relocating it.
+### MCP project inspection and onboarding proposals
+
+Use a packaged installation and disposable internal/external projects. Verify
+the 22-tool read-only and 38-tool everyday catalogs with both SDK auto and legacy
+modes. Inspection is available in both; proposals are everyday-only. Validate
+structured results against catalog schemas and refuse unknown fields, invalid
+IDs, wrong types and insufficient result budgets without changing files.
+
+Inspect only the explicitly selected active registered project. Check the 100-name
+top-level inventory and ten allowlisted documents with 4 KiB content bounds,
+including a UTF-8 character split at the bound. Check exact source paths, retained
+project link, complete omission reasons, and inventory/content coverage flags.
+Refuse archived, missing and replaced-by-symlink project locations. Omit symlink
+documents/parent directories, FIFOs, invalid UTF-8, possible secrets and missing
+files without reading outside the selected project or executing source content.
+Compare CLI inspection and confirm source/control hashes remain unchanged.
+
+Submit an inference with sources and the inspected project link. Confirm a pending
+candidate with project provenance and no review, exact readback and CLI parity.
+Identical retries must preserve bytes before and after edits, rejection and
+approval. Refuse project mismatch, malformed/oversized/symlink/special-file notes,
+duplicate identities, conflicting provenance, lock contention and recovery state.
+Inject failures before/after candidate persistence; inspect saved state before
+retrying and retain one candidate. During interrupted approval, proposal replay
+must refuse until the exact review recovery resolves the dual-store state; do not
+rewrite the already saved canonical content.
+
+Packaged manual verification on Linux passed both SDK modes, with 46 onboarding
+calls per mode and schema checks for every response. It covered bounded inspection,
+omissions, strict inputs/profile restrictions, minimum proposal receipt budget,
+CLI parity, review-state preservation, lock/recovery refusals, unsafe locations,
+malformed and conflicting records, and injected pre/post-persistence failures.
+External source and outside-control hashes stayed unchanged. Registration/create
+regression checks also passed both modes after the shared project changes.
+Additional direct checks verified interrupted-approval refusal and exact recovery
+with unchanged canonical bytes, plus corrupt registry/registration-note refusals.
+The built wheel matched changed runtime, command guide and add-project skill;
+dependency and whitespace checks passed. These checks do not establish live model
+tool/skill selection, actual server-kill recovery or power-loss durability for
+project proposals. No automated suite was added or run.
+
+Live onboarding verification also passed on Linux with Codex CLI 0.156.1 and
+Claude Code 2.1.289: 36 actual MCP calls per host, both exit code 0. Independent
+transcript/schema and whole-workspace hash audits confirmed 22/38 tool catalogs,
+the installed add-project skill read, external registration and bounded inspection,
+internal inspection, evidence-cited onboarding explanations and two new pending
+inference proposals. Identical retries followed exact status reads and preserved
+Markdown/revisions. Preseeded completed, approved and rejected proposal replays
+retained their content and histories. Four intended refusals covered archived and
+missing locations, insufficient inspection budget and a mismatched summary project.
+Pending proposals stayed outside approved search. Exactly the new registration
+note, registry and two candidate notes changed; all prior records, user files,
+external source and outside controls remained unchanged. No runtime fixes needed.
+
+Runs used disposable workspaces and temporary launch-only MCP configurations.
+Codex used ephemeral execution, ignored user config, a read-only shell sandbox
+and per-tool approval overrides for the two authorized writes. Claude used strict
+MCP configuration without builtin tools, settings sources, hooks or session
+persistence. Only the intended MCP tools were called. Codex emitted unrelated
+state-db and file-watcher warnings; Claude stderr was empty. This verifies live
+tool use, not automatic skill routing or an actual host-hook lifecycle.
+
+Ten actual SIGKILL checks passed across SDK auto and legacy modes: internal and
+external proposals before/after atomic persistence, plus interrupted approval after
+canonical persistence in each mode. The parent killed only the disposable fault
+server after its exact boundary marker; the client received MCPError without a
+result. Fresh unmodified servers read exact status/inventory before retry. Missing
+proposals produced one pending candidate; completed proposals returned existing
+without rewriting bytes. Interrupted approvals refused proposal replay until the
+identical original review completed cleanup, preserving canonical content/revision
+and one approval record. Further proposal replay returned existing. Controls and
+project source stayed unchanged. This proves process-death recovery at those
+boundaries, not power-loss durability or live-model automatic reconnection.

@@ -19,7 +19,8 @@ creates the directory and registers it, preserving existing files. For external
 work obtain the user's directory; registration requires it to exist. Creating a
 new external directory is separate authorized work, not an effect of registration.
 
-For “continue <project>”, run `project inspect <name-or-id>`; names are directory
+For “continue <project>”, prefer `tdt_project_list` to resolve an exact ID, then
+`tdt_project_inspect` with `id`. Fall back to `project inspect <name-or-id>`; names are directory
 basenames, and internal relative paths also resolve. If ambiguous, use project
 list and ask which location. Read that project's own instructions and current
 working/progress files, and retrieve related brain knowledge by project ID.
@@ -42,14 +43,17 @@ For the user's existing directory use `tdt_project_add` with an absolute `path`,
 or fall back to `tdt --workspace <root> project add <path>` with safely quoted arguments.
 MCP returns `id` and `result` (`registered` or `existing`); use `tdt_project_read`
 with that ID for registration facts. It does not inspect source or approve
-onboarding interpretations. Use the CLI `project inspect <id>` for bounded source
-evidence; the CLI add/create commands include this inspection automatically.
+onboarding interpretations. Use `tdt_project_inspect` with `id` for bounded source
+evidence, or fall back to CLI `project inspect <id>`; the CLI add/create commands
+include this inspection automatically. If the complete MCP result exceeds its
+budget, increase `budget_bytes` up to 131072; do not treat a refused read as evidence.
 After an uncertain response inspect `tdt_project_list` and `tdt_project_read`
 (or CLI list/inspect) before retrying the identical location, including CLI fallback.
 An interrupted create can leave a directory, and interrupted registration can leave
 only its registration note. An identical retry can finish registration while
 preserving the note. Never choose a new folder or modify a note to force a retry. Duplicate registration preserves its identity and note. Use
-`project list` for IDs/status and `project inspect <id>` to reread bounded evidence.
+`tdt_project_list` for IDs/status and `tdt_project_inspect` to reread bounded evidence,
+with CLI list/inspect as fallback.
 For renamed/moved directories, follow `.tdt/skills/tdt-relink-project/SKILL.md`;
 never register a replacement identity silently. For archived projects, follow
 `.tdt/skills/tdt-remove-project/SKILL.md` to restore when requested.
@@ -70,12 +74,21 @@ entry points indicated by docs/manifests, and unknowns. Cite exact source paths
 and distinguish inference from documented facts. Registration metadata is the
 only immediately approved knowledge; onboarding interpretation remains tentative.
 
-For useful durable knowledge, submit one concise summary JSON on stdin to
+For useful durable knowledge, prefer `tdt_project_propose` with the selected `id`
+and structured `summary`. Fall back to one concise summary JSON on stdin to
 `tdt --workspace <root> project propose <id>`. Use title, kind (inference when
 interpreting), body (at most 3000 characters), sources (1–8 exact references),
 and links (use the `brain_link` returned by project inspection). See docs/brain.md for the summary format. Include
 purpose, structure, entry points and unknowns only as supported by inspected
 sources. This creates a pending candidate; it does not approve it. Show the
-proposal and offer /tdt-review-brain for explicit review. Do not claim the
+proposal and offer /tdt-review-brain for explicit review. MCP returns candidate
+`id`, `status` and `result` (`saved` or `existing`). An identical retry preserves
+existing content and any prior review, including approval or rejection; never
+describe an existing reviewed proposal as newly pending. After an uncertain
+response inspect candidate list and exact `tdt_candidate_review_status` (or read
+the saved candidate/knowledge Markdown when MCP is unavailable) before an identical
+retry or CLI fallback. Duplicate,
+malformed or interrupted-promotion records require inspection and recovery before
+retry; do not change the summary to bypass them. Do not claim the
 onboarding has been saved until proposal submission succeeds. Work beyond
 registration follows the project's own instructions and the user's authorization.

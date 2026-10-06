@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has twenty-one tools:
+The default `read-only` catalog has twenty-two tools:
 
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
@@ -112,6 +112,7 @@ The default `read-only` catalog has twenty-one tools:
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
+- `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
 - `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
 - `tdt_constitution_read`: complete constitution and its revision.
@@ -340,8 +341,48 @@ Project registration is available in the everyday profile:
 Both require the user's instruction and return only `id` and `result`
 (`registered` or `existing`), within the minimum 1024-byte budget. Read registration
 facts with `tdt_project_read`. These tools do not inspect external source or save
-onboarding interpretations. `/tdt-add-project` prefers them with CLI fallback;
-source inspection and onboarding proposals still use the CLI.
+onboarding interpretations. `/tdt-add-project` prefers them with CLI fallback.
+
+Project onboarding adds two tools (38 tools total in everyday):
+
+- `tdt_project_inspect` (both profiles): pass the exact registered `id`. Reads up
+  to 100 top-level names and ten allowlisted docs/manifests, at most 4 KiB each,
+  from an active available project. This explicitly reads internal or external
+  source. It returns registration facts, `brain_link`, names, documents and an
+  evidence notice. Documents carry exact `source`, `text` and `truncated`, or an
+  `omitted` reason. Missing/unsafe/unreadable files and possible secrets are
+  reported as omissions; inventory/content truncation also sets coverage flags.
+  Directory components and documents cannot be symlinks. No recursive scan,
+  command execution or project writes occur. Increase `budget_bytes` up to
+  131072 if the result does not fit; budget refusal returns no partial evidence.
+- `tdt_project_propose` (everyday): pass `id` and `summary` with title, kind,
+  concise body, 1–8 source references and links (prefer inspection's `brain_link`).
+  Optional summary `project` must be null/absent or match `id`. Interpretations
+  should use kind `inference` and cite the inspected evidence. Returns candidate
+  `id`, `status` and `result` (`saved` or `existing`) within 1024 bytes. New
+  proposals are pending, with project provenance and no approval. Read full
+  saved content with `tdt_candidate_review_status`; promotion requires the
+  ordinary explicit candidate review.
+
+`/tdt-add-project` prefers these tools with CLI inspect/propose fallback. Identical
+proposal retries preserve existing bytes, including edited or reviewed content;
+they may return pending, approved or rejected. After an uncertain write, inspect
+candidate inventory and exact review status (or saved Markdown) before retrying
+the identical summary. Malformed records, duplicate identities, interrupted
+promotion, mismatched provenance, archived/missing projects, lock conflicts and
+pending stack recovery refuse proposal writes. Resolve the existing state rather
+than changing the summary to force a new identity. Project source stays unchanged.
+
+Onboarding passed live Codex CLI 0.156.1 and Claude Code 2.1.289 verification on
+Linux, with 36 MCP calls per host. Independent transcript and file-hash audits
+confirmed bounded internal/external inspection, two pending proposals, exact reads
+before identical retries, retained reviewed proposals, expected refusals and
+unchanged external source/control records. Ten actual server-kill checks covered
+both SDK modes before/after proposal persistence and after approval's canonical
+write. Fresh-server reads and recovery retained one proposal, preserved completed
+bytes and required exact approval recovery before replaying an interrupted
+promotion. Automatic skill routing, actual host-hook lifecycle, power loss and
+live-model automatic reconnection were not verified by these checks.
 
 After an uncertain response, inspect project list/read before an identical retry.
 Creation can leave a directory before registration completes. Registration writes
@@ -368,8 +409,8 @@ the default. Mutations use the same nonblocking cross-process lock as the CLI;
 in-process mutations are serialized, and cancellation waits for an active worker
 before releasing serialization. A lock conflict may return `operation_refused`;
 inspect state before retrying. Reads remain available during a mutation.
-Other everyday writes, provider execution and external source
-reads are not exposed. Retrieved notes are
+Other everyday writes and provider execution are not exposed. External source
+reads are limited to explicit registered-project inspection. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified
 on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289 in noninteractive sessions

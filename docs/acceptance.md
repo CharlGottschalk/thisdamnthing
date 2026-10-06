@@ -730,3 +730,31 @@ builtin tools, settings sources, hooks or session persistence. Saved MCP
 registrations were not changed. Codex emitted unrelated state-db warnings;
 Claude stderr was empty. This verifies live MCP usage with explicitly requested
 skill reads, not automatic native skill routing or host-hook lifecycle.
+
+## MCP installed stacks and provider discovery
+
+In a disposable packaged installation, check `tdt_search_providers`,
+`tdt_stack_list` and `tdt_stack_docs` in both profiles. Expect 29 read-only and
+45 everyday tools. Validate output schemas, read-only annotations, pagination,
+profile equivalence and cursor rejection after inventory/selection changes.
+Compare provider metadata with `tdt brain providers`; discovery must not execute
+entrypoints, check assets, create caches or fetch sources. Missing trust/origin
+hashes must not count as trusted. Recorded trust does not establish runtime
+readiness. Read declared docs through `tdt_guide_read`, matching their revisions.
+
+Refuse malformed/duplicate registry records, registry files above 1 MiB,
+symlink/special-file registry paths, interrupted stack/skill operations, unsafe
+or oversized documents and results exceeding requested budgets. Preserve workspace
+and outside-control bytes during reads. Check empty catalogs and existing guide
+and skill discovery after the shared registry-reader change. No automated tests.
+
+Packaged manual verification passed on Linux with MCP SDK auto and legacy modes,
+49 calls each: schema/annotation checks, 29/45 catalogs, pagination and profile
+parity, stale/invalid cursors, CLI/core provider parity, recorded-trust correction,
+full guide reads, malformed metadata, duplicate registry IDs, recovery markers,
+registry size/symlink/FIFO refusals, document symlink/size refusals and result
+budgets. Discovery succeeded with absent provider entrypoints, without executing
+or checking assets. Read-phase workspace hashes and outside controls were
+unchanged. Separate packaged checks passed empty catalogs and core guide/skill
+regression. Installed source/resource parity, dependency checks and diff whitespace
+passed. No live-model selection or provider execution was exercised.

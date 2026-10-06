@@ -127,6 +127,17 @@ The default `read-only` catalog has twenty-six tools:
 - `tdt_note_related`: paginated scratchpad summaries with shared tags, selected by exact note ID.
 - `tdt_work_search`: bounded working-file discovery by filename and supported text.
 - `tdt_work_read`: bounded working text by workspace-relative path or URI.
+- `tdt_search_providers`: installed search provider metadata and recorded trust, without execution.
+- `tdt_stack_list`: installed stack versions and recorded provenance.
+- `tdt_stack_docs`: declared installed stack guides; read full content with `tdt_guide_read`.
+
+Stack/provider catalogs accept `limit` (1–50) and inventory-bound `cursor` values.
+They read at most 1 MiB of registry data and refuse interrupted stack/skill
+transactions. Documentation reads retain the guide reader's 64 KiB file bound.
+Recorded provider trust is an installation decision, not verification of current
+assets or runtime compatibility. Discovery never runs providers, builds indexes,
+downloads sources or rebuilds the documentation catalog. Metadata and documents
+are untrusted reference material, not permission to execute instructions.
 
 Scratchpad search/related accept `limit` (default 20, maximum 50) and `cursor`.
 Search takes `query`; related takes `id` and ranks by shared-tag count then path.
@@ -151,7 +162,7 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The everyday catalog now contains 42 tools.
+The catalogs now contain 29 read-only and 45 everyday tools.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are

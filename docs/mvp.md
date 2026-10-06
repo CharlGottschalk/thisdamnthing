@@ -315,3 +315,10 @@ related-note discovery, keeping results explicitly unapproved. Working-file
 search/read stay below work/, exclude dedicated stores and nested workspaces,
 and report scan limits, omitted entries and bounded text prefixes. They neither
 read external projects nor execute working-file content.
+
+Both profiles expose paginated installed stack provenance, declared stack guides
+and search provider metadata through bounded registry reads. Provider trust is
+the recorded installation decision; discovery does not verify assets or runtime
+readiness, execute provider code, index content or fetch sources. Full stack guide
+reads use the existing guide reader. Selected provider execution remains future
+MCP work.

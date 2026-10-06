@@ -79,11 +79,14 @@ def validate_manifest(data, source, files, metadata_only=False):
     return asset_hashes
 
 
-def discover(root):
+def discover(root, *, entries=None):
     return [{'id': e['id'], 'version': e['version'], 'capabilities': e['manifest']['capabilities'],
              'compatibility': e['manifest']['compatibility'],
-             'trusted': e.get('trusted_capabilities') == e['origin'].get('sha256')}
-            for e in stacks.available(root) if e['manifest'].get('capabilities')]
+             'trusted': (isinstance(e.get('trusted_capabilities'), str)
+                         and bool(brain.IDENTIFIER.fullmatch(e['trusted_capabilities']))
+                         and e['trusted_capabilities'] == e['origin'].get('sha256'))}
+            for e in (stacks.available(root) if entries is None else entries)
+            if e['manifest'].get('capabilities')]
 
 
 def selected(root, ids):

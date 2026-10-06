@@ -103,25 +103,44 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The current catalog has four tools:
+The current catalog has eight tools:
 
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_constitution_read`: complete constitution and its revision.
 - `tdt_brain_search`: literal search of approved knowledge with bounded links.
 - `tdt_brain_read`: read an eligible note using a path or URI returned by search.
+- `tdt_candidate_list`: paginated summaries; `status` is `pending` (default), `rejected` or `all`.
+- `tdt_candidate_read`: complete candidate Markdown and its core review hash.
+- `tdt_note_list`: paginated scratchpad summaries with subject tags.
+- `tdt_note_read`: complete scratchpad Markdown, explicitly labeled unapproved.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are
 larger. Oversized results are refused whole. Increase the budget or narrow the
 query; a refusal never substitutes a policy summary. Search accepts `query`,
 `limit` (1 to 50, default 20) and `depth` (0 to 3, default 1). `limit_reached`
-means more results may exist. There is no pagination yet. Invalid note paths
+means more results may exist. Approved search does not paginate. Invalid note paths
 appear in `coverage.omissions`; failed scans return an error rather than an empty
 successful result. Evidence revisions identify the returned path, title and
 content, including source references.
 
-Only `read-only` is available. This catalog excludes candidates, scratchpad,
-external source files, provider execution and mutations. Retrieved notes are
+Candidate and scratchpad lists accept `limit` (1 to 50, default 20) and an opaque
+`cursor`. Pass `next_cursor` unchanged with the same limit and status; null marks
+the last page. Cursors bind the workspace, category, filter and inventory revision.
+Changed inventory returns `stale_revision`; restart without a cursor. Scans are
+bounded to 2000 entries per category and are not atomic across external edits.
+Invalid notes are omitted with paths in `coverage.omissions`. A failed or oversized
+scan is refused, not returned as a complete empty list.
+
+Candidate/scratchpad reads accept `reference` as an inventory ID, path or URI.
+They return full Markdown including sources, provenance and review history.
+Their `revision` hashes that complete text with the same newline normalization
+as core candidate review. Read the full candidate before reviewing it through the
+existing CLI; a list summary is insufficient. Reading never approves content.
+Duplicate IDs require an exact path. Neither category enters approved retrieval.
+
+Only `read-only` is available. This catalog excludes external source files,
+provider execution and mutations. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Live Claude/Codex host
 compatibility remains unverified. The transport has no incoming message-size cap yet.

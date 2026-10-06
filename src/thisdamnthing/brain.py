@@ -83,7 +83,7 @@ class NoteError(WorkspaceError):
     """Malformed note content, distinct from unsafe paths or workspace failures."""
 
 
-def read_note(root, relative):
+def read_note(root, relative, *, include_text=False):
     path = managed_path(root, relative)
     try:
         if not stat.S_ISREG(path.lstat().st_mode):
@@ -109,6 +109,9 @@ def read_note(root, relative):
             raise ValueError("invalid note metadata")
     except (ValueError, RecursionError) as exc:
         raise NoteError(f"Invalid note {relative}: {exc}") from exc
+    if include_text:
+        # Match the text-mode newline normalization used by candidate review.
+        return meta, body.strip(), text.replace("\r\n", "\n").replace("\r", "\n")
     return meta, body.strip()
 
 

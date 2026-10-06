@@ -273,6 +273,7 @@ Internal work and project resolution follow the [project guide](../src/thisdamnt
 
 The optional `mcp` dependency enables `tdt --workspace PATH mcp serve` over stdio.
 The initial read-only catalog exposes current policy/context and built-in approved
-knowledge search/read through the existing core. Workspace selection is explicit
+knowledge search/read through the existing core, plus paginated candidate and
+scratchpad inventories and complete reads with explicit status labels. Workspace selection is explicit
 and fixed for the process. Writable profiles, host registration, resources and
 prompts are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

@@ -153,7 +153,7 @@ Use disposable workspaces and external directories; never a personal workspace.
 
 Use a disposable workspace and an installation built with the `mcp` extra.
 Launch `tdt --workspace PATH mcp serve --profile read-only` with a local stdio
-client. Check discovery and JSON input/output schemas for the four advertised
+client. Check discovery and JSON input/output schemas for the eight advertised
 tools. Read context and policy, search approved knowledge, and follow a returned
 reference. Compare CLI and MCP search eligibility and link traversal.
 
@@ -167,6 +167,15 @@ Confirm no silent policy summary, no provider execution and no workspace writes.
 
 Exercise disconnect/restart and concurrent reads with the SDK client, then verify
 actual Claude and Codex registration and tool use separately. SDK client success
-does not establish live host compatibility. The current slice has no pagination
-or enforced incoming transport-message cap; output budgets cover application JSON,
+does not establish live host compatibility.
+
+Page candidate and scratchpad inventories with small limits. Check pending/rejected
+filters, empty/final pages, changed content, changed filters/limits, foreign and
+malformed cursors. Read by ID/path/URI, compare candidate revision with the CLI
+review hash and check that full provenance/history is present. Refuse category
+crossovers; require an exact path for duplicate IDs. Exercise invalid scratchpad
+tags, status mismatches, malformed files, scan limits and output budget refusal.
+Confirm that reads preserve all workspace bytes and reminder/capture state.
+
+Approved search does not paginate. There is no enforced incoming transport-message cap; output budgets cover application JSON,
 which is duplicated in the MCP text block. No automated tests.

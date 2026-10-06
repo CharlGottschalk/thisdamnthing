@@ -277,6 +277,9 @@ knowledge search/read through the existing core, plus paginated candidate and
 scratchpad inventories and complete reads with explicit status labels. Workspace
 status and paginated project registry/registration reads are also available;
 external project source is not read. Paginated guide and canonical skill catalogs
-provide complete, bounded reads without executing instructions. Workspace selection is explicit
-and fixed for the process. Writable profiles, host registration, resources and
+provide complete, bounded reads without executing instructions. Reminder lists and
+complete reads expose task and delivery state without claiming or acknowledging
+notifications. Workspace selection is explicit
+and fixed for the process. Incoming stdio messages are bounded to 8 MiB before
+decoding or parsing; oversized frames close the connection. Writable profiles, host registration, resources and
 prompts are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

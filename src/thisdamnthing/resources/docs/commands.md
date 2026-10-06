@@ -103,10 +103,11 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The current catalog has fifteen tools:
+The current catalog has seventeen tools:
 
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
+- `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
@@ -147,8 +148,16 @@ Duplicate IDs require an exact path. Neither category enters approved retrieval.
 Only `read-only` is available. This catalog excludes external source files,
 provider execution and mutations. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
-HTTP endpoint, resource subscriptions or MCP prompts. Live Claude/Codex host
-compatibility remains unverified. The transport has no incoming message-size cap yet.
+HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified
+on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289 in noninteractive sessions
+using temporary MCP configuration. Interactive UI, persistent registration and
+automatic capture were not exercised by those checks. Incoming stdio messages are limited to 8 MiB of
+bytes per line, excluding the final LF (a CR counts toward the limit). The reader
+enforces this before UTF-8 decoding and JSON parsing. Oversized input closes the
+connection with a nonzero exit and a stderr diagnostic, without echoing content
+or draining the rest of the line. Reconnect with a smaller request; no JSON-RPC
+response is promised for the rejected frame. This is a per-message limit, not a
+total session memory or concurrency limit.
 
 Project lists use the same `limit`/`cursor` rules as note inventories. Project reads
 accept an exact registered ID, absolute path or workspace URI from the list; names
@@ -185,3 +194,15 @@ stack docs or recovery markers refuse the call. Skill descriptions come from
 validated canonical front matter. Reads return complete Markdown with its SHA256;
 output budgets can refuse a document whole. Reading does not execute a skill or
 authorize embedded instructions, and these tools never rebuild catalogs.
+
+Reminder lists use the same `limit`/`cursor` rules, sorted by due time and ID.
+`status` accepts `pending` (default), `done`, `cancelled` or `all`. Pending includes
+future, already notified and claimed reminders; listing is not a delivery check.
+`claimed` means a stored claim exists, including an expired claim. Reads accept an
+exact ID, workspace-relative path or bound URI and return complete Markdown.
+`revision` is the SHA256 of that text; `reminder_revision` is the core integer edit
+revision. Delivery changes invalidate cursors even when the edit revision stays
+unchanged. Reads never claim, acknowledge, complete or schedule reminders.
+Malformed or duplicate records refuse the inventory; files are limited to 32 KiB
+and scanning to 2000 entries. Reminder text remains operational data, separate
+from approved knowledge.

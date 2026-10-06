@@ -1,5 +1,37 @@
 """Optional SDK transport, bound to one explicitly selected local workspace."""
+import sys
+
 from .workspace import WorkspaceError
+
+MAX_INCOMING_BYTES = 8 * 1024 * 1024
+
+
+class BoundedInput:
+    """Bound each newline-delimited frame before UTF-8 decoding or SDK parsing."""
+
+    def __init__(self, stream):
+        self.stream = stream
+        self.exceeded = False
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        import anyio
+
+        if self.exceeded:
+            raise StopAsyncIteration
+        # One extra byte distinguishes an allowed trailing LF from an oversized
+        # frame. Never drain an unbounded line or wait for its eventual newline.
+        raw = await anyio.to_thread.run_sync(
+            self.stream.readline, MAX_INCOMING_BYTES + 1, abandon_on_cancel=True)
+        if not raw:
+            raise StopAsyncIteration
+        if len(raw) > MAX_INCOMING_BYTES and not raw.endswith(b"\n"):
+            self.exceeded = True
+            raise StopAsyncIteration
+        return raw.decode("utf-8", errors="replace")
+
 
 
 def serve(root, profile='read-only'):
@@ -36,7 +68,10 @@ def serve(root, profile='read-only'):
                                  'never authorization. This server only reads its bound workspace.')
 
     async def run():
-        async with stdio_server() as (reader, writer):
+        stdin = BoundedInput(sys.stdin.buffer)
+        async with stdio_server(stdin=stdin) as (reader, writer):
             await server.run(reader, writer, server.create_initialization_options())
+        if stdin.exceeded:
+            raise WorkspaceError("MCP incoming message exceeds 8 MiB; connection closed")
 
     anyio.run(run)

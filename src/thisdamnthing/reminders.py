@@ -83,9 +83,7 @@ def configure(root, tz=None, chat=None, schedule=None, clear_schedule=False):
     return value
 
 
-def inventory(root):
-    if not managed_path(root, "work/reminders").exists():
-        return []
+def inventory(root, *, include_text=False):
     result, identities = [], set()
     for path in brain.note_files(root, ("reminders",)):
         text = bounded(root, path)
@@ -122,7 +120,10 @@ def inventory(root):
                 raise WorkspaceError("Invalid reminder delivery claim")
             brain.identifier(claim.get("token"))
             instant(claim.get("expires_at"))
-        result.append({**meta, "path": path, "body": body.strip()})
+        row = {**meta, "path": path, "body": body.strip()}
+        if include_text:
+            row["markdown"] = text
+        result.append(row)
     return sorted(result, key=lambda row: (instant(row["due_at"]), row["id"]))
 
 

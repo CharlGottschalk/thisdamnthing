@@ -201,3 +201,33 @@ URIs, cross-category/foreign/traversal refusals, missing files, malformed front
 matter, ownership conflicts, symlinks, FIFOs, oversized content and registry bounds.
 Verify no execution, catalog rebuilding or workspace writes; recovery markers must
 refuse discovery. Check the earlier MCP tools after shared-reader changes.
+
+For MCP reminder reads, check pending/done/cancelled/all filtering, due-time order,
+pagination and ID/path/bound-URI reads against complete stored Markdown and its
+SHA256. Keep notified and claimed pending reminders visible, including future
+reminders; verify reading changes no files. Distinguish content hashes from core
+integer edit revisions. Delivery-only changes must invalidate cursors. Check
+foreign/traversal references, duplicate IDs, malformed metadata, symlinks, special
+files, 32 KiB files, 2000-entry scans, recovery refusal (also with no reminder
+store), result budgets and empty inventories. Verify discovery/output schemas and
+stdio calls with modern and legacy SDK clients on the installed wheel.
+
+For MCP incoming message limits, verify an 8 MiB frame plus LF is accepted and
+an 8 MiB + 1 byte frame closes the connection without waiting for LF or EOF.
+Check UTF-8 byte counting, fragmented input, several frames in one write, final
+EOF without LF, malformed JSON below the cap and disconnect/restart. Oversized
+input must produce a nonzero exit, a bounded stderr diagnostic and no content
+reflection or traceback. Confirm modern/legacy SDK discovery and calls on the
+packaged wheel. The cap bounds individual raw frames, not all concurrent calls.
+
+Live read-only verification on 2026-10-06: Codex CLI 0.156.1 and Claude Code
+2.1.289 both connected to the installed wheel using temporary stdio configuration
+on Linux. Each successfully invoked all 17 tools. Transcript inspection confirmed
+complete read bytes/hashes, reminder pagination, a rejected foreign-workspace
+reference and successful status calls after that error. Claude also recovered
+from a guide result budget refusal by increasing the budget. Workspace file
+hashes were identical before and after; neither host claimed reminders. These
+were noninteractive model-driven CLI sessions, not SDK-only probes. Interactive
+UI, persistent registration, capture hooks and macOS remain separate checks.
+The generic result-size diagnostic currently mentions policy rereading for
+non-policy results too; this is a wording follow-up, not a failed read/retry.

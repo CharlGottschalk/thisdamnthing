@@ -173,6 +173,7 @@ from .capture import (
 )
 from .catalog import (
     CATALOG,
+    EVERYDAY_READS,
     WRITES,
     catalog_for,
 )

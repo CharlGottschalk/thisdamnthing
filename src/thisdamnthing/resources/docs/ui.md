@@ -101,3 +101,18 @@ remain only in the browser tab. Submit those explicitly if you want to carry the
 over; showing a default or changing a control does not authorize an action.
 Responses are local interview state, not approved brain knowledge. Avoid entering
 secrets. After completion, close the session and clean up when no longer needed.
+
+
+Everyday MCP exposes `tdt_ui_start`, `tdt_ui_present`, `tdt_ui_status`,
+`tdt_ui_read`, `tdt_ui_wait`, `tdt_ui_ack`, `tdt_ui_close` and `tdt_ui_cleanup`.
+Present accepts the page object directly, using the same core validation as CLI.
+Start defaults to no browser launch and returns the private local URL. Status
+returns connection/round/cursor metadata without page content or credentials.
+Read/wait include complete events and original prompts, defaulting to one event;
+use `next_after` while `has_more` is true. Increase `budget_bytes` up to 1 MiB
+for large events. Budget refusal never acknowledges events. Waits are bounded to
+30 seconds and do not hold the MCP mutation lock. A cancelled MCP call does not
+cancel the interview. After uncertain start/present responses inspect retained
+state/current round before retrying; present always creates a new round.
+Close retains answers; cleanup deletes them and requires explicit user instruction.
+These tools do not submit answers on the user's behalf or promote them to knowledge.

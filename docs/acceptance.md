@@ -803,3 +803,36 @@ catalog-size assertions were updated to the current counts. The separate held
 worker cancellation probe passed read concurrency, busy-write refusal and lock
 retention until worker completion. No automated suite or live-model verification
 was performed, and no host configuration changed.
+
+## MCP UI lifecycle
+
+Verify all eight UI tools in the everyday catalog and their absence from read-only.
+Verify guide discovery includes `core/ui` and `core/contracts/ui`; read complete
+installed bytes by ID, path and workspace URI, with arbitrary paths and symlinks refused.
+Check status/read/wait annotations and that a pending wait permits unrelated reads
+and mutations. Present standard and custom page objects, reject invalid pages,
+stale rounds and invalid cursors, and preserve false/zero answers. Verify complete
+original prompts, event pagination, large-event budget refusal/recovery and no
+implicit acknowledgement. Compare CLI and MCP lifecycle results. Close must retain
+answers; offline reads/acks must work; cleanup must refuse live sessions, symlinks
+and unexpected files. Compare unrelated workspace files before/after. Verify actual
+browser submissions and the active wait loop with each live host separately from
+SDK/HTTP checks; SDK success alone does not establish automatic skill routing.
+
+Verified 2026-10-06 with live Codex CLI and Claude Code on the corrected packaged
+wheel: each completed 29 actual MCP calls. Actual in-app browser interactions
+rejected blank required submissions, retained drafts across refresh (including
+false and zero), submitted a grouped form, submitted the sandboxed custom
+follow-up, and cancelled a third round. Each host continued bounded waits after
+three timeouts, reread complete events with their original prompts, paged from
+the first event to the second, acknowledged only submitted events, and retained
+all three after close/disconnection. A separate empty session was closed and
+cleaned up. Independent output-schema/transcript and file-hash audits passed;
+only session state changed, and the instruction-like comment caused no knowledge
+write. The live run exposed missing UI documents in MCP discovery; the corrected
+catalog includes the separately installed UI guide and contract. ID/path/URI
+reads matched installed bytes in both profiles, with arbitrary-path and symlink
+refusals. All packaged files matched source and installation. Launch-only host
+configurations were used; no saved host settings changed. Explicitly requested
+skill reads do not prove automatic native routing. Crash recovery, power loss,
+and browser-driven wakeup of a stopped agent were not exercised by this run.

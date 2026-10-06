@@ -329,3 +329,8 @@ reads use the existing guide reader. Everyday also exposes `tdt_brain_search_pro
 providers through shared core search. It validates trust/assets/compatibility,
 rechecks current approved evidence, and never implicitly indexes. Provider code
 runs with local process permissions, outside any OS or network sandbox.
+
+Everyday MCP also exposes the eight UI lifecycle tools through shared CLI core
+functions. Structured pages, complete paginated events with original prompts,
+bounded waits, explicit acknowledgements, retained close and authorized cleanup
+follow the [UI guide](ui.md). Read-only stays at 29 tools; everyday has 54.

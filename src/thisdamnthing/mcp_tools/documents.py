@@ -1,7 +1,7 @@
 """Installed guide and skill discovery and read adapters."""
 import json
 from pathlib import Path
-from .. import bootstrap, brain, frontmatter, skills, stack_docs
+from .. import bootstrap, brain, frontmatter, skills, stack_docs, ui_resources
 from ..workspace import managed_path
 from .common import Refused, bounded_text, inventory_page, serialized, workspace_key
 from .models import DocumentPage, DocumentRead, DocumentSummary
@@ -24,9 +24,11 @@ def document_targets(root, category):
             raise Refused('operation_refused', 'Document catalog exceeds 2000 entries')
 
     if category in ('guides', 'stack-docs'):
-        for path in bootstrap.RESOURCES:
+        for path in {**bootstrap.RESOURCES, **ui_resources.RESOURCES}:
             if category == 'guides' and path.startswith('docs/') and path.endswith('.md'):
                 add(path, 'core/' + Path(path).stem, 'core')
+            elif category == 'guides' and path == '.tdt/contracts/ui.md':
+                add(path, 'core/contracts/ui', 'core')
         for stack_id, _, paths in stack_docs.documents(root, installed):
             for path in paths:
                 add(f'.tdt/stacks/{stack_id}/{path}', f'{stack_id}/{path}', stack_id)

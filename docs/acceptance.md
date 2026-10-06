@@ -231,3 +231,26 @@ were noninteractive model-driven CLI sessions, not SDK-only probes. Interactive
 UI, persistent registration, capture hooks and macOS remain separate checks.
 The generic result-size diagnostic currently mentions policy rereading for
 non-policy results too; this is a wording follow-up, not a failed read/retry.
+
+For the first writable MCP slice, launch both profiles in disposable workspaces.
+Verify 17 read-only / 19 everyday tools and matching context/annotations; excluded
+calls must not mutate. Complete and cancel pending reminders with current integer
+revisions and user instruction; check preserved body/provenance, incremented
+revision and cleared claim. Check stale, finished, missing, malformed and unknown
+arguments, minimum result budget, recovery refusal and competing CLI locks.
+Inspect state after a lost response before retrying. Verify unrelated reads during
+a write and cancellation retaining serialization until the worker finishes.
+Generic result-budget failures must not direct callers to policy; context budget
+failures must still require complete policy. Use both SDK modes on the built wheel.
+
+Live writable verification passed on Linux with Codex CLI 0.156.1 and Claude Code
+2.1.289: each made 14 calls through temporary everyday/read-only servers,
+completed and cancelled the selected fixtures, received two stale-revision
+refusals, and read back results through both servers. Independent file hashes
+confirmed only the two authorized reminder records changed per host. The initial
+Codex run refused writes under its noninteractive approval policy and changed no
+files; a rerun used launch-only per-tool approval for completion/cancellation.
+No persistent registration or saved host settings changed. Read-only excluded-call
+refusal was exercised through the SDK; live hosts observed the absent write tools.
+Cancellation serialization was checked with an instrumented held worker, not a
+live-host disconnect. Actual crash/restart during a write remains unverified.

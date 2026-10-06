@@ -136,10 +136,10 @@ def main(argv=None):
     skills.add_parser(commands)
     from . import ui
     ui.add_parser(commands)
-    mcp = commands.add_parser("mcp", help="serve local read-only workspace tools over stdio")
+    mcp = commands.add_parser("mcp", help="serve local workspace tools over stdio")
     mcp_actions = mcp.add_subparsers(dest="action", required=True)
     serve = mcp_actions.add_parser("serve")
-    serve.add_argument("--profile", choices=("read-only",), default="read-only")
+    serve.add_argument("--profile", choices=("read-only", "everyday"), default="read-only")
     args = parser.parse_args(argv)
     try:
         if args.command == "mcp":

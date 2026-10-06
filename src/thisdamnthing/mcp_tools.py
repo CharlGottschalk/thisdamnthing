@@ -1,4 +1,4 @@
-"""Bounded read-only MCP adapters. No host state or conversation identity is inferred."""
+"""Bounded MCP adapters. No host state or conversation identity is inferred."""
 import base64
 import hashlib
 import json
@@ -18,6 +18,18 @@ class Model(BaseModel):
 
 class ReadInput(Model):
     budget_bytes: int = Field(default=32768, ge=1024, le=131072)
+
+
+class ReminderChangeInput(ReadInput):
+    id: str = Field(pattern='^[a-f0-9]{64}$')
+    reminder_revision: int = Field(ge=1, le=9223372036854775806)
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class ReminderChanged(Model):
+    id: str
+    reminder_revision: int
+    status: Literal['done', 'cancelled']
 
 
 class SearchInput(ReadInput):
@@ -156,7 +168,7 @@ class Policy(Model):
 
 class Context(Model):
     workspace_key: str
-    profile: Literal['read-only'] = 'read-only'
+    profile: Literal['read-only', 'everyday'] = 'read-only'
     policy: Policy
     filing_conventions: str | None
     tools: list[str]
@@ -560,6 +572,21 @@ def skill_read(root, args):
     return document_read(root, args, 'skills')
 
 
+def reminder_complete(root, args):
+    return reminder_change(root, args, 'done')
+
+
+def reminder_cancel(root, args):
+    return reminder_change(root, args, 'cancel')
+
+
+def reminder_change(root, args, action):
+    row = reminders.change(root, args.id, action, args.reminder_revision, args.user_instruction)
+    # A fixed, small receipt fits even the minimum budget. No post-write reread.
+    return ReminderChanged(id=row['id'], reminder_revision=row['revision'],
+                           status=row['status']), []
+
+
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
     'tdt_workspace_context': (ReadInput, Context, context_read,
@@ -599,28 +626,55 @@ CATALOG = {
 }
 
 
-def execute(root, name, arguments):
-    entry = CATALOG.get(name)
+WRITES = {
+    'tdt_reminder_complete': (ReminderChangeInput, ReminderChanged, reminder_complete,
+        'Mark a pending reminder done on user instruction using its current reminder_revision. '
+        'After a lost response, reread before retrying. Does not acknowledge notification.'),
+    'tdt_reminder_cancel': (ReminderChangeInput, ReminderChanged, reminder_cancel,
+        'Cancel a pending reminder on user instruction using its current reminder_revision. '
+        'After a lost response, reread before retrying. Preserves the reminder record.'),
+}
+
+
+def catalog_for(profile):
+    if profile == 'read-only':
+        return CATALOG
+    if profile == 'everyday':
+        return {**CATALOG, **WRITES}
+    raise WorkspaceError('Unknown MCP profile')
+
+
+def execute(root, name, arguments, profile='read-only'):
+    catalog = catalog_for(profile)
+    entry = catalog.get(name)
     if entry is None:
         return Result(ok=False, error=Error(code='profile_disabled',
-                      message='Tool is unavailable in the read-only catalog')).model_dump()
+                      message='Tool is unavailable in the selected catalog')).model_dump()
     input_type, output_type, operation, _ = entry
     try:
         args = input_type.model_validate(arguments)
         data, omissions = operation(root, args)
+        if name == 'tdt_workspace_context':
+            data.profile = profile
+            data.tools = list(catalog)
         result = Result[output_type](data=data, coverage=Coverage(omissions=omissions))
         value = result.model_dump()
         if len(serialized(value).encode('utf-8')) > args.budget_bytes:
             code = 'policy_read_required' if name == 'tdt_workspace_context' else 'result_too_large'
-            raise Refused(code, 'Result exceeds budget; increase budget_bytes or narrow the search. '
-                          'Read complete policy with tdt_constitution_read before proceeding.')
+            message = 'Result exceeds budget; increase budget_bytes or request fewer results.'
+            if name == 'tdt_workspace_context':
+                message += ' Read complete policy with tdt_constitution_read before proceeding.'
+            raise Refused(code, message)
         return value
     except Refused as exc:
         error = Error(code=exc.code, message=exc.message)
+    except reminders.StaleRevision:
+        error = Error(code='stale_revision', message='Reminder changed; reread before editing')
     except ValidationError:
         error = Error(code='invalid_input', message='Arguments do not match the tool input schema')
     except (WorkspaceError, OSError, ValueError, RecursionError):
         # Avoid echoing model input, filesystem content or tracebacks over the wire.
         error = Error(code='operation_refused',
-                      message='Invalid input or unreadable workspace state; inspect with the CLI')
+                      message='Operation refused or workspace state unavailable; inspect before retrying',
+                      retry='inspect_outcome' if name in WRITES else 'reread')
     return Result[output_type](ok=False, error=error).model_dump()

@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The current catalog has seventeen tools:
+The default `read-only` catalog has seventeen tools:
 
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
@@ -145,13 +145,33 @@ as core candidate review. Read the full candidate before reviewing it through th
 existing CLI; a list summary is insufficient. Reading never approves content.
 Duplicate IDs require an exact path. Neither category enters approved retrieval.
 
-Only `read-only` is available. This catalog excludes external source files,
-provider execution and mutations. Retrieved notes are
+The opt-in `--profile everyday` adds `tdt_reminder_complete` and
+`tdt_reminder_cancel`. Both require an exact `id`, the integer
+`reminder_revision` from a fresh read (not the Markdown hash), and
+`user_instruction` describing the user's request. They preserve the record, advance
+its revision and clear delivery claims. Completion is separate from notification.
+They return a small receipt containing ID, status and the new reminder revision;
+read the reminder again for its full content. A stale revision refuses the write.
+After a disconnect or uncertain error, inspect the reminder before retrying;
+these operations do not replay a successful receipt. The instruction records
+stated authority; it does not authenticate a human decision.
+
+Profiles are fixed at startup, and excluded calls are refused. `read-only` remains
+the default. Mutations use the same nonblocking cross-process lock as the CLI;
+in-process mutations are serialized, and cancellation waits for an active worker
+before releasing serialization. A lock conflict may return `operation_refused`;
+inspect state before retrying. Reads remain available during a mutation.
+Other everyday writes, delivery claims, provider execution and external source
+reads are not exposed. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified
 on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289 in noninteractive sessions
-using temporary MCP configuration. Interactive UI, persistent registration and
-automatic capture were not exercised by those checks. Incoming stdio messages are limited to 8 MiB of
+using temporary MCP configuration. Completion/cancellation also passed live checks
+in both hosts, including stale-revision refusals and reads through a second
+read-only server. The noninteractive Codex check required launch-only approval
+for the two writable tools; host approval settings still apply independently of
+the selected TDT profile. Interactive UI, persistent registration and automatic
+capture were not exercised by those checks. Incoming stdio messages are limited to 8 MiB of
 bytes per line, excluding the final LF (a CR counts toward the limit). The reader
 enforces this before UTF-8 decoding and JSON parsing. Oversized input closes the
 connection with a nonzero exit and a stderr diagnostic, without echoing content

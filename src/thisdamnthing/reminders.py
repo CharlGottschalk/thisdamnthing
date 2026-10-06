@@ -171,12 +171,16 @@ def select(root, key):
     return row
 
 
+class StaleRevision(WorkspaceError):
+    """The reminder changed since the caller read it."""
+
+
 def change(root, key, action, revision, instruction, data=None):
     instruction = brain.clean_text(instruction, "user instruction/reference", 500)
     with brain.locked(root):
         row = select(root, key)
         if row["revision"] != revision:
-            raise WorkspaceError("Reminder changed; reread before editing")
+            raise StaleRevision("Reminder changed; reread before editing")
         if row["status"] != "pending":
             raise WorkspaceError("Reminder is already done or cancelled; create a new reminder")
         if action in ("done", "cancel"):

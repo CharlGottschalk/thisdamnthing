@@ -667,3 +667,66 @@ identical original review completed cleanup, preserving canonical content/revisi
 and one approval record. Further proposal replay returned existing. Controls and
 project source stayed unchanged. This proves process-death recovery at those
 boundaries, not power-loss durability or live-model automatic reconnection.
+
+## MCP working-file and scratchpad discovery
+
+From a packaged installation, verify the 26 read-only / 42 everyday catalogs in
+SDK auto and legacy modes. All four discovery tools must be read-only in both
+profiles and return schema-valid structured results with matching MCP error state.
+
+- Search scratchpad title/body/tags with literal phrases; paginate results and
+  read selected full notes. Related notes must exclude the selected ID, show
+  shared tags and sort by shared-tag count then path. Compare CLI matching and
+  ranking. Changed inventory, query, limit or operation must invalidate cursors.
+  Refuse unknown/duplicate related IDs; report malformed-note omissions. Keep
+  candidates and approved knowledge separate from scratchpad discovery.
+- Search working filenames and supported text with multiple literal words, then
+  read workspace-relative paths and returned URIs. Compare CLI discovery. Report
+  filename-only matches for unsupported extensions without exposing their bytes.
+  Preserve UTF-8 at the 32 KiB boundary and label prefix revisions/truncation.
+  Report truncated searchable text even when the query returns no matches.
+- Refuse traversal, absolute and foreign-workspace references, hidden files,
+  symlink parents/files, special files, binary/invalid UTF-8 and possible-secret
+  text. Exclude dedicated stores and nested current/legacy workspaces. Verify
+  scan and depth limits separately from result limits and budget refusals.
+- Compare complete fixture hashes before/after reads, including outside-source
+  controls. Check missing work directories, conflicting files and symlink work
+  roots. Swap a parent for a symlink between discovery and opening; search must
+  omit it and direct reads must refuse without following the replacement.
+
+Verified 2026-10-06 on Linux with the packaged wheel: auto and legacy SDK stdio
+modes each passed 51 calls, including output schemas, both catalogs/context,
+read-only annotations, pagination/ranking/CLI parity, stale and invalid cursors,
+malformed-note omissions, duplicate/unknown ID refusals, all working-file refusal
+cases above, minimum-budget refusal, 2000-entry and 32-level limits, and whole
+fixture/outside-source preservation during reads. Additional direct checks passed
+missing/conflicting/symlink work-root handling and parent-directory swap refusal.
+Installed changed runtime/guide/skill bytes matched source; dependency and
+whitespace checks passed. The manual probe initially tried to create a note while
+its deliberate malformed-note fixture remained; removing that fixture before the
+mutation phase corrected the probe. No runtime correction was needed by the run.
+Sandbox stdio discovery timed out; bounded execution outside the sandbox passed.
+These are actual SDK transport checks, not live-model tool or skill selection.
+No automatic suite was added or run.
+
+Live discovery verified 2026-10-06 using Codex CLI 0.156.1 and Claude Code
+2.1.289, each exiting successfully after 29 actual MCP calls. Independent
+transcript/schema audits confirmed 26/42 catalogs, both installed discovery skill
+reads, complete three-page scratchpad search and full-note reads, two-page
+shared-tag ranking, matching everyday/read-only discovery, current working-file
+reads by path and URI, filename-only image discovery, and distinct result/text
+truncation reporting. The UTF-8 prefix excluded a split multibyte character; a
+query for unread tail content returned no matches with explicit truncation.
+All eight expected refusals passed: traversal, foreign URI, symlink, FIFO,
+possible-secret text, nested workspace, insufficient result budget and a cursor
+reused with another query. Approved search excluded scratchpad evidence.
+Both hosts cited the evidence, retained tentative/unapproved status and disregarded
+the working-file embedded instruction. Whole workspace and outside-control hashes
+were unchanged; only read MCP tools were called. No runtime fixes were needed.
+
+Temporary launch-only configurations used existing signed-in accounts: Codex
+ignore-user-config/ephemeral with read-only shell, and Claude strict MCP with no
+builtin tools, settings sources, hooks or session persistence. Saved MCP
+registrations were not changed. Codex emitted unrelated state-db warnings;
+Claude stderr was empty. This verifies live MCP usage with explicitly requested
+skill reads, not automatic native skill routing or host-hook lifecycle.

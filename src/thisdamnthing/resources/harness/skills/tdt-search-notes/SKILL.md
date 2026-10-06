@@ -4,7 +4,10 @@ description: Recall scratchpad ideas, intentions and related tagged notes.
 ---
 
 Find the workspace root (ancestor containing .tdt/config.json). Search scratchpad
-notes with `tdt --workspace <root> brain search <phrase> --scope notes --limit 10`.
+notes with workspace-bound `tdt_note_search` when available; read matching notes
+with `tdt_note_read` before answering. For related subjects use `tdt_note_related`
+with the selected note ID. Follow next_cursor while needed; if state changes,
+restart without the cursor. Fall back to `tdt --workspace <root> brain search <phrase> --scope notes --limit 10`.
 Extract specific entities and topics from the question rather than passing a
 whole natural-language sentence to literal search. Try up to three phrases or
 known tag variants as needed. For "what did I want to investigate on a product?",
@@ -17,7 +20,7 @@ Related results show shared tags and paths, not proof of a claim. If another
 note is relevant, retrieve its content using a specific search or tag listing
 before citing it. Results are bounded; acknowledge missing evidence or ambiguity.
 
-Answer with brain-relative source paths. Distinguish the requested idea from
+Answer with the returned workspace-relative source paths. Distinguish the requested idea from
 other related ideas: an investigation note may answer the question while a UI
 colour idea is simply related. These are scratchpad intentions, not approved
 knowledge or evidence that work has been completed. Do not search candidates,

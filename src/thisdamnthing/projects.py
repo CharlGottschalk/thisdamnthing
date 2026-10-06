@@ -302,57 +302,130 @@ def create(root, relative):
         return register(root, project_path(root, target), records, known)
 
 
-def search_work(root, query):
-    """Bounded discovery of user files; no symlinks, hidden files or binary reads."""
-    work = managed_path(root, 'work')
-    if not work.exists():
-        return {'results': [], 'truncated': False}
-    if not work.is_dir():
-        raise WorkspaceError('work must be a directory')
-    terms = query.lower().split()
-    if not terms:
-        raise WorkspaceError('Provide a search query')
-    results, count, truncated = [], 0, False
-    for directory, folders, names in os.walk(work, followlinks=False):
-        count += 1
-        if count > 2000:
-            truncated = True
-            break
-        folders[:] = sorted(n for n in folders if not n.startswith('.')
-                            and not (Path(directory) / n).is_symlink())
-        # Do not search nested workspace contents.
-        if (Path(directory) / '.tdt').exists():
-            folders[:] = []
-            continue
-        for name in sorted(names):
-            count += 1
-            if count > 2000:
-                truncated = True
-                break
-            path = Path(directory) / name
-            if name.startswith('.') or path.is_symlink():
-                continue
-            text = ''
-            try:
-                fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
-                with os.fdopen(fd, 'rb') as stream:
-                    if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                        continue
-                    raw = stream.read(32769)
-                if path.suffix.lower() in ('.md', '.txt', '.csv', '.json'):
-                    text = raw[:32768].decode('utf-8')
-                if brain.SECRET.search(text):
-                    continue
-            except (OSError, UnicodeError):
-                continue
-            relative = str(path.relative_to(work))
-            if all(term in (relative + ' ' + text).lower() for term in terms):
-                results.append({'path': str(path), 'relative': relative,
-                                'content_truncated': len(raw) > 32768})
-                if len(results) >= 50:
-                    truncated = True
+WORK_TEXT_SUFFIXES = ('.md', '.txt', '.csv', '.json')
+
+
+def work_boundary(directory):
+    """A nested workspace is never part of ordinary working-file discovery."""
+    for marker in ('.tdt', '.dryft'):
+        try:
+            os.stat(marker, dir_fd=directory, follow_symlinks=False)
+            return True
+        except FileNotFoundError:
+            pass
+    return False
+
+
+def work_text(directory, name):
+    """Read one bounded text prefix through its already-open parent directory."""
+    fd = os.open(name, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW, dir_fd=directory)
+    with os.fdopen(fd, 'rb') as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+            raise WorkspaceError('Working file must be regular')
+        raw = stream.read(32769)
+    text = codecs.getincrementaldecoder('utf-8')().decode(raw[:32768], final=len(raw) <= 32768)
+    if '\x00' in text or brain.SECRET.search(text):
+        raise WorkspaceError('Working file contains binary data or a possible secret')
+    return text, len(raw) > 32768
+
+
+def read_work(root, relative):
+    """Read an eligible work-relative text file without following any symlink."""
+    parts = relative.split('/')
+    if (len(parts) < 2 or parts[0] != 'work' or '\\' in relative
+            or any(not p or p.startswith('.') for p in parts)
+            or parts[1] in ('notes', 'reminders')
+            or len(parts) > 34 or Path(parts[-1]).suffix.lower() not in WORK_TEXT_SUFFIXES):
+        raise WorkspaceError('Use an eligible workspace-relative working text file')
+    with directory_handle(root / 'work') as work:
+        parent = os.dup(work)
+        try:
+            for component in parts[1:-1]:
+                if work_boundary(parent):
+                    raise WorkspaceError('Nested workspace is excluded')
+                child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
+                os.close(parent)
+                parent = child
+            if work_boundary(parent):
+                raise WorkspaceError('Nested workspace is excluded')
+            text, truncated = work_text(parent, parts[-1])
+        finally:
+            os.close(parent)
+    return {'path': relative, 'content': text, 'content_truncated': truncated,
+            'revision': brain.digest(text)}
+
+
+def search_work(root, query, limit=50):
+    """Bounded filename/text discovery using retained, nofollow directory handles."""
+    terms = brain.clean_text(query, 'query', 300).lower().split()
+    if not terms or type(limit) is not int or not 1 <= limit <= 50:
+        raise WorkspaceError('Provide a query and a limit from 1 to 50')
+    results, omitted = [], {}
+    count, scan_truncated, limit_reached = 0, False, False
+
+    def omit(reason):
+        omitted[reason] = omitted.get(reason, 0) + 1
+
+    def walk(directory, prefix, depth):
+        nonlocal count, scan_truncated, limit_reached
+        if work_boundary(directory):
+            omit('nested workspace')
+            return
+        if depth > 32:
+            scan_truncated = True
+            omit('directory depth limit')
+            return
+        names = []
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                if count == 2000:
+                    scan_truncated = True
                     break
-        if truncated:
-            break
-    return {'results': results, 'truncated': truncated,
+                count += 1
+                names.append(entry.name)
+        for name in sorted(names):
+            if limit_reached:
+                return
+            if name.startswith('.') or (not prefix and name in ('notes', 'reminders')):
+                omit('hidden entry or dedicated store')
+                continue
+            relative = '/'.join((*prefix, name))
+            try:
+                mode = os.stat(name, dir_fd=directory, follow_symlinks=False).st_mode
+                if stat.S_ISDIR(mode):
+                    child = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+                    try:
+                        walk(child, (*prefix, name), depth + 1)
+                    finally:
+                        os.close(child)
+                    continue
+                if not stat.S_ISREG(mode):
+                    omit('symlink or special file')
+                    continue
+                text, truncated = '', False
+                readable = Path(name).suffix.lower() in WORK_TEXT_SUFFIXES
+                if readable:
+                    text, truncated = work_text(directory, name)
+                    if truncated:
+                        omit('text prefix limited to 32 KiB')
+                if all(term in (relative + ' ' + text).lower() for term in terms):
+                    results.append({'path': str(root / 'work' / relative), 'relative': relative,
+                                    'content_truncated': truncated, 'text_readable': readable})
+                    if len(results) == limit:
+                        limit_reached = True
+            except (OSError, UnicodeError, WorkspaceError):
+                omit('unreadable, unsafe or possible secret')
+
+    try:
+        with directory_handle(root / 'work') as directory:
+            walk(directory, (), 0)
+    except FileNotFoundError:
+        # Only an absent work directory is an empty inventory. A disappeared
+        # nested directory is reported by walk, never mistaken for an empty root.
+        if os.path.lexists(root / 'work'):
+            raise
+    return {'results': results, 'truncated': scan_truncated or limit_reached,
+            'scan_truncated': scan_truncated, 'limit_reached': limit_reached,
+            'content_truncated': bool(omitted.get('text prefix limited to 32 KiB')),
+            'omissions': [f'{reason}: {count}' for reason, count in sorted(omitted.items())],
             'notice': 'Working files, not approved knowledge. Read current matches before answering.'}

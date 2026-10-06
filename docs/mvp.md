@@ -309,3 +309,9 @@ reported omissions. Everyday also submits onboarding interpretations as pending
 candidates; identical retries preserve prior content and review status. Retries preserve exact interrupted registration
 notes and existing identities. Read-only remains the default. Other writes, host registration, resources and prompts
 are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).
+
+Both MCP profiles also expose paginated scratchpad literal search and shared-tag
+related-note discovery, keeping results explicitly unapproved. Working-file
+search/read stay below work/, exclude dedicated stores and nested workspaces,
+and report scan limits, omitted entries and bounded text prefixes. They neither
+read external projects nor execute working-file content.

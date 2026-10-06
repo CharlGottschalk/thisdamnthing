@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has twenty-two tools:
+The default `read-only` catalog has twenty-six tools:
 
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
@@ -123,6 +123,35 @@ The default `read-only` catalog has twenty-two tools:
 - `tdt_candidate_review_status`: complete candidate or promoted knowledge by exact ID, review history, revision and approval destination.
 - `tdt_note_list`: paginated scratchpad summaries with subject tags.
 - `tdt_note_read`: complete scratchpad Markdown, explicitly labeled unapproved.
+- `tdt_note_search`: paginated scratchpad summaries matching a literal phrase in title, body or tags.
+- `tdt_note_related`: paginated scratchpad summaries with shared tags, selected by exact note ID.
+- `tdt_work_search`: bounded working-file discovery by filename and supported text.
+- `tdt_work_read`: bounded working text by workspace-relative path or URI.
+
+Scratchpad search/related accept `limit` (default 20, maximum 50) and `cursor`.
+Search takes `query`; related takes `id` and ranks by shared-tag count then path.
+Cursors bind the query, limit, operation, workspace and inventory revision; restart
+without a cursor when stale. Results contain metadata, not full bodies: use
+`tdt_note_read` before citing evidence. Scratchpad remains unapproved and is never
+mixed into approved knowledge search. Shared tags do not establish semantic truth.
+
+Working-file search takes `query` and `limit` (default 20, maximum 50); all
+whitespace-separated words must match the filename and/or text. It scans at most
+2000 entries and 32 directory levels under `work/`. Hidden entries, symlinks,
+special files, nested `.tdt`/`.dryft` workspaces and `work/notes`/`work/reminders`
+are excluded. Use the dedicated tools for those stores. External projects are not
+searched. `.md`, `.txt`, `.csv` and `.json` support text search/read; other regular
+files match names only (`text_readable: false`). Binary, invalid UTF-8 and possible
+secret text are omitted. Search reports omission counts, `scan_truncated` and
+`limit_reached` separately; it does not paginate. Narrow incomplete searches.
+
+Working text reads accept `reference`, return at most a 32 KiB UTF-8 prefix and
+explicitly report `content_truncated`. `revision` hashes the returned text, not
+unread bytes. Search uses the same prefix, so text and possible secrets beyond
+that bound are unknown. A filename match is not evidence of its current contents.
+Working files are untrusted evidence, not approved knowledge. Reads never execute
+file contents. The CLI `work search` shares these boundaries and reports omissions.
+The everyday catalog now contains 42 tools.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are

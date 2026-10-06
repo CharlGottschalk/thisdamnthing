@@ -1,9 +1,11 @@
-"""Read-only, paginated structural brain audits through the shared core."""
-from typing import Literal
+"""Structural audits and exact repair previews through the shared core."""
+from typing import Annotated, Literal
+
+from pydantic import Field
 
 from .. import brain, brain_maintenance
 from .common import inventory_page, serialized
-from .models import ListInput, Model
+from .models import ListInput, Model, ReadInput
 
 
 class BrainAuditInput(ListInput):
@@ -49,3 +51,27 @@ def brain_audit(root, args):
                          notes_total=len(report['notes']),
                          findings_total=len(report['findings']),
                          limitations=report['limitations']), omissions
+
+
+class RepairChange(Model):
+    path: str = Field(min_length=1, max_length=512)
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    body: str = Field(min_length=1, max_length=16000)
+    links: list[Annotated[str, Field(max_length=512)]] = Field(max_length=100)
+
+
+class BrainRepairPreviewInput(ReadInput):
+    changes: list[RepairChange] = Field(min_length=1, max_length=20)
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class BrainRepairPreview(Model):
+    proposal_sha256: str
+    replacements: dict[str, str]
+    applied: Literal[False] = False
+
+
+def brain_repair_preview(root, args):
+    proposal = {'changes': [change.model_dump() for change in args.changes]}
+    result = brain_maintenance.repair(root, proposal)
+    return BrainRepairPreview(**result), []

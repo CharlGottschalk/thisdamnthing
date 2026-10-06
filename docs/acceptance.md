@@ -859,3 +859,28 @@ refusals. All packaged files matched source and installation. Launch-only host
 configurations were used; no saved host settings changed. Explicitly requested
 skill reads do not prove automatic native routing. Crash recovery, power loss,
 and browser-driven wakeup of a stopped agent were not exercised by this run.
+
+
+## MCP repair previews — 2026-10-06
+
+Both profiles expose `tdt_brain_repair_preview` (31 read-only / 56 everyday).
+Check exact shared-core replacement/fingerprint parity, read-only annotations,
+strict changes schema, stale hashes, duplicate paths, escaping paths, missing
+link targets and result-budget refusal without writes. Compare all workspace
+file hashes before/after previews, excluding the shared lock file. Apply the
+identical proposal through the shared CLI core with the returned fingerprint;
+verify the retained backup and protected metadata.
+
+Source verification passed 40 actual SDK calls across auto/legacy and both
+profiles in disposable workspaces, including every check above. The exact
+preview fingerprint was accepted by shared core apply and protected metadata
+was preserved. Sandbox discovery timed out; the bounded outside-sandbox probe
+passed. Follow-up packaged verification also passed all 40 SDK calls in a fresh
+virtual environment, actual CLI preview/apply parity with retained backup and
+protected metadata, pip check, and byte equality of all 97 packaged files with
+source and installation. Boundary checks passed index previews, schema limits,
+symlink and interrupted-transaction refusals, and complete 20-note responses
+with a raised budget (default budget refuses without writes). Existing tool
+schemas and relative order are unchanged; only the audit description changed.
+No live-model routing verification. Apply and retained-outcome reconciliation
+over MCP remain future work.

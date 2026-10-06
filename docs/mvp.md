@@ -338,5 +338,7 @@ follow the [UI guide](ui.md).
 Both profiles expose `tdt_brain_audit` through the shared structural scanner.
 Findings and note hashes are separately paginated, with report-bound cursors,
 totals, limitations and unreadable-note omissions. Audits do not repair notes or
-replace semantic review; repairs remain on the CLI. Read-only has 30 tools;
-everyday has 55.
+replace semantic review. Both profiles also expose `tdt_brain_repair_preview`
+for complete, hash-bound replacements through shared core validation, without
+writing notes or backups. Authorized apply and outcome reconciliation remain on
+the CLI. Read-only has 31 tools; everyday has 56.

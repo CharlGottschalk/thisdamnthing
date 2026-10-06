@@ -1,5 +1,8 @@
 """Workspace-bound MCP tools; public imports retained across domain modules."""
-from .maintenance import BrainAuditInput, AuditNote, AuditFinding, BrainAuditPage, brain_audit
+from .maintenance import (
+    BrainAuditInput, AuditNote, AuditFinding, BrainAuditPage, brain_audit,
+    RepairChange, BrainRepairPreviewInput, BrainRepairPreview, brain_repair_preview,
+)
 from .models import (
     Model,
     ReadInput,

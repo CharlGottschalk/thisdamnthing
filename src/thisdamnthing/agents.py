@@ -42,12 +42,15 @@ def plan_skills(root, hosts):
     users = skills.state(root)
     changes = {}
 
-    def add(name, record, content):
+    def add(name, record, content, refresh=False):
         for host in hosts:
             target = f'{PROVIDERS[host][1]}/{name}/SKILL.md'
             if host == 'claude' and managed_path(root, f'.claude/commands/{name}.md').exists():
                 raise WorkspaceError(f'Claude command collision: {name}')
             if target in record:
+                if refresh and record[target] != digest(content):
+                    changes[target] = content
+                    record[target] = digest(content)
                 continue
             if managed_path(root, str(Path(target).parent)).exists():
                 raise WorkspaceError(f'Skill directory collision: {target}')
@@ -60,7 +63,8 @@ def plan_skills(root, hosts):
         stacks.check_owned(root, entry)
         for relative in entry['manifest']['skills']:
             name = relative.split('/')[1]
-            add(name, entry['files'], stacks.bridge(name))
+            canonical = existing_text(root, f'.tdt/skills/{name}/SKILL.md')
+            add(name, entry['files'], stacks.bridge(name, canonical), refresh=True)
     for name, record in users['skills'].items():
         for path, expected in record.items():
             current = existing_text(root, path)

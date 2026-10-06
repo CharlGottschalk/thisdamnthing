@@ -273,8 +273,13 @@ def recover(root):
     return 'Rolled back interrupted stack operation.'
 
 
-def bridge(name):
-    return (f'---\nname: {name}\ndescription: Run the {name} workflow.\n---\n\n'
+def bridge(name, canonical):
+    # Keep the author's serialized YAML value, including quoting and escapes.
+    head = canonical[4:].split('\n---\n', 1)[0]
+    description = re.search(r'^description: ([^\n]+)$', head, re.M)
+    if description is None:
+        raise WorkspaceError(f'Missing stack skill description: {name}')
+    return (f'---\nname: {name}\ndescription: {description[1]}\n---\n\n'
             f'Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n')
 
 
@@ -313,7 +318,7 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
                 if (managed_path(root, f'{folder}/{name}').exists()
                         and (replacing is None or f'{folder}/{name}/SKILL.md' not in replacing['files'])):
                     raise WorkspaceError(f'Skill directory conflict: {folder}/{name}')
-                changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name)
+                changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name, files[relative])
             if '.claude/skills' in skill_folders and managed_path(root, f'.claude/commands/{name}.md').exists():
                 raise WorkspaceError(f'Claude command conflict: {name}')
         owned = {p: sha(t) for p, t in changes.items()}

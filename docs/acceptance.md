@@ -24,6 +24,7 @@ results and local paths in development records outside these guides.
 | History discovery | Use bounded native records with trustworthy completion evidence. Check workspace scope, duplicates and unavailable/partial coverage. |
 | Workspace policy | Review and save rules, update by revision, check missing-policy failure and actual current-policy delivery. |
 | Stack lifecycle | Validate, inspect, install, approve an update and uninstall. Confirm exact trust, ownership refusal, recovery and preserved brain/user files. |
+| Stack descriptions | Confirm both hosts preserve canonical description YAML on install, update and host enablement. Reinitialize an existing workspace to refresh owned placeholder bridges; repeat for idempotence and confirm edited bridges are refused. |
 | Stack docs | Check empty catalog, declared guides, version changes, escaped paths, refusal on edits and rebuild behavior. |
 | Capabilities | Index/query an approved corpus; probe stale IDs, altered assets, incompatible runtimes, malformed output and interruption. |
 | Registry | Check real TLS, digests, archive safety, prerequisites and withdrawn/absent selection refusal. Separate local and public transport. |

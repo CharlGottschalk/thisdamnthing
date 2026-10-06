@@ -268,3 +268,11 @@ core resources. See [the UI implementation guide](ui.md) for session handling,
 browser boundaries and verification procedures.
 
 Internal work and project resolution follow the [project guide](../src/thisdamnthing/resources/docs/projects.md). WORK.md is user-owned; refresh preserves edits. Stack skills respect it when scaffolding requested work.
+
+## Local MCP retrieval
+
+The optional `mcp` dependency enables `tdt --workspace PATH mcp serve` over stdio.
+The initial read-only catalog exposes current policy/context and built-in approved
+knowledge search/read through the existing core. Workspace selection is explicit
+and fixed for the process. Writable profiles, host registration, resources and
+prompts are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

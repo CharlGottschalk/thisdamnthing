@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import tempfile
 import sys
 import unicodedata
@@ -85,9 +86,13 @@ class NoteError(WorkspaceError):
 def read_note(root, relative):
     path = managed_path(root, relative)
     try:
-        if path.stat().st_size > 32768:
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise ValueError("note must be a regular file")
+        with path.open('rb') as stream:
+            raw = stream.read(32769)
+        if len(raw) > 32768:
             raise ValueError("note exceeds 32 KiB")
-        text = path.read_text(encoding="utf-8")
+        text = raw.decode("utf-8")
         if not text.startswith("---\n") or "\n---\n" not in text[4:]:
             raise ValueError("expected YAML front matter between --- delimiters")
         head, body = text[4:].split("\n---\n", 1)
@@ -107,13 +112,16 @@ def read_note(root, relative):
     return meta, body.strip()
 
 
-def scan_notes(root, categories):
+def scan_notes(root, categories, *, omissions=None):
     """Skip content failures with visible diagnostics; keep path/IO safeguards strict."""
     for relative in note_files(root, categories):
         try:
             meta, body = read_note(root, relative)
         except NoteError as exc:
-            print(f"tdt: warning: skipping {exc}", file=sys.stderr)
+            if omissions is not None:
+                omissions.append(relative)
+            else:
+                print(f"tdt: warning: skipping {exc}", file=sys.stderr)
             continue
         yield relative, meta, body
 
@@ -334,14 +342,14 @@ def review(root, key, decision, instruction, expected, edited=None):
         return meta["status"] + ": " + key
 
 
-def eligible_notes(root):
+def eligible_notes(root, *, omissions=None):
     """Current canonical approvals, restricted to registered project identities."""
     if managed_path(root, ".tdt/state/stack-transaction.json").exists():
         raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
     from .projects import registry
     project_ids = {p['id'] for p in registry(root)}
     notes = {}
-    for relative, meta, body in scan_notes(root, ("knowledge", "projects", "sessions")):
+    for relative, meta, body in scan_notes(root, ("knowledge", "projects", "sessions"), omissions=omissions):
         category = relative.split("/")[1]
         if (meta["status"] == "approved"
                 and (not meta.get("project") or meta["project"] in project_ids)
@@ -350,12 +358,12 @@ def eligible_notes(root):
     return notes
 
 
-def search(root, query, limit=10, depth=1, providers=()):
+def search(root, query, limit=10, depth=1, providers=(), *, omissions=None):
     """Literal text seeds plus bounded outgoing links, always approved-only."""
     query = clean_text(query, "query", 300).casefold()
     if type(limit) is not int or not 1 <= limit <= 50 or type(depth) is not int or not 0 <= depth <= 3:
         raise WorkspaceError("Search limit must be 1–50 and depth 0–3")
-    notes = eligible_notes(root)
+    notes = eligible_notes(root, omissions=omissions)
     seeds = [key for key, (_, title, body) in notes.items()
              if query in (title + "\n" + body).casefold()][:limit]
     if providers:

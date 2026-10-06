@@ -148,3 +148,25 @@ Use disposable workspaces and external directories; never a personal workspace.
 8. Exercise skill conversations with neither relink argument, only one argument,
    both unambiguous arguments, ambiguous names and removal with no chosen mode.
    Ask only for missing choices; never infer relocation or cleanup authority.
+
+## Local MCP retrieval
+
+Use a disposable workspace and an installation built with the `mcp` extra.
+Launch `tdt --workspace PATH mcp serve --profile read-only` with a local stdio
+client. Check discovery and JSON input/output schemas for the four advertised
+tools. Read context and policy, search approved knowledge, and follow a returned
+reference. Compare CLI and MCP search eligibility and link traversal.
+
+Check missing explicit workspace, invalid workspace, missing optional dependency,
+unknown profiles/tools/arguments, numeric bounds, foreign URIs and traversal.
+Include pending/rejected notes, scratchpad and unregistered-project knowledge;
+none should enter approved retrieval. Exercise invalid UTF-8, malformed metadata,
+oversized notes, a symlink and a FIFO. Confirm omissions or refusal without hangs.
+Change/remove expected policy and request a budget too small for complete context.
+Confirm no silent policy summary, no provider execution and no workspace writes.
+
+Exercise disconnect/restart and concurrent reads with the SDK client, then verify
+actual Claude and Codex registration and tool use separately. SDK client success
+does not establish live host compatibility. The current slice has no pagination
+or enforced incoming transport-message cap; output budgets cover application JSON,
+which is duplicated in the MCP text block. No automated tests.

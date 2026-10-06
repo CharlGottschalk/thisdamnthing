@@ -136,8 +136,19 @@ def main(argv=None):
     skills.add_parser(commands)
     from . import ui
     ui.add_parser(commands)
+    mcp = commands.add_parser("mcp", help="serve local read-only workspace tools over stdio")
+    mcp_actions = mcp.add_subparsers(dest="action", required=True)
+    serve = mcp_actions.add_parser("serve")
+    serve.add_argument("--profile", choices=("read-only",), default="read-only")
     args = parser.parse_args(argv)
     try:
+        if args.command == "mcp":
+            if not args.workspace:
+                raise WorkspaceError("MCP requires an explicit --workspace path")
+            root = resolve_workspace(args.workspace)
+            from .mcp_server import serve
+            serve(root, args.profile)
+            return 0
         if args.command == "init":
             if args.workspace:
                 parser.error("init uses its directory argument; --workspace is for workspace commands")

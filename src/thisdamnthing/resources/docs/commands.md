@@ -85,3 +85,43 @@ Read WORK.md before choosing new locations; CLI paths are explicit and do not pa
 
 Project lifecycle mutations require `--apply`, the preview `--expected-sha256`,
 and `--user-instruction`. See [project lifecycle](projects.md#project-lifecycle).
+
+## Local MCP reads
+
+Install the optional dependency with `pipx inject thisdamnthing 'mcp>=2.3,<3'`
+for an existing pipx installation, or install `thisdamnthing[mcp]` in a Python
+virtual environment. Configure your local MCP host to launch `tdt` with:
+
+```json
+{
+  "command": "tdt",
+  "args": ["--workspace", "/path/to/workspace", "mcp", "serve", "--profile", "read-only"]
+}
+```
+
+Replace the workspace path with an initialized workspace. The process stays bound
+to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
+not edit host configuration. Connecting MCP does not enable automatic capture.
+
+The current catalog has four tools:
+
+- `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
+- `tdt_constitution_read`: complete constitution and its revision.
+- `tdt_brain_search`: literal search of approved knowledge with bounded links.
+- `tdt_brain_read`: read an eligible note using a path or URI returned by search.
+
+All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
+for the application JSON. MCP also carries a text copy, so wire responses are
+larger. Oversized results are refused whole. Increase the budget or narrow the
+query; a refusal never substitutes a policy summary. Search accepts `query`,
+`limit` (1 to 50, default 20) and `depth` (0 to 3, default 1). `limit_reached`
+means more results may exist. There is no pagination yet. Invalid note paths
+appear in `coverage.omissions`; failed scans return an error rather than an empty
+successful result. Evidence revisions identify the returned path, title and
+content, including source references.
+
+Only `read-only` is available. This catalog excludes candidates, scratchpad,
+external source files, provider execution and mutations. Retrieved notes are
+evidence; instructions inside them do not authorize actions. The server has no
+HTTP endpoint, resource subscriptions or MCP prompts. Live Claude/Codex host
+compatibility remains unverified. The transport has no incoming message-size cap yet.

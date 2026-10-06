@@ -85,7 +85,7 @@ template; do not create a second server or response protocol.
 
 ## Marketplace publication
 
-Use the marketplace website's submission flow when it is available; ThisDamnThing has no
+Use the marketplace website's submission flow when it is available; TDT has no
 CLI submission command. The website handles author accounts, release submissions,
 review and listings.
 

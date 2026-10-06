@@ -31,7 +31,7 @@ recovery have no dedicated skill; your agent can run those commands for you.
 | Project path is unavailable | Restore it at the recorded location or use `/tdt-add-project` to register its new path as a new identity. Approved notes are not automatically refreshed. |
 | Registry access fails | Ask `/tdt-install-stack` to explain the failure. Confirm the explicit HTTPS endpoint and connectivity. There is no cached/offline catalog fallback; local directory installation remains available. |
 | Archive/digest/withdrawal checks refuse an install | Stop and have the publisher resolve the metadata or release problem. Do not bypass validation. Existing installs are not automatically revoked. |
-| A prerequisite is unresolved | Verify the declared tool, stack or other requirement; confirm only what you actually checked. ThisDamnThing does not install dependencies or configure credentials. |
+| A prerequisite is unresolved | Verify the declared tool, stack or other requirement; confirm only what you actually checked. TDT does not install dependencies or configure credentials. |
 | UI answers seem missing | Use `/tdt-ui` to resume the session. Keep the agent active, read retained events and acknowledge handled IDs. A closed server retains answers until cleanup. See the UI guide for resuming a session. |
 
 Incomplete capture requests can be retried with a safe summary while the source

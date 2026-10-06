@@ -56,13 +56,13 @@ If request hooks are unavailable, workspace instructions tell the agent to run
 `tdt constitution show` before each request. Ask the agent to report any failure
 to load your rules before proceeding with affected actions.
 
-These natural-language rules guide the agent. ThisDamnThing does not enforce network or
+These natural-language rules guide the agent. TDT does not enforce network or
 filesystem isolation, and host permissions still apply. Path checks cannot prevent
 every concurrent filesystem change.
 
 ## Recover missing or invalid rules
 
-After a save through ThisDamnThing, an expectation marker detects accidental deletion.
+After a save through TDT, an expectation marker detects accidental deletion.
 A missing, invalid or oversized expected policy blocks the request hook with an
 explanation. Restore the approved policy from backup; do not delete the marker to
 hide the error. A directly authored policy becomes covered by deletion detection

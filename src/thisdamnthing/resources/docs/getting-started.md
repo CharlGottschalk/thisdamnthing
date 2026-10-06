@@ -3,27 +3,28 @@
 Setup starts in a parent directory outside your projects and the TDT source
 checkout. After `cd`, the remaining commands run from the new workspace root.
 
-ThisDamnThing gives your agent a local knowledge workspace. You can capture and review
-knowledge, link existing projects and add stacks as you need them.
+TDT gives you a persistent local workspace for Claude Code and Codex.
+Keep reviewed knowledge, working rules, linked projects and reusable workflows
+together across sessions. You can use either agent with the same workspace and
+add optional Stacks when you need additional capabilities.
 
-## Install ThisDamnThing
+## Install TDT
 
 You need Python 3.11 or later and pipx in your shell. Install Claude Code or Codex
 separately if you want an agent integration, including its account access and
-subscription. Linux is the initial target; do not assume macOS or native Windows
-compatibility.
+subscription. Installation has been verified on Linux and macOS. Native Windows
+installation remains unverified.
 
 Ask your agent to handle setup:
 
-> Install ThisDamnThing using its release instructions, create a workspace at my chosen
+> Install TDT using its release instructions, create a workspace at my chosen
 > directory, and check it.
 
 There is no TDT setup skill before installation. Once the workspace is ready,
 use `/tdt-workspace` to check it. Throughout these guides, Codex users can use
 `$` in place of `/` for skill names, or use the skill picker.
 
-For terminal setup, the public installation command, once the TDT release is
-available on PyPI, is:
+For terminal setup:
 
 ```sh
 pipx install thisdamnthing
@@ -65,7 +66,7 @@ See [agent setup](agent-bootstrap.md) if skills or hooks are missing.
 ## Save and find a decision
 
 Discuss a useful decision with your agent, such as your team's weekly planning
-day. With capture hooks enabled and trusted, ThisDamnThing asks the active agent for a
+day. With capture hooks enabled and trusted, TDT asks the active agent for a
 concise summary after the turn. That extra continuation is visible in the chat.
 The summary becomes a proposal awaiting your review; a turn with nothing worth
 retaining may be skipped.

@@ -4,13 +4,13 @@ Run the initial setup from a parent directory outside your projects and source
 checkout, then open the created workspace for agent work. Paths are relative to
 the current shell directory.
 
-ThisDamnThing can connect Claude Code, Codex or both to one workspace. Install and sign in
-to your chosen agent separately. ThisDamnThing's integrations are local to the workspace;
+TDT connects Claude Code, Codex or both to one workspace. Install and sign in
+to your chosen agent separately. Integrations are scoped to the workspace;
 they do not change global agent settings or register skills in linked projects.
 
 ## Choose an agent
 
-Ask your agent to set up ThisDamnThing for Claude, Codex or both, giving the workspace
+Ask your agent to set up TDT for Claude, Codex or both, giving the workspace
 path. There is no dedicated skill for installation or enabling/disabling hosts.
 Once enabled, `/tdt-workspace` checks setup and explains what is available;
 it also offers reminder preferences during onboarding, without changing host trust.
@@ -22,7 +22,7 @@ PATH. Use `--agent claude`, `--agent codex`, `--agent both` or `--agent none` to
 choose explicitly. Desktop-only apps and executables outside PATH need an explicit
 selection. Detection alone does not establish account access or hook trust.
 
-ThisDamnThing remembers enabled agents in `.tdt/config.json`. Repeating init refreshes
+TDT remembers enabled agents in `.tdt/config.json`. Repeating init refreshes
 that saved set. A changed PATH does not remove an integration, and `--agent none`
 does not disable agents already enabled.
 
@@ -69,11 +69,11 @@ in `.claude/settings.json` or `.codex/hooks.json`.
 Hooks apply to sessions in this workspace and its subdirectories; outside sessions
 are excluded. Startup supplies workspace context, request hooks load the current
 [Constitution](constitution.md), and Stop hooks support [knowledge capture](brain.md).
-ThisDamnThing preserves unrelated settings and text outside its owned entries.
+TDT preserves unrelated settings and text outside its owned entries.
 
 ## Disable an integration
 
-Ask your agent to disable the selected ThisDamnThing integration in this workspace.
+Ask your agent to disable the selected TDT integration in this workspace.
 Terminal alternatives (choose the host you want to disable):
 
 ```sh
@@ -98,7 +98,7 @@ Use `/tdt-workspace` for diagnostics after recovery.
 
 Technical procedure:
 
-After upgrading ThisDamnThing or moving the workspace, repeat `tdt init PATH` to refresh
+After upgrading TDT or moving the workspace, repeat `tdt init PATH` to refresh
 unchanged owned resources and hook paths for saved agents. Keep the Python
 environment available and review changed hooks in the host.
 

@@ -3,8 +3,15 @@
 For terminal examples, run workspace commands from the workspace root. External
 projects and stack bundles are sibling directories; adjust their relative paths.
 
-Start with zero stacks, then install only workflows or capabilities you choose. For the bundle
-format and examples, read `.tdt/contracts/stack.md`.
+Stacks are optional packages that extend your workspace with skills, workflows,
+knowledge, templates, documentation and local capabilities. They can include
+hooks or local search providers, and their workflows can use TDT’s shared UI.
+Start with zero stacks, then add the capabilities you need. For the bundle format
+and examples, read `.tdt/contracts/stack.md`.
+
+A stack can declare external prerequisites such as tools, services or MCP servers.
+These declarations explain what a workflow needs; installing a stack does not
+automatically configure those services or change your agent’s permissions.
 
 ## Manage stacks through your agent
 

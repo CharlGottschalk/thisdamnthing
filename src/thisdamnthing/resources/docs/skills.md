@@ -3,7 +3,7 @@
 For terminal examples, run workspace commands from the workspace root. External
 projects and stack bundles are sibling directories; adjust their relative paths.
 
-ThisDamnThing can offer to save a reusable workflow during ordinary work. One clearly
+TDT can offer to save a reusable workflow during ordinary work. One clearly
 reusable request is enough for a live offer; the original work continues whether
 you accept or decline. The proposal names the skill and describes its future
 behavior. Existing skills and remembered declines are checked first. Stack-builder

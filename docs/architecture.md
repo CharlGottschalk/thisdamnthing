@@ -1,6 +1,9 @@
 # Architecture
 
-ThisDamnThing is a small Python CLI around a local Markdown knowledge brain. Core works
+ThisDamnThing is a persistent local workspace for AI agents, managed through a
+small Python CLI. It owns reviewed knowledge, workspace rules, project links and
+reusable skills; Claude Code and Codex provide the active execution sessions.
+Thin host adapters connect agents to the same workspace resources. Core works
 without stacks, a database or a background service. Optional stacks add domain
 workflows or local search providers. [MVP scope](mvp.md) explains the boundaries.
 

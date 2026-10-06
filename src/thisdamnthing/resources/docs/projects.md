@@ -44,7 +44,7 @@ availability. `tdt project inspect ID` rereads bounded evidence. Missing/moved p
 there is no automatic relocation or refresh of approved knowledge. Adding a new
 path creates a new identity. Workspace/self/ancestor registration and internal locations outside work/ are refused.
 
-## What ThisDamnThing reads
+## What TDT reads
 
 Inspection reads only README.md, README.rst, README.txt, pyproject.toml,
 package.json, Cargo.toml, go.mod, Makefile, docs/README.md and

@@ -3,9 +3,14 @@
 Run the setup examples from a parent directory outside your projects and the
 TDT source checkout. Paths are relative to that directory.
 
-ThisDamnThing keeps reviewed knowledge in local Markdown and links projects at their
-existing paths. Claude or Codex supplies the active agent; optional stacks add
-workflows. A new workspace has zero stacks and zero registered projects.
+ThisDamnThing is a persistent local workspace for AI agents. Your reviewed
+knowledge, Constitution, linked projects and reusable skills stay with the
+workspace across sessions and when you switch between Claude Code and Codex.
+The active agent does the work; TDT keeps the context in files you own.
+
+Knowledge stays in readable Markdown, and linked projects stay at their existing
+paths. Optional Stacks package skills, workflows, knowledge, templates and local
+capabilities. A new workspace has zero stacks and zero registered projects.
 
 Use skills in your agent for everyday work. These guides show Claude's
 `/tdt-*` names; in Codex use the same name with `$` or the skill picker.

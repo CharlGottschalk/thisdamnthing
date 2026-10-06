@@ -1,4 +1,4 @@
-# Care for your workspace
+# Workspace maintenance
 
 For terminal examples, run workspace commands from the workspace root. External
 projects and stack bundles are sibling directories; adjust their relative paths.
@@ -46,13 +46,13 @@ review the replacement, then approve its exact token. Review executable trust an
 prerequisites separately. Restart host sessions after core, stack or skill changes.
 See [recovery](troubleshooting.md) for interrupted operations.
 
-## Know what is private
+## Protect private information
 
 Candidates, approved notes, project paths, local configuration, skill proposals
 and UI responses can contain private information. Brain approval makes a note
 eligible for retrieval; it does not authorize publishing or sharing it. Secret
 filters are heuristic, so inspect content before approval, backup sharing or export.
-Full conversation transcripts stay with the host; ThisDamnThing capture stores summaries
+Full conversation transcripts stay with the host; TDT capture stores summaries
 and provenance references rather than full transcripts. Optional history discovery
 reads only identified accessible histories and does not persist its raw output.
 
@@ -61,4 +61,4 @@ retained data. Keep session URLs private. Provider indexes are disposable local
 state and may also contain sensitive derived data. Markdown remains authoritative.
 Trusted hooks, providers and custom browser code must be reviewed: local provider
 subprocesses retain normal OS access, and workspace policy is agent guidance rather
-than an operating-system sandbox. ThisDamnThing does not change host permission settings.
+than an operating-system sandbox. TDT does not change host permission settings.

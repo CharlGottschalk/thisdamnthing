@@ -1,12 +1,12 @@
 # Knowledge capture and review
 
-ThisDamnThing turns useful facts, decisions and open questions from your conversations into
-proposals for your brain. You decide which proposals become approved knowledge.
-Use `/tdt-review-brain` to review them and `/tdt-search` to find what you know.
+TDT captures useful facts, decisions and open questions from your conversations
+as proposed knowledge. You decide which proposals to approve for the workspace
+brain. Use `/tdt-review-brain` to review them and `/tdt-search` to retrieve approved notes.
 
 ## Capture useful knowledge
 
-With trusted capture hooks enabled, ThisDamnThing asks your active agent for a concise
+With trusted capture hooks enabled, TDT asks your active agent for a concise
 summary after a turn using your host subscription. The agent submits it through
 the CLI, preserves your answer, and adds one short confirmation when knowledge is
 captured for review. Capture JSON and instructions do not belong in the answer;

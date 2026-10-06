@@ -67,6 +67,8 @@ def settings(root):
 
 def configure(root, tz=None, chat=None, schedule=None, clear_schedule=False):
     with brain.locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         value = settings(root)
         if tz is not None:
             zone(tz)
@@ -214,7 +216,7 @@ def available(row, current):
             and (row["claim"] is None or instant(row["claim"]["expires_at"]) <= current))
 
 
-def check(root, channel="manual", limit=10):
+def check(root, channel="manual", limit=10, *, before_write=None):
     if channel not in CHANNELS or not 1 <= limit <= 20:
         raise WorkspaceError("Invalid delivery channel or limit (1–20)")
     with brain.locked(root):
@@ -229,6 +231,10 @@ def check(root, channel="manual", limit=10):
             row["claim"] = {"token": secrets.token_hex(32), "channel": channel,
                             "revision": row["revision"],
                             "expires_at": (current + timedelta(minutes=10)).isoformat()}
+        # Validate the complete proposed delivery while locked, before any claim is saved.
+        if before_write is not None:
+            before_write(rows)
+        for row in rows:
             write(root, row)
     return rows
 

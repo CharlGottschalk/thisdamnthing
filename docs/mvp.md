@@ -283,6 +283,8 @@ notifications. Workspace selection is explicit
 and fixed for the process. Incoming stdio messages are bounded to 8 MiB before
 decoding or parsing; oversized frames close the connection. The opt-in `everyday` profile adds reminder creation and revision-checked editing,
 snoozing, completion and cancellation on explicit user instruction, using the shared
-core lock. Read-only
-remains the default. Other writes, host registration, resources and prompts are
+core lock. Settings are readable in both profiles; everyday also configures
+preferences, claims due reminders with expiring leases, and acknowledges delivery
+without completing tasks. Claim responses are budget-checked before writing.
+Read-only remains the default. Other writes, host registration, resources and prompts are
 not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

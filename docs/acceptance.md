@@ -283,3 +283,40 @@ retained creation provenance, no delivery claims/acknowledgements and unchanged
 control. Full workspace hashes proved only the new authorized reminder file
 changed. Both hosts exited 0. Codex used launch-only approval for the three
 writable tools; no persistent host settings or registrations changed.
+
+For MCP reminder settings/delivery, verify the 18-tool read-only and 26-tool
+everyday catalogs and context, read/write annotations and excluded calls. Read
+unconfigured defaults without creating settings. Configure partial preferences,
+clear only the schedule reference with null, reject empty/invalid changes and
+require an initial timezone. Confirm no external job is created or stopped.
+Claim due reminders using explicit manual/chat/scheduled channels; verify chat
+opt-out, unconfigured scheduled refusal, complete content and expiring tokens.
+Compete across MCP processes and the shared core/CLI lock. Refuse oversized
+responses before any claim writes, including multi-item and UTF-8 byte boundaries.
+Acknowledge current tokens, repeat the same token without changing bytes or
+announcing again, expire/reclaim a lease and reject old or edit-invalidated tokens.
+Keep task status, revision and creation provenance unchanged on notification.
+Check lock/recovery refusal and creation/edit/snooze regression.
+
+Verified on Linux with the packaged wheel and both auto/legacy SDK stdio clients:
+18/26 catalogs, output schemas, preferences/clearing, explicit channel gates,
+competing MCP claims and shared-core exclusion, expiry/reclaim, acknowledgement
+retry/invalidation, preserved task state, lock/recovery refusal, and existing
+creation/edit/snooze behavior. Direct packaged-adapter checks additionally passed
+all-or-nothing two-item budget refusal, exact UTF-8 envelope size boundaries, and
+a 1024-byte configuration receipt with long settings. The shared settings writer
+now refuses an outstanding stack recovery marker. Dependency and whitespace
+checks passed. No automated suite added/run.
+
+Live noninteractive Codex CLI 0.156.1 and Claude Code 2.1.289 checks also passed
+on Linux, each with 19 actual MCP calls and exit code 0. Independent transcript
+and whole-fixture hash audits verified 18/26 catalogs, initial/read-only settings,
+partial configuration, chat opt-out and scheduled-channel refusal, chat claim
+exclusion of a manual check, notified/already-notified acknowledgement results,
+and exactly one Markdown notification emitted after acknowledgement. Readback
+confirmed pending revision 1 with notification recorded; the future control
+remained byte-identical. Only reminder settings and the due fixture's delivery
+state changed. Hosts used temporary launch-only configuration, with Codex per-tool
+approval for the three authorized writes and Claude's strict MCP allowlist.
+No runtime fix was required. Desktop rendering, scheduled execution and disconnect
+during claim writes remain unverified.

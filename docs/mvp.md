@@ -276,6 +276,7 @@ The initial read-only catalog exposes current policy/context and built-in approv
 knowledge search/read through the existing core, plus paginated candidate and
 scratchpad inventories and complete reads with explicit status labels. Workspace
 status and paginated project registry/registration reads are also available;
-external project source is not read. Workspace selection is explicit
+external project source is not read. Paginated guide and canonical skill catalogs
+provide complete, bounded reads without executing instructions. Workspace selection is explicit
 and fixed for the process. Writable profiles, host registration, resources and
 prompts are not implemented. See the installed [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).

@@ -163,7 +163,11 @@ def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=F
 
 
 def registry(root):
-    entries = read_json(root, REGISTRY)
+    return validate_registry(read_json(root, REGISTRY))
+
+
+def validate_registry(entries):
+    """Validate already loaded ownership data for bounded readers."""
     if not isinstance(entries, list):
         raise WorkspaceError('Invalid stack registry')
     seen = set()

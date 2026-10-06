@@ -153,7 +153,7 @@ Use disposable workspaces and external directories; never a personal workspace.
 
 Use a disposable workspace and an installation built with the `mcp` extra.
 Launch `tdt --workspace PATH mcp serve --profile read-only` with a local stdio
-client. Check discovery and JSON input/output schemas for the eleven advertised
+client. Check discovery and JSON input/output schemas for the fifteen advertised
 tools. Read context and policy, search approved knowledge, and follow a returned
 reference. Compare CLI and MCP search eligibility and link traversal.
 
@@ -190,3 +190,13 @@ notified, claimed, completed and future reminders without changing delivery stat
 Exercise recovery markers (null blocked counts), malformed/oversized state, bounded
 capture inventory and invalid candidate omissions. Compare workspace and external
 fixture bytes before/after calls. Live host verification remains separate.
+
+
+For MCP guide/skill reads, check core guide allowlists, approved user skills and
+installed stack skills/docs. Compare exact installed bytes/revisions; check skill
+descriptions and absence of host duplicates, undeclared files and pending proposals.
+Page lists and invalidate cursors after content changes. Exercise exact IDs/paths/
+URIs, cross-category/foreign/traversal refusals, missing files, malformed front
+matter, ownership conflicts, symlinks, FIFOs, oversized content and registry bounds.
+Verify no execution, catalog rebuilding or workspace writes; recovery markers must
+refuse discovery. Check the earlier MCP tools after shared-reader changes.

@@ -51,7 +51,11 @@ def valid_record(record, name):
 def state(root):
     if not managed_path(root, STATE).exists():
         return {'version': 1, 'skills': {}, 'proposals': {}}
-    value = read_json(root, STATE)
+    return validate_state(read_json(root, STATE))
+
+
+def validate_state(value):
+    """Validate already loaded skill state for bounded readers."""
     if (not isinstance(value, dict) or value.get('version') != 1
             or not isinstance(value.get('skills'), dict)
             or not isinstance(value.get('proposals'), dict)):

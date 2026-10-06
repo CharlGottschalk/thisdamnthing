@@ -103,12 +103,14 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The current catalog has eleven tools:
+The current catalog has fifteen tools:
 
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
+- `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
+- `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
 - `tdt_constitution_read`: complete constitution and its revision.
 - `tdt_brain_search`: literal search of approved knowledge with bounded links.
 - `tdt_brain_read`: read an eligible note using a path or URI returned by search.
@@ -167,3 +169,19 @@ so candidate counts may be partial. An interrupted stack/project transaction
 leaves candidate/reminder counts null with omissions. Status never recovers,
 claims delivery, executes providers or writes files. These reads are observations,
 not atomic snapshots across concurrent edits.
+
+Guide and skill lists use `limit`/`cursor` pagination. Reads accept the returned
+catalog ID, exact path or workspace URI. Guides include the shipped core guide
+allowlist and documentation declared in installed stack records. Skills include
+canonical core skills, approved user-owned skills and installed stack-owned
+canonical entries. Host bridges, undeclared files, skill proposals and decision
+history are excluded. Ownership labels identify registry attribution, not a fresh
+integrity or trust approval. Local edits remain readable and change revisions.
+
+Each document is limited to 64 KiB and each catalog to 2000 entries. Stack registry
+reads cap at 1 MiB and user skill state at 2 MiB. Missing core/user files appear as
+list omissions; invalid content, unsafe paths, conflicting owners, missing declared
+stack docs or recovery markers refuse the call. Skill descriptions come from
+validated canonical front matter. Reads return complete Markdown with its SHA256;
+output budgets can refuse a document whole. Reading does not execute a skill or
+authorize embedded instructions, and these tools never rebuild catalogs.

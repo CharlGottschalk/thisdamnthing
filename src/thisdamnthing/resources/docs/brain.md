@@ -273,3 +273,54 @@ guides for requirements, offline behavior and licenses before installing.
 Semantic similarity may miss evidence or return irrelevant material. Inspect the
 notes, cite sources, and describe absent/conflicting evidence rather than treating
 rank as confidence. Local trusted provider processes retain normal OS access.
+
+## Maintain the brain
+
+Use `/tdt-maintain-brain` (Codex: `$tdt-maintain-brain`) to check links and review
+knowledge that may need consolidation or clarification. The skill starts with a
+structural scan, then reads notes to assess duplicates, conflicting decisions and
+relationships. It reports how much of the brain it reviewed. An old or disconnected
+note is a reason to look closer, not a reason to delete it.
+
+`tdt brain audit` returns JSON with note paths and hashes, broken or invalid links,
+notes without incoming links, notes unreachable from the index, duplicate IDs,
+matching titles and metadata problems. It checks the index and canonical knowledge,
+project and legacy session folders. Scratchpad notes can be link targets; candidates
+are handled by candidate review. The scan does not check external URLs, heading
+anchors or whether a source remains current. Semantic judgments belong to the agent.
+
+The skill shows proposed changes before applying them. Consolidation keeps original
+notes and their evidence, using cross-links and explanations to identify the
+preferred summary. Repairs preserve note paths, IDs, sources, provenance and approval
+history. They do not delete notes or change their approval status.
+
+For technical use, pass a proposal on stdin to `tdt brain repair`:
+
+```json
+{
+  "changes": [
+    {
+      "path": "brain/index.md",
+      "expected_sha256": "<hash from audit>",
+      "body": "# Brain\n\nSee [[knowledge/example-12345678]].",
+      "links": []
+    }
+  ]
+}
+```
+
+Use existing paths and real link targets. Each batch contains at most 20 changes.
+`body` replaces the full Markdown body, including any Related section; `links`
+replaces the note's link metadata. Keep those references consistent. The index
+has no metadata, so its `links` must be empty. This command previews the exact
+replacement files and returns `proposal_sha256`; it makes no note changes.
+
+After reviewing and approving the replacements, submit identical JSON to
+`tdt brain repair --apply --expected-sha256 <proposal-hash> --user-instruction
+'<actual approval or message reference>'`. Changed source files or proposals
+invalidate the preview. The command saves a local backup under
+`.tdt/state/brain-maintenance/` with before/after contents and approval context,
+then applies the batch through a recoverable transaction. Keep these backups
+private, like the brain itself. Interrupted transactions use `tdt stack recover`;
+completed repairs can be reversed with a reviewed repair against current hashes.
+Run `tdt brain audit` again to check the result.

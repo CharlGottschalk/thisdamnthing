@@ -15,7 +15,7 @@ projects retain their own applicable instructions.
 Load the relevant installed skill for details instead of guessing:
 
 - `/tdt-search`, `/tdt-search-notes`, `/tdt-capture`, `/tdt-note` and
-  `/tdt-review-brain` handle knowledge and scratchpad workflows.
+  `/tdt-review-brain` and `/tdt-maintain-brain` handle knowledge and scratchpad workflows.
 - `/tdt-remind` and `/tdt-check-reminders` handle one-time reminders as
   operational data, separate from knowledge.
 - `/tdt-install-stack`, `/tdt-update-stack` and `/tdt-remove-stack` manage

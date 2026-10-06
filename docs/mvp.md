@@ -177,6 +177,13 @@ and subject tags, labels it as unapproved, and follows shared-tag relationships.
 Default knowledge search still excludes scratchpad notes. Explicit saving uses
 the turn suppression guard to avoid duplicate automatic candidates.
 
+Brain maintenance uses `/tdt-maintain-brain` and `tdt brain audit` to inspect
+canonical note links and structure, followed by agent review of meaning. Reviewed
+repairs use `tdt brain repair`: hash-bound previews, preserved identities and
+provenance, local backups and recoverable writes. Consolidation retains original
+notes; candidate approval remains a separate operation. See the installed
+[brain guide](../src/thisdamnthing/resources/docs/brain.md#maintain-the-brain).
+
 ## Reminders
 
 `/tdt-remind` saves explicit one-time reminders directly to `work/reminders/`,

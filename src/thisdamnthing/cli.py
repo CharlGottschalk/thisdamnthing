@@ -46,6 +46,11 @@ def main(argv=None):
     listing = actions.add_parser("candidates", help="show candidate proposals and review hashes")
     listing.add_argument("--status", choices=("pending", "approved", "rejected", "all"), default="pending")
     actions.add_parser("requests", help="list incomplete capture request ids for recovery")
+    actions.add_parser("audit", help="inspect brain links, metadata and disconnected notes")
+    repair = actions.add_parser("repair", help="preview reviewed note replacements from JSON stdin")
+    repair.add_argument("--apply", action="store_true")
+    repair.add_argument("--expected-sha256")
+    repair.add_argument("--user-instruction")
     names = actions.add_parser("migrate-names", help="preview readable brain filenames and link updates")
     names.add_argument("--apply", action="store_true", help="apply the migration with recoverable writes")
     review = actions.add_parser("review", help="apply an explicitly instructed user review")
@@ -221,10 +226,10 @@ def main(argv=None):
             else:
                 print(json.dumps(stacks.available(root), indent=2))
             return 0
-        def input_json():
-            raw = sys.stdin.read(16385)
-            if len(raw) > 16384:
-                raise ValueError("JSON input exceeds 16 KiB")
+        def input_json(limit=16384):
+            raw = sys.stdin.read(limit + 1)
+            if len(raw) > limit:
+                raise ValueError(f"JSON input exceeds {limit} characters")
             return json.loads(raw)
         if args.command == "reminder":
             data = input_json() if args.action in ("add", "edit", "snooze") else None
@@ -289,6 +294,12 @@ def main(argv=None):
             elif args.action == "review":
                 print(brain.review(root, args.id, args.decision, args.user_instruction,
                                    args.expected_sha256, input_json() if args.decision == "edit" else None))
+            elif args.action in ("audit", "repair"):
+                from . import brain_maintenance
+                result = (brain_maintenance.scan(root) if args.action == "audit" else
+                          brain_maintenance.repair(root, input_json(524288), args.apply,
+                                                   args.expected_sha256, args.user_instruction))
+                print(json.dumps(result, indent=2, ensure_ascii=False))
             elif args.action == "migrate-names":
                 from .brain_names import migrate
                 print(json.dumps(migrate(root, args.apply), indent=2, ensure_ascii=False))

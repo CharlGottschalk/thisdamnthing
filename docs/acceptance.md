@@ -101,3 +101,22 @@ Exercise reminder claim/acknowledgement and confirm no repeat delivery. Refresh
 the workspace and compare store bytes. Preview/apply a scratchpad hash-filename
 rename and check current links and repeat idempotence. Refuse symlink/file store
 conflicts and project creation/registration in either reserved store.
+
+
+## Brain maintenance
+
+In a disposable workspace, run `tdt brain audit` on an empty brain; code examples
+in the default index must not become broken-link findings. Add notes with a broken
+link, duplicate ID, matching titles, missing sources, malformed metadata and a
+cluster unreachable from the index. Confirm separate findings and visible scan
+limits. Candidate and scratchpad contents remain outside semantic brain review.
+
+Preview a small `tdt brain repair` batch and verify no note bytes change. Apply
+with the displayed proposal hash and explicit approval reference, then inspect the
+backup and confirm identity, sources, provenance and prior review history survive.
+Rescan to confirm repaired links and index reachability. Refuse stale source or
+proposal hashes, missing targets, path escapes, symlinks and non-approved notes.
+Simulate an interrupted shared transaction and run `tdt stack recover`; confirm
+original bytes are restored. Install and refresh both host skill bridges and
+check brain-router discovery. Semantic review quality and live host execution
+require a separate real conversation; structural checks do not establish them.

@@ -77,6 +77,7 @@ def main(argv=None):
     project_create = project_actions.add_parser("create", help="create below work/; path is relative to work")
     project_create.add_argument("path")
     project_actions.add_parser("list")
+    project_actions.add_parser("operation-status", help="read retained lifecycle outcome by exact proposal hash").add_argument("proposal_sha256")
     for action in ("relink", "remove", "restore", "references", "cleanup"):
         command = project_actions.add_parser(action)
         command.add_argument("id", help="registered project ID, path or unambiguous name")
@@ -276,6 +277,9 @@ def main(argv=None):
             elif args.action == "list":
                 for entry in projects.registry(root):
                     print(f"{entry['id']}  {projects.status(entry)}  {entry['path']}")
+            elif args.action == "operation-status":
+                from . import project_lifecycle
+                print(json.dumps(project_lifecycle.operation_status(root, args.proposal_sha256), indent=2))
             elif args.action in ("relink", "remove", "restore", "references", "cleanup"):
                 from . import project_lifecycle
                 if args.action == "references":

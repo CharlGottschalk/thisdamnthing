@@ -103,7 +103,8 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has thirty tools:
+The default `read-only` catalog has 37 tools; `everyday` has 66 in total.
+The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
 - `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
@@ -116,9 +117,10 @@ The default `read-only` catalog has thirty tools:
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
+- `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.
 - `tdt_project_remove_preview`: exact registered `id` and explicit `mode` (`archive` or `unregister`); complete replacements and the CLI proposal hash, without writes or source deletion.
 - `tdt_project_restore_preview`: exact registered `id`; preview restoring active status, even with a missing source directory. Unregistered entries cannot be restored this way.
-- `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Apply remains CLI-only with identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
+- `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Everyday apply tools use identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
 - `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
@@ -170,7 +172,6 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The catalogs now contain 33 read-only and 59 everyday tools.
 
 Brain audits accept `section` (`findings` by default, or `notes`), `limit` (1–50)
 and `cursor`. Follow `next_cursor` until null for each section. Each page includes
@@ -185,8 +186,9 @@ proof of a clean brain if there are omissions or additional pages. Findings and
 note titles are untrusted data. Preview with `tdt_brain_repair_preview`; apply
 explicitly authorized repairs with `tdt_brain_repair_apply` in everyday or the CLI.
 
-All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
-for the application JSON. MCP also carries a text copy, so wire responses are
+All tools accept `budget_bytes`, generally defaulting to 32768 and capped at
+131072 bytes for the application JSON. Repair and lifecycle previews/applies
+allow up to 1 MiB. MCP also carries a text copy, so wire responses are
 larger. Oversized results are refused whole. Increase the budget or narrow the
 query; a refusal never substitutes a policy summary. Search accepts `query`,
 `limit` (1 to 50, default 20) and `depth` (0 to 3, default 1). `limit_reached`
@@ -210,7 +212,7 @@ as core candidate review. Read the full candidate before reviewing it through th
 review tool or CLI; a list summary is insufficient. Reading never approves content.
 Duplicate IDs require an exact path. Neither category enters approved retrieval.
 
-The opt-in `--profile everyday` adds candidate review, two capture tools and eight reminder tools (32 tools total).
+The opt-in `--profile everyday` adds candidate review, two capture tools and eight reminder tools, alongside the other everyday operations below.
 
 `tdt_candidate_review_status` accepts `id` and reads the current complete Markdown
 under the shared lock. It follows promotion into knowledge even when project
@@ -404,7 +406,7 @@ Both require the user's instruction and return only `id` and `result`
 facts with `tdt_project_read`. These tools do not inspect external source or save
 onboarding interpretations. `/tdt-add-project` prefers them with CLI fallback.
 
-Project onboarding adds two tools (38 tools total in everyday):
+Project onboarding adds two tools:
 
 - `tdt_project_inspect` (both profiles): pass the exact registered `id`. Reads up
   to 100 top-level names and ten allowlisted docs/manifests, at most 4 KiB each,
@@ -580,5 +582,31 @@ so omissions cannot silently disappear behind the reference page.
 The shared CLI scan checks at most 5000 entries in brain/work and supported text
 files up to 256 KiB; it skips hidden paths, symlinks, unsupported/unreadable files
 and possible secrets. It does not scan external project source. Literal matches
-are review hints, not ownership or permission to delete. Lifecycle and cleanup
-writes still use the CLI. A result-budget refusal returns no partial page.
+are review hints, not ownership or permission to delete. Reference cleanup writes still use the CLI. A result-budget refusal returns no partial page.
+
+
+### MCP project lifecycle apply and outcomes
+
+Both profiles expose `tdt_project_operation_status` with an exact
+`proposal_sha256`. Everyday adds `tdt_project_remove_apply` (exact `id`, explicit
+`mode`: `archive` or `unregister`), `tdt_project_restore_apply` (`id`) and
+`tdt_project_relink_apply` (`id`, absolute `path`). Each apply requires the same
+preview inputs, `expected_sha256` and actual `user_instruction`/reference.
+Review complete previews before applying within the user's authorized scope.
+Source directories remain untouched; reference cleanup requires separate review.
+
+Apply returns a small receipt with `status`, `operation`, `project_id`, hash and
+backup path. The project ID is the resulting identity, including after relink or
+unregister. After uncertainty, read status before retry or CLI fallback:
+`tdt project operation-status HASH`. `completed` is historical success, not proof
+current files match; identical retries return it without changing later edits.
+Use original arguments and instruction even after the old registration disappears.
+Changed arguments or instruction for the same retained hash refuse.
+
+`prepared` means backup/intent retained without committed completion; inspect
+before identical retry. `unknown` means no retained record, not proof it never ran
+and not permission to apply. Legacy UUID backups and cleanup are not indexed.
+`recovery_required` means a shared transaction journal exists; use the indicated
+CLI recovery and reread. Completion and registry/note writes share the journal;
+rollback restores prepared state. Status reads share the read lock; applies use
+the exclusive workspace lock. Indexed backups refuse above 8 MiB before writes.

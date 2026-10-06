@@ -5,10 +5,11 @@ from pathlib import Path
 import stat
 import uuid
 
-from . import brain, frontmatter, projects, stacks
+from . import brain, constitution, frontmatter, projects, stacks
 from .workspace import WorkspaceError, managed_path
 
 LIMIT = 262144
+OUTCOME_LIMIT = 8 * 1024 * 1024
 
 
 def text_file(root, relative):
@@ -23,7 +24,79 @@ def text_file(root, relative):
     return raw.decode('utf-8')
 
 
-def commit(root, changes, operation, apply, expected, instruction, details):
+def outcome_path(fingerprint):
+    return '.tdt/state/project-operations/' + brain.identifier(fingerprint) + '.json'
+
+
+def retained_outcome(root, fingerprint):
+    path = managed_path(root, outcome_path(fingerprint))
+    if not path.exists():
+        return None
+    record = json.loads(constitution.bounded(path, OUTCOME_LIMIT))
+    if (not isinstance(record, dict)
+            or set(record) != {'created', 'operation', 'user_instruction', 'proposal_sha256',
+                               'request_sha256', 'before', 'after', 'status', 'details'}
+            or record['proposal_sha256'] != fingerprint
+            or record['operation'] not in ('remove', 'restore', 'relink')
+            or record['status'] not in ('prepared', 'completed')
+            or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
+            or not record['before'] or record['before'].keys() != record['after'].keys()
+            or any(not isinstance(v, str) for v in (*record['before'].values(), *record['after'].values()))
+            or brain.digest(json.dumps({'operation': record['operation'], 'before': record['before'],
+                                        'after': record['after']}, sort_keys=True)) != fingerprint):
+        raise WorkspaceError('Invalid retained project outcome')
+    for relative in record['before']:
+        stacks.safe_path(relative)
+        if relative != projects.REGISTRY and not (relative.startswith('brain/') and relative.endswith('.md')):
+            raise WorkspaceError('Invalid retained project replacement path')
+    brain.identifier(record['request_sha256'])
+    brain.clean_text(record['user_instruction'], 'retained instruction', 500)
+    details = record['details']
+    if not isinstance(record['created'], str) or not isinstance(details, dict):
+        raise WorkspaceError('Invalid retained project details')
+    expected_keys = ({'previous', 'project', 'brain_link', 'notice'} if record['operation'] == 'relink'
+                     else {'project', 'state', 'notice'})
+    if set(details) != expected_keys or not isinstance(details['notice'], str):
+        raise WorkspaceError('Invalid retained project details')
+    projects.validate_registry([details['project']])
+    if record['operation'] == 'relink':
+        projects.validate_registry([details['previous']])
+        if not isinstance(details['brain_link'], str):
+            raise WorkspaceError('Invalid retained project link')
+    elif details['state'] not in ('active', 'archived', 'removed'):
+        raise WorkspaceError('Invalid retained project state')
+    return record
+
+
+def operation_status(root, fingerprint):
+    """Historical completion is meaningful only after shared journal recovery."""
+    with brain.locked(root, shared=True):
+        record = retained_outcome(root, fingerprint)
+        from .skills import JOURNAL as SKILL_JOURNAL
+        recovery = any(managed_path(root, p).exists() for p in (stacks.JOURNAL, SKILL_JOURNAL))
+        return {'proposal_sha256': fingerprint,
+                'status': 'recovery_required' if recovery else record['status'] if record else 'unknown',
+                'backup': outcome_path(fingerprint) if record else None,
+                'operation': record['operation'] if record else None,
+                'project_id': record['details']['project']['id'] if record else None}
+
+
+def completed_retry(root, expected, instruction, request):
+    brain.identifier(expected)
+    instruction = brain.clean_text(instruction, 'user instruction/reference', 500)
+    record = retained_outcome(root, expected)
+    if record:
+        if (record['request_sha256'] != brain.digest(json.dumps(request, sort_keys=True))
+                or record['user_instruction'] != instruction):
+            raise WorkspaceError('Retained operation requires identical inputs and instruction')
+        if record['status'] == 'completed':
+            return {'operation': record['operation'], **record['details'],
+                    'proposal_sha256': expected, 'replacements': record['after'],
+                    'applied': True, 'backup': outcome_path(expected)}
+    return None
+
+
+def commit(root, changes, operation, apply, expected, instruction, details, request=None):
     for path in changes:
         stacks.safe_path(path)
     before = {path: text_file(root, path) for path in changes}
@@ -36,6 +109,20 @@ def commit(root, changes, operation, apply, expected, instruction, details):
     if expected != fingerprint:
         raise WorkspaceError('Project proposal changed; preview again before applying')
     instruction = brain.clean_text(instruction, 'user instruction/reference', 500)
+    if request is not None:
+        backup = outcome_path(fingerprint)
+        record = retained_outcome(root, fingerprint) or {
+            'created': brain.now(), 'operation': operation, 'user_instruction': instruction,
+            'proposal_sha256': fingerprint, 'request_sha256': brain.digest(json.dumps(request, sort_keys=True)),
+            'before': before, 'after': changes, 'status': 'prepared', 'details': details}
+        completed = json.dumps({**record, 'status': 'completed'}, indent=2, ensure_ascii=False) + '\n'
+        if len(completed.encode('utf-8')) > OUTCOME_LIMIT:
+            raise WorkspaceError('Project operation backup exceeds 8 MiB; nothing applied')
+        brain.save_json(root, backup, record)
+        # Rollback restores prepared state along with the registry and note contents.
+        stacks.transaction(root, {**changes, backup: completed})
+        return {**result, 'applied': True, 'backup': backup}
+    # Reference cleanup remains CLI-only with its existing UUID backups.
     backup = '.tdt/state/project-operations/' + uuid.uuid4().hex + '.json'
     brain.save_json(root, backup, {'created': brain.now(), 'operation': operation,
                                  'user_instruction': instruction, 'before': before,
@@ -61,6 +148,11 @@ def moved_source(source, old, new):
 def relink(root, key, directory, *, apply=False, expected=None, instruction=None):
     with brain.locked(root, shared=not apply):
         stacks.available(root)
+        request = {'operation': 'relink', 'key': key, 'directory': str(directory)}
+        if apply:
+            completed = completed_retry(root, expected, instruction, request)
+            if completed:
+                return completed
         entry = projects.resolve(root, key)  # Missing/archived projects can be relinked.
         path = projects.project_path(root, directory)
         new_id = brain.digest(str(path))
@@ -100,12 +192,19 @@ def relink(root, key, directory, *, apply=False, expected=None, instruction=None
         changes[projects.REGISTRY] = stacks.encode([updated if e['id'] == entry['id'] else e for e in records])
         return commit(root, changes, 'relink', apply, expected, instruction,
                       {'previous': entry, 'project': updated, 'brain_link': brain.note_link(note),
-                       'notice': 'Note filenames and historical provenance are preserved. Review prose and work references separately.'})
+                       'notice': 'Note filenames and historical provenance are preserved. Review prose and work references separately.'}, request)
 
 
 def remove(root, key, *, permanent=False, restore=False, apply=False, expected=None, instruction=None):
     with brain.locked(root, shared=not apply):
         stacks.available(root)
+        if permanent and restore:
+            raise WorkspaceError('Restore and permanent removal are mutually exclusive')
+        request = {'operation': 'restore' if restore else 'unregister' if permanent else 'archive', 'key': key}
+        if apply:
+            completed = completed_retry(root, expected, instruction, request)
+            if completed:
+                return completed
         entry = projects.resolve(root, key)
         records = projects.registry(root)
         state = 'active' if restore else 'removed' if permanent else 'archived'
@@ -120,7 +219,7 @@ def remove(root, key, *, permanent=False, restore=False, apply=False, expected=N
         changes = {projects.REGISTRY: stacks.encode(records), note: brain.note_text(meta, body)}
         return commit(root, changes, 'restore' if restore else 'remove', apply, expected, instruction,
                       {'project': entry, 'state': state,
-                       'notice': 'Project files and brain/work references retained. Cleanup requires a separate explicit request.'})
+                       'notice': 'Project files and brain/work references retained. Cleanup requires a separate explicit request.'}, request)
 
 
 def reference_entry(root, key):

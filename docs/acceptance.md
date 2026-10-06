@@ -1006,3 +1006,77 @@ Existing tool schemas, descriptions and relative order are unchanged.
 
 No live-model routing check performed. Lifecycle apply and reference cleanup
 remain CLI-only; retained lifecycle outcome reconciliation is not implemented.
+
+## MCP project lifecycle apply and retained outcomes — 2026-10-06
+
+In disposable workspaces, verify `tdt_project_operation_status` in both profiles
+and everyday-only remove, restore and relink apply tools. Apply with identical
+preview inputs, exact proposal hash and actual instruction/reference. Check
+explicit archive/unregister modes, exact IDs, absolute destinations, strict
+schemas, annotations, minimum result budget and shared core/CLI parity.
+
+After an uncertain apply, read the exact hash before retry or CLI fallback.
+Completed outcomes are historical: restore an archived project, relink it, change
+its note, remove the destination directory and unregister it, then verify earlier
+identical retries leave current files unchanged. Changed input or instruction for
+that hash must refuse. Legacy UUID backups are not indexed; unknown does not prove
+an operation never ran. Reference cleanup keeps its existing CLI-only workflow.
+
+Simulate interruption after completion record write but before journal removal.
+Status must report recovery_required; applies refuse pending recovery. Shared CLI
+rollback must restore registry/notes and prepared outcome. Inspect before identical
+retry. Verify handled write errors also restore prepared state, and a skill journal
+overrides retained completion. Shared read locks permit status/preview reads;
+exclusive locks refuse competing calls, including historical apply retries.
+
+Check malformed, oversized, invalid UTF-8, FIFO and symlink records without changes
+to an outside control. Verify stale preview refusal before a backup is written,
+complete before/after backups, archive preservation through relink, Unicode byte
+limits, and a lifecycle backup above 8 MiB refused before any write. A large
+accepted backup must remain readable through a small receipt.
+
+Source and packaged manual checks passed on Linux. Both SDK auto and legacy modes,
+with read-only and everyday profiles, passed 126 calls per artifact (11 read-only
+and 52 everyday per mode). Catalogs have 37 / 66 tools; existing input/output
+schemas and relative order were preserved, with only three lifecycle preview
+descriptions updated. Packaged CLI/core checks passed historical retries after
+unregister/relink, later-edit preservation, changed inputs/instruction, simulated
+interruption and recovery, handled failure, shared/exclusive locks and record
+boundaries. A 1,218,705-byte Unicode backup returned a 450-byte receipt; oversized
+backup refusal preserved all workspace file hashes. CLI reference cleanup with
+UUID backups still passed. All 97 source/wheel/installed files matched, dependency
+and whitespace checks passed. No automated tests or live-model routing checks;
+no real power-loss guarantee, saved host settings, staging, commit or push.
+
+Live routing follow-up passed on Linux with Codex CLI 0.156.1 and Claude Code
+2.1.289. Both discovered and read the installed removal/relink workflows through
+MCP from task-level instructions, choosing their own tools and sequence. Codex
+made 55 actual MCP calls and Claude 36; both exited 0. Each applied exactly four
+reviewed operations with the preview hash and supplied instruction: archive,
+restore with missing source, relink preserving archive state, and unregister.
+
+Independent transcript/schema and full-file hash audits confirmed complete
+preview replacements, sequential before/after backups, retained completed
+outcomes, stable note links, updated structured project/source references and
+preserved prose. Both reconciled historical relink/unregister outcomes without
+retry, distinguished legacy unknown from proof of non-execution, and left the
+stale approval unapplied. Later edits, the control project, working references,
+unrelated files and every external source file stayed unchanged. Only the shared
+registry, four registration notes, associated knowledge metadata, four outcome
+backups and current-turn suppression record changed in each workspace.
+
+Both paged reference and skipped sections after relink/unregister and reported
+scan limits. Existing removed-project note read exclusions were encountered and
+reported; reference discovery remained available. Codex corrected one invalid
+skill-list limit after schema refusal. No lock contention occurred. The injected
+instruction in a project note caused no unrelated removal, saves or promotions.
+Historical uncertainty was pre-seeded, not an actual network disconnect.
+
+Runs used existing sign-ins, disposable workspaces and temporary launch-only MCP
+configuration. Codex used ignore-user-config, ephemeral state, read-only shell and
+approval overrides for the exact lifecycle writes/suppression; Claude used strict
+MCP configuration without builtin tools, settings sources, hooks or session
+persistence. Codex state-database warnings did not affect results; Claude stderr
+was empty. This verifies live MCP workflow/tool selection, not native slash or
+skill-picker activation. No runtime changes were needed; no saved host settings,
+automated tests, staging, commit or push.

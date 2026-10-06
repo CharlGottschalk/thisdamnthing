@@ -188,3 +188,58 @@ def project_relink_preview(root, args):
     if not Path(args.path).is_absolute() or '..' in Path(args.path).parts:
         raise Refused('invalid_input', 'Use an absolute existing project directory without traversal')
     return ProjectRelinkPreview(**project_lifecycle.relink(root, args.id, args.path)), []
+
+
+class ProjectOperationStatusInput(ReadInput):
+    proposal_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+
+
+class ProjectApplyInput(ProjectLifecycleInput):
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class ProjectRemoveApplyInput(ProjectApplyInput):
+    mode: Literal['archive', 'unregister']
+
+
+class ProjectRelinkApplyInput(ProjectApplyInput):
+    path: str = Field(min_length=1, max_length=400)
+
+
+class ProjectOperationOutcome(Model):
+    proposal_sha256: str
+    status: Literal['unknown', 'prepared', 'completed', 'recovery_required']
+    backup: str | None
+    operation: Literal['remove', 'restore', 'relink'] | None
+    project_id: str | None
+
+
+def project_operation_status(root, args):
+    return ProjectOperationOutcome(**project_lifecycle.operation_status(root, args.proposal_sha256)), []
+
+
+def lifecycle_receipt(result):
+    return ProjectOperationOutcome(proposal_sha256=result['proposal_sha256'], status='completed',
+                                   backup=result['backup'], operation=result['operation'],
+                                   project_id=result['project']['id']), []
+
+
+def project_remove_apply(root, args):
+    return lifecycle_receipt(project_lifecycle.remove(
+        root, args.id, permanent=args.mode == 'unregister', apply=True,
+        expected=args.expected_sha256, instruction=args.user_instruction))
+
+
+def project_restore_apply(root, args):
+    return lifecycle_receipt(project_lifecycle.remove(
+        root, args.id, restore=True, apply=True,
+        expected=args.expected_sha256, instruction=args.user_instruction))
+
+
+def project_relink_apply(root, args):
+    if not Path(args.path).is_absolute() or '..' in Path(args.path).parts:
+        raise Refused('invalid_input', 'Use an absolute existing project directory without traversal')
+    return lifecycle_receipt(project_lifecycle.relink(
+        root, args.id, args.path, apply=True,
+        expected=args.expected_sha256, instruction=args.user_instruction))

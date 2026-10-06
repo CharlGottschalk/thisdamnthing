@@ -24,10 +24,18 @@ The source folder must already have moved; this command never moves source files
 or rewrites project-local UUIDs, stack artifacts or arbitrary working files.
 
 Inspect the preview. An explicit relink instruction with both unambiguous arguments
-authorizes these mechanical updates; do not ask again. Apply the same command with
+authorizes these mechanical updates; do not ask again. Prefer
+`tdt_project_relink_apply` with identical `id`/absolute `path`, `expected_sha256`
+and actual `user_instruction`/reference. CLI fallback adds
 `--apply --expected-sha256 <proposal_sha256> --user-instruction <actual request or
-message reference>`. If stale, preview again and check that the scope still matches
-the request. For an interrupted transaction use `tdt stack recover`, then re-preview.
+message reference>`. After uncertainty, read `tdt_project_operation_status` by the
+preview hash or `tdt project operation-status <hash>` before retry or fallback.
+Completed is historical success; read current registration instead of overwriting
+later changes. Retried inputs use the original ID/path even after relinking.
+Unknown means no retained record, not proof it never ran; legacy UUID backups are
+not indexed. Prepared needs inspection before an identical retry. Recovery-required
+needs the indicated CLI transaction recovery, then a fresh status read. If stale,
+preview again and check that the scope still matches the request.
 
 Run `project list`. Prefer workspace-bound `tdt_project_references` with the new
 exact `id`, paging both `references` and `skipped`; fall back to

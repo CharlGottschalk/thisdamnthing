@@ -17,11 +17,19 @@ Prefer workspace-bound `tdt_project_remove_preview` with the exact registered
 `id` and explicit `mode` (`archive` or `unregister`), or
 `tdt_project_restore_preview` for an explicit restore request. Fall back to
 `tdt project remove <project>` for archive, add `--permanent` to unregister,
-or use `tdt project restore <project>`. Lifecycle apply remains CLI-only. Inspect the
-preview, then apply with `--apply --expected-sha256 <proposal_sha256>
+or use `tdt project restore <project>`. Inspect the complete preview, then prefer
+`tdt_project_remove_apply` (same `id` and `mode`) or `tdt_project_restore_apply`
+(same `id`), with `expected_sha256` and the actual `user_instruction`/reference.
+CLI fallback adds `--apply --expected-sha256 <proposal_sha256>
 --user-instruction <actual request or message reference>`. Existing clear authorization
-for that project and mode suffices. On stale input re-preview; on interrupted
-writes use `tdt stack recover` before retrying.
+for that project and mode suffices. After an uncertain response, read
+`tdt_project_operation_status` by the preview hash, or
+`tdt project operation-status <hash>`, before retry or fallback. Completed means
+historical success; inspect current state and do not reapply to undo later edits.
+Unknown means no retained record, not proof the operation never ran; legacy UUID
+backups are not indexed. Prepared requires inspection before identical retry.
+Recovery-required needs the indicated CLI transaction recovery and a fresh status
+read. Keep original inputs and instruction for retries. On stale input re-preview.
 
 Archive marks the project and registration note, excludes it from normal project
 inspection/resumption, and retains knowledge. Restore works even while the directory

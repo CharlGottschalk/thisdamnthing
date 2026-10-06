@@ -146,7 +146,27 @@ not authorize an action by itself. An explicit relink with both arguments or a
 removal with a chosen mode already authorizes those mechanical changes. If a
 file has changed since preview, preview again. Backups under
 `.tdt/state/project-operations/` record before/after content and the instruction.
-Interrupted writes use the shared `tdt stack recover` rollback command.
+Lifecycle outcomes are retained by proposal hash. After an uncertain response,
+read `tdt project operation-status HASH` before retrying or switching transport.
+`completed` records historical success, even if the project later changes;
+identical completed retries return that result without writing. Keep the original
+project argument, destination/mode and instruction for retries, including after
+relink or unregister. Different inputs or instruction for a retained hash refuse.
+`prepared` means a backup exists without committed completion; inspect before retry.
+`unknown` means no indexed record, not proof the operation never ran. Legacy UUID
+backups and reference cleanup are not indexed. `recovery_required` overrides a
+retained result while either shared transaction journal exists; use the indicated
+`tdt stack recover` or `tdt skill recover`, then reread. Completion and lifecycle
+changes share the journal, and rollback restores the prepared backup.
+
+Both MCP profiles provide lifecycle previews and `tdt_project_operation_status`.
+Everyday also offers `tdt_project_remove_apply`, `tdt_project_restore_apply` and
+`tdt_project_relink_apply` with identical preview inputs, `expected_sha256` and
+`user_instruction`. Receipts include the resulting `project_id`, operation, hash
+and backup path. This is historical state; read current registration separately.
+MCP project arguments are exact IDs and relink destinations are absolute paths.
+Reference cleanup remains CLI-only. Indexed lifecycle backups are bounded to
+8 MiB; oversized operations refuse before writing.
 
 ### Review and clean references
 

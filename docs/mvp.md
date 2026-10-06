@@ -333,4 +333,10 @@ runs with local process permissions, outside any OS or network sandbox.
 Everyday MCP also exposes the eight UI lifecycle tools through shared CLI core
 functions. Structured pages, complete paginated events with original prompts,
 bounded waits, explicit acknowledgements, retained close and authorized cleanup
-follow the [UI guide](ui.md). Read-only stays at 29 tools; everyday has 54.
+follow the [UI guide](ui.md).
+
+Both profiles expose `tdt_brain_audit` through the shared structural scanner.
+Findings and note hashes are separately paginated, with report-bound cursors,
+totals, limitations and unreadable-note omissions. Audits do not repair notes or
+replace semantic review; repairs remain on the CLI. Read-only has 30 tools;
+everyday has 55.

@@ -804,6 +804,29 @@ worker cancellation probe passed read concurrency, busy-write refusal and lock
 retention until worker completion. No automated suite or live-model verification
 was performed, and no host configuration changed.
 
+## MCP structural brain audit
+
+Check `tdt_brain_audit` in both profiles and SDK modes. Page both findings and
+note hashes and compare complete results with `tdt brain audit`. Verify totals,
+limitations, unreadable-note omissions on every page and read-only annotations.
+Changed report content, section and page limit must invalidate cursors. Invalid
+arguments and insufficient result budgets must refuse rather than return a
+partial successful page. Check malformed/oversized/invalid-UTF-8 notes, special
+files, symlinks, interrupted transactions, shared-lock contention and scan bounds.
+An empty findings page does not establish semantic correctness. Preserve workspace
+content and outside control files; repair remains a separate CLI operation.
+
+Packaged manual verification passed on Linux in SDK auto and legacy modes for
+both read-only and everyday profiles: 21 calls per combination, schema-valid
+results, complete CLI/core parity, cursor and input refusals, budget refusal,
+unreadable-note coverage, FIFO/symlink handling, recovery and lock refusals.
+Workspace content hashes and outside controls were unchanged. Catalogs contain
+30/55 tools; prior tool schemas, descriptions and relative order are unchanged.
+Separate checks passed empty audits, note FIFOs, the 2001-entry refusal, CRLF
+normalization and CLI-core repair preview/apply with a retained backup. All 97
+packaged files matched source and installation; dependency checks passed.
+This verifies the packaged SDK tools, not live-model maintenance skill routing.
+
 ## MCP UI lifecycle
 
 Verify all eight UI tools in the everyday catalog and their absence from read-only.

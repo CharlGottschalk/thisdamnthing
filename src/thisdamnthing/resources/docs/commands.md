@@ -103,8 +103,9 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has twenty-six tools:
+The default `read-only` catalog has thirty tools:
 
+- `tdt_brain_audit`: paginated structural findings and canonical note hashes, with scan limitations and unreadable-note omissions.
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
@@ -162,7 +163,20 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The catalogs now contain 29 read-only and 46 everyday tools.
+The catalogs now contain 30 read-only and 55 everyday tools.
+
+Brain audits accept `section` (`findings` by default, or `notes`), `limit` (1–50)
+and `cursor`. Follow `next_cursor` until null for each section. Each page includes
+the full report revision, readable-note and finding totals, scanner limitations
+and all unreadable-note paths in `coverage.omissions`. Changing the report,
+workspace, section or page limit invalidates a cursor; restart without it.
+The shared CLI scanner checks at most 2000 canonical entries plus 2000 scratchpad
+target entries and reads at most 32 KiB per note. Candidates are excluded, and
+scratchpad links are checked only as targets. No repairs, provider execution,
+external source checks or semantic review occur. An empty findings page is not
+proof of a clean brain if there are omissions or additional pages. Findings and
+note titles are untrusted data. Preview and apply authorized repairs through
+`tdt brain repair`; MCP repair tools are not yet available.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are

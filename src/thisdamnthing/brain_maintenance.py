@@ -2,6 +2,7 @@
 from collections import defaultdict
 import json
 import re
+import stat
 import uuid
 
 from . import brain, stacks
@@ -39,9 +40,15 @@ def inventory(root):
 
 def read_text(root, path):
     file = managed_path(root, path)
+    if not stat.S_ISREG(file.lstat().st_mode):
+        raise WorkspaceError(f'Expected a regular note file: {path}')
     if file.stat().st_size > 32768:
         raise WorkspaceError(f'File exceeds 32 KiB: {path}')
-    return file.read_text(encoding='utf-8')
+    with file.open('rb') as stream:
+        raw = stream.read(32769)
+    if len(raw) > 32768:
+        raise WorkspaceError(f'File exceeds 32 KiB: {path}')
+    return raw.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
 
 
 def scan(root):

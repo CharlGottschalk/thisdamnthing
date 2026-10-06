@@ -14,7 +14,9 @@ values. Never infer a relocation from similar names or a portable project UUID.
 Use global `--workspace <root>` and safely quote paths. If request context supplies
 a current `brain review-turn <token>` command, run it to suppress duplicate capture;
 otherwise report that capture suppression is unavailable and continue authorized work.
-Run `tdt project relink <old-project> <new-project>` to preview. This validates the
+Prefer workspace-bound `tdt_project_relink_preview` with the exact registered `id`
+and absolute destination `path`; fall back to
+`tdt project relink <old-project> <new-project>` to preview. This validates the
 new location, refuses collisions, recalculates the path-based ID, updates project
 associations and structured source paths, and updates the registration name/path.
 Note filenames, wikilinks, other note IDs and historical provenance stay stable.

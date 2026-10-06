@@ -347,10 +347,17 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 32 tools; everyday has 58.
+Read-only has 36 tools; everyday has 62.
 
 Both MCP profiles expose `tdt_project_references` for explicit project IDs through
 the shared lifecycle scanner, including retained removed registrations. Reference
 and skipped-entry pages bind the complete scan revision and report totals, scan
 truncation and limitations. Matches do not establish ownership or authorize
 cleanup. Project lifecycle/cleanup mutations remain CLI-only.
+
+Both profiles expose project archive/unregister, restore and relink previews with
+complete replacements and shared CLI proposal hashes. Lifecycle previews use
+shared read locks; applies keep exclusive locks. Preview result budgets support
+up to 1 MiB and refuse oversized output without partial review content. Lifecycle
+apply and reference cleanup remain CLI-only; retained lifecycle outcome
+reconciliation is not yet implemented.

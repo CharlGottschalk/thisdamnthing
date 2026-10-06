@@ -90,6 +90,9 @@ from .models import (
     WorkspaceStatus,
 )
 from .projects import (
+    ProjectLifecycleInput, ProjectRemovePreviewInput, ProjectRelinkPreviewInput,
+    ProjectStatePreview, ProjectRelinkPreview, project_remove_preview,
+    project_restore_preview, project_relink_preview,
     ProjectReferencesInput, ProjectReferencesPage, project_references,
     project_add,
     project_create,
@@ -118,6 +121,21 @@ from .workspace import context_read, policy_read, workspace_status
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_project_remove_preview': (ProjectRemovePreviewInput, ProjectStatePreview, project_remove_preview,
+        'Preview archive or permanent unregister for an exact registered project id. Explicit mode is required. '
+        'Returns complete replacements and the shared CLI proposal hash; writes no notes, registry or backups. '
+        'Neither mode deletes source or cleans references. Review the entire preview; increase budget_bytes '
+        'up to 1 MiB if needed. Apply remains CLI-only with the same mode and hash on user instruction.'),
+    'tdt_project_restore_preview': (ProjectLifecycleInput, ProjectStatePreview, project_restore_preview,
+        'Preview restoration of an exact registered project id, including a missing directory. '
+        'Returns complete replacements and CLI proposal hash without writes. Does not recreate source or '
+        'restore an unregistered entry. Review complete output; apply remains CLI-only on user instruction.'),
+    'tdt_project_relink_preview': (ProjectRelinkPreviewInput, ProjectRelinkPreview, project_relink_preview,
+        'Preview relinking an exact registered project id to an absolute existing directory. '
+        'Returns complete replacements, previous/new identities, preserved brain link and CLI proposal hash. '
+        'Updates structured references only; never moves, reads or edits source contents. '
+        'Archive state and historical provenance are retained. Review complete output; increase budget_bytes '
+        'up to 1 MiB if needed. Apply remains CLI-only using the same inputs and hash on user instruction.'),
     'tdt_brain_repair_status': (BrainRepairStatusInput, BrainRepairOutcome, brain_repair_status,
         'Read retained repair outcome by exact preview proposal_sha256 after an uncertain apply or before retry. '
         'completed is historical success, not proof notes still match. prepared means intent/backup retained '

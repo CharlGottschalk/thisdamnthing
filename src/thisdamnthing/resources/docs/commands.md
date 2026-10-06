@@ -116,6 +116,9 @@ The default `read-only` catalog has thirty tools:
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
+- `tdt_project_remove_preview`: exact registered `id` and explicit `mode` (`archive` or `unregister`); complete replacements and the CLI proposal hash, without writes or source deletion.
+- `tdt_project_restore_preview`: exact registered `id`; preview restoring active status, even with a missing source directory. Unregistered entries cannot be restored this way.
+- `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Apply remains CLI-only with identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
 - `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.

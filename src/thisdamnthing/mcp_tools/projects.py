@@ -6,7 +6,7 @@ from pydantic import Field
 from .. import brain, projects, project_lifecycle
 from .common import Refused, bounded_text, inventory_page, serialized, workspace_key
 from .models import (
-    ListInput, Model,
+    ListInput, Model, ReadInput,
     ProjectInspection,
     ProjectPage,
     ProjectProposed,
@@ -139,3 +139,52 @@ def project_read(root, args):
         raise Refused('operation_refused', 'Duplicate project registration notes')
     return ProjectRead(project=selected, registration=matches[0] if matches else None,
                        registration_status='available' if matches else 'missing'), omissions
+
+
+class ProjectLifecycleInput(ReadInput):
+    id: str = Field(pattern='^[a-f0-9]{64}$')
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class ProjectRemovePreviewInput(ProjectLifecycleInput):
+    mode: Literal['archive', 'unregister']
+
+
+class ProjectRelinkPreviewInput(ProjectLifecycleInput):
+    path: str = Field(min_length=1, max_length=400)
+
+
+class ProjectStatePreview(Model):
+    operation: Literal['remove', 'restore']
+    project: ReferenceProject
+    state: Literal['active', 'archived', 'removed']
+    notice: str
+    proposal_sha256: str
+    replacements: dict[str, str]
+    applied: Literal[False] = False
+
+
+class ProjectRelinkPreview(Model):
+    operation: Literal['relink']
+    previous: ReferenceProject
+    project: ReferenceProject
+    brain_link: str
+    notice: str
+    proposal_sha256: str
+    replacements: dict[str, str]
+    applied: Literal[False] = False
+
+
+def project_remove_preview(root, args):
+    return ProjectStatePreview(**project_lifecycle.remove(
+        root, args.id, permanent=args.mode == 'unregister')), []
+
+
+def project_restore_preview(root, args):
+    return ProjectStatePreview(**project_lifecycle.remove(root, args.id, restore=True)), []
+
+
+def project_relink_preview(root, args):
+    if not Path(args.path).is_absolute() or '..' in Path(args.path).parts:
+        raise Refused('invalid_input', 'Use an absolute existing project directory without traversal')
+    return ProjectRelinkPreview(**project_lifecycle.relink(root, args.id, args.path)), []

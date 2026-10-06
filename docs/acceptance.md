@@ -982,3 +982,27 @@ and lifecycle writer refusal under a shared read lock. Existing catalog schemas,
 descriptions and relative ordering matched HEAD in both profiles. Source, wheel
 and installed file sets and bytes matched exactly (97 files). No runtime fixes
 were required; live-model routing remains unverified.
+
+## MCP project lifecycle previews
+
+Both profiles expose archive/unregister, restore and relink previews. Verify exact
+registered IDs and explicit removal modes; relink requires an absolute existing
+directory without traversal. Compare complete replacements and proposal hashes
+against shared CLI/core output (optional absent registration status becomes null
+in MCP). Apply the preview through CLI with the identical inputs and hash; stale
+state must refuse. Preserve archive state across relink and permit restore with
+missing source. Unregistered entries cannot be restored through this operation.
+
+Packaged manual verification passed on Linux with SDK auto/legacy × both profiles:
+148 calls checked catalog/schema/annotations, repeat parity, concurrent shared
+read locks, exclusive-lock and transaction-marker refusal, strict inputs,
+missing targets and result-budget refusal. Fixture file hashes were unchanged
+across previews. CLI accepted MCP hashes for archive, relink, restore and
+unregister; a stale relink hash refused. Separate source and packaged checks
+passed destination collisions, complete Unicode output at increased budget and
+registration-note symlink refusal with outside control preserved. All 97 packaged
+files match source and installation; dependency and whitespace checks passed.
+Existing tool schemas, descriptions and relative order are unchanged.
+
+No live-model routing check performed. Lifecycle apply and reference cleanup
+remain CLI-only; retained lifecycle outcome reconciliation is not implemented.

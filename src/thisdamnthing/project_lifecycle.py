@@ -59,7 +59,7 @@ def moved_source(source, old, new):
 
 
 def relink(root, key, directory, *, apply=False, expected=None, instruction=None):
-    with brain.locked(root):
+    with brain.locked(root, shared=not apply):
         stacks.available(root)
         entry = projects.resolve(root, key)  # Missing/archived projects can be relinked.
         path = projects.project_path(root, directory)
@@ -104,7 +104,7 @@ def relink(root, key, directory, *, apply=False, expected=None, instruction=None
 
 
 def remove(root, key, *, permanent=False, restore=False, apply=False, expected=None, instruction=None):
-    with brain.locked(root):
+    with brain.locked(root, shared=not apply):
         stacks.available(root)
         entry = projects.resolve(root, key)
         records = projects.registry(root)

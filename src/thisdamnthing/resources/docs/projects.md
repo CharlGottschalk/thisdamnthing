@@ -154,7 +154,7 @@ project argument, destination/mode and instruction for retries, including after
 relink or unregister. Different inputs or instruction for a retained hash refuse.
 `prepared` means a backup exists without committed completion; inspect before retry.
 `unknown` means no indexed record, not proof the operation never ran. Legacy UUID
-backups and reference cleanup are not indexed. `recovery_required` overrides a
+backups are not indexed. `recovery_required` overrides a
 retained result while either shared transaction journal exists; use the indicated
 `tdt stack recover` or `tdt skill recover`, then reread. Completion and lifecycle
 changes share the journal, and rollback restores the prepared backup.
@@ -165,7 +165,7 @@ Everyday also offers `tdt_project_remove_apply`, `tdt_project_restore_apply` and
 `user_instruction`. Receipts include the resulting `project_id`, operation, hash
 and backup path. This is historical state; read current registration separately.
 MCP project arguments are exact IDs and relink destinations are absolute paths.
-Reference cleanup apply remains CLI-only. Indexed lifecycle backups are bounded to
+Everyday also exposes hash-bound reference cleanup apply. Indexed lifecycle backups are bounded to
 8 MiB; oversized operations refuse before writing.
 
 ### Review and clean references
@@ -216,8 +216,14 @@ Both MCP profiles expose `tdt_project_cleanup_preview` with an exact project ID
 and 1–20 changes (`path`, current `expected_sha256`, complete `content`, or
 explicit null for whole-file deletion). It uses the shared CLI cleanup validation
 and returns complete replacements, proposal hash and scan coverage without writes
-or backups. Preview reads share the workspace lock; CLI applies remain exclusive.
+or backups. Preview reads share the workspace lock; applies remain exclusive.
 Output budgets allow up to 1 MiB and refuse oversized results without partial
-review content. Apply the identical JSON through `tdt project cleanup ID` only
-for the separately authorized changes, using the preview hash and instruction.
-Cleanup backups remain unindexed; inspect files and CLI backups after uncertainty.
+review content. Everyday exposes `tdt_project_cleanup_apply` with identical `id` and `changes`,
+`expected_sha256` from the preview and the actual `user_instruction`; the CLI accepts
+the same proposal and hash. Apply only separately authorized changes. Cleanup now
+retains prepared/completed outcomes through the shared transaction, including
+whole-file deletions. Read `tdt_project_operation_status` after uncertainty before
+retry or CLI fallback. Identical completed retries return historical success even
+after deleting the removed registration note, preserving later file edits.
+Changed inputs/instruction refuse; old UUID backups remain unindexed. Backups are
+bounded to 8 MiB before writes.

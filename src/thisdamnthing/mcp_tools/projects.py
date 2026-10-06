@@ -211,7 +211,7 @@ class ProjectOperationOutcome(Model):
     proposal_sha256: str
     status: Literal['unknown', 'prepared', 'completed', 'recovery_required']
     backup: str | None
-    operation: Literal['remove', 'restore', 'relink'] | None
+    operation: Literal['remove', 'restore', 'relink', 'cleanup'] | None
     project_id: str | None
 
 
@@ -275,3 +275,15 @@ def project_cleanup_preview(root, args):
     omissions = ([f"{len(result['coverage']['skipped'])} entries skipped; inspect coverage.skipped"]
                  if result['coverage']['skipped'] else [])
     return ProjectCleanupPreview(**result), omissions
+
+
+class ProjectCleanupApplyInput(ProjectCleanupPreviewInput):
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+def project_cleanup_apply(root, args):
+    proposal = {'changes': [change.model_dump() for change in args.changes]}
+    return lifecycle_receipt(project_lifecycle.cleanup(
+        root, args.id, proposal, apply=True,
+        expected=args.expected_sha256, instruction=args.user_instruction))

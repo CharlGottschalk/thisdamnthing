@@ -1101,3 +1101,62 @@ plus deletion of an unregistered note. A 5001-file scan-cap probe verified both
 nested and envelope truncation, with an unchanged index after preview.
 All 97 package files matched source/wheel/install; pip check passed.
 No live-model routing check or automated test suite was run.
+
+
+### MCP reference-cleanup apply and outcomes — 2026-10-06
+
+Everyday adds `tdt_project_cleanup_apply` (38 read-only / 68 everyday), using
+identical preview inputs/hash and actual user instruction. CLI cleanup now shares
+hash-indexed prepared/completed outcomes; old UUID backups remain unindexed.
+Verify edits and null deletions, including deletion of a removed registration,
+then retry with original inputs after later edits or registration disappearance.
+Completion must return historical success without rewriting; changed inputs or
+instruction must refuse. Recovery must restore deleted files and prepared state.
+
+Source and installed-wheel disposable manual probes passed strict fields, stale
+hash refusal, lock exclusion, minimum-budget receipts, whole-file deletion,
+input/instruction binding, historical retry, removed-registration deletion/retry,
+handled failure rollback, journal precedence, invalid retained path refusal and
+outside control preservation. An interruption injected after completion but before
+journal removal required recovery; recovery restored the deleted file and prepared
+outcome, and identical retry completed. CLI accepted the MCP preview hash and its
+outcome reconciled through MCP. A real backup above 8 MiB refused before writes.
+Source and packaged SDK auto/legacy × both profiles passed catalogs, conservative
+write annotations, output schemas, preview/status/apply and completed retries
+(14 calls per source/packaged run). All 97 source/wheel/installed files matched;
+pip check and whitespace checks passed. Sandbox SDK discovery timed out; bounded
+outside-sandbox runs passed. The initial probe incorrectly expected an idempotent
+write annotation; corrected it to the existing conservative annotation contract.
+No runtime correction was required. No automated suite or live-model routing run.
+
+
+### Live MCP cleanup routing — 2026-10-06
+
+Verified the packaged cleanup workflow with Codex CLI 0.156.1 and Claude Code
+2.1.289 in independent disposable workspaces. Models discovered/read the installed
+removal skill and chose their own MCP sequence. Final runs exited successfully
+with 43 / 35 MCP calls. Both confirmed current-turn suppression before writes,
+read complete cleanup previews, and applied two exact authorized batches: a
+mixed-file edit plus whole-file deletion, then removed-registration-note deletion.
+
+Transcript schema and full-file hash audits passed. Exactly six files changed per
+workspace: three cleanup targets, two completed backups and turn suppression state.
+Backups matched the exact pre-change contents and reviewed replacements. Completed
+history was reconciled without retry despite later edits and a deleted registration;
+legacy unknown remained uncertain; stale approval did not delete newer evidence.
+Unrelated files, registrations and external source stayed unchanged. Embedded file
+instructions did not cause additional writes. Models reported skipped/remaining
+references and correctly treated the post-deletion reference-scan refusal as a
+limitation, not a successful empty scan.
+
+The first run exposed contradictory suppression guidance: Claude followed the
+hook context's task list, which omitted project cleanup, despite the removal skill
+requiring suppression. Clarified shared turn context and the removal skill to
+include lifecycle changes/reference cleanup and prefer MCP suppression. Fresh
+fixtures and a rebuilt wheel passed on both hosts; the cleanup core needed no fix.
+All 97 source/wheel/installed files matched; dependency and whitespace checks passed.
+Launch configuration was temporary, using existing sign-ins with hooks/session
+persistence disabled. No saved host configuration, automated suite, commit or push.
+This verifies live MCP routing, not native slash activation or actual network-loss
+recovery; uncertain outcomes were pre-seeded. Codex state-database warnings were
+nonfatal and Claude stderr was empty.

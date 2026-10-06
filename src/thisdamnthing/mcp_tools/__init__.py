@@ -147,6 +147,7 @@ from .reminders import (
 )
 from .projects import (
     ProjectCleanupPreviewInput, ProjectCleanupPreview, project_cleanup_preview,
+    ProjectCleanupApplyInput, project_cleanup_apply,
     ProjectLifecycleInput, ProjectRemovePreviewInput, ProjectRelinkPreviewInput,
     ProjectStatePreview, ProjectRelinkPreview, project_remove_preview,
     project_restore_preview, project_relink_preview,

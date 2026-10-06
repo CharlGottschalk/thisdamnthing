@@ -347,13 +347,13 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 38 tools; everyday has 67.
+Read-only has 38 tools; everyday has 68.
 
 Both MCP profiles expose `tdt_project_references` for explicit project IDs through
 the shared lifecycle scanner, including retained removed registrations. Reference
 and skipped-entry pages bind the complete scan revision and report totals, scan
 truncation and limitations. Matches do not establish ownership or authorize
-cleanup. Reference cleanup mutations remain CLI-only.
+cleanup. Reference cleanup requires separate explicit authorization.
 
 Both profiles expose project archive/unregister, restore and relink previews with
 complete replacements and shared CLI proposal hashes. Lifecycle previews use
@@ -365,16 +365,22 @@ by proposal hash. Completion shares the registry/note transaction; identical
 completed retries return historical success without resolving the old registration
 or overwriting later changes. Prepared outcomes require inspection; interrupted
 journals require CLI recovery and a fresh status read. Unknown is not proof an
-operation never ran; legacy UUID backups and cleanup are not indexed. Indexed
-backups are bounded to 8 MiB before writes. Reference cleanup apply remains CLI-only.
+operation never ran; legacy UUID backups are not indexed. Indexed
+backups are bounded to 8 MiB before writes. Everyday also exposes hash-bound reference cleanup apply.
 
 
 Both MCP profiles expose `tdt_project_cleanup_preview` with an exact project ID
 and 1–20 changes (`path`, current `expected_sha256`, complete `content`, or
 explicit null for whole-file deletion). It uses the shared CLI cleanup validation
 and returns complete replacements, proposal hash and scan coverage without writes
-or backups. Preview reads share the workspace lock; CLI applies remain exclusive.
+or backups. Preview reads share the workspace lock; applies remain exclusive.
 Output budgets allow up to 1 MiB and refuse oversized results without partial
-review content. Apply the identical JSON through `tdt project cleanup ID` only
-for the separately authorized changes, using the preview hash and instruction.
-Cleanup backups remain unindexed; inspect files and CLI backups after uncertainty.
+review content. Everyday exposes `tdt_project_cleanup_apply` with identical `id` and `changes`,
+`expected_sha256` from the preview and the actual `user_instruction`; the CLI accepts
+the same proposal and hash. Apply only separately authorized changes. Cleanup now
+retains prepared/completed outcomes through the shared transaction, including
+whole-file deletions. Read `tdt_project_operation_status` after uncertainty before
+retry or CLI fallback. Identical completed retries return historical success even
+after deleting the removed registration note, preserving later file edits.
+Changed inputs/instruction refuse; old UUID backups remain unindexed. Backups are
+bounded to 8 MiB before writes.

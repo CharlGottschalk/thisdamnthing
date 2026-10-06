@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 38 tools; `everyday` has 67 in total.
+The default `read-only` catalog has 38 tools; `everyday` has 68 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
@@ -120,7 +120,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.
 - `tdt_project_remove_preview`: exact registered `id` and explicit `mode` (`archive` or `unregister`); complete replacements and the CLI proposal hash, without writes or source deletion.
 - `tdt_project_restore_preview`: exact registered `id`; preview restoring active status, even with a missing source directory. Unregistered entries cannot be restored this way.
-- `tdt_project_cleanup_preview`: exact project `id` and 1–20 `changes` with `path`, current `expected_sha256`, and complete `content` (explicit null deletes the whole file). Returns full replacements, scan coverage and CLI proposal hash; up to 1 MiB output budget, shared read lock, no writes. Apply remains CLI-only with identical JSON and separately authorized changes. Cleanup outcomes are not indexed.
+- `tdt_project_cleanup_preview`: exact project `id` and 1–20 `changes` with `path`, current `expected_sha256`, and complete `content` (explicit null deletes the whole file). Returns full replacements, scan coverage and CLI proposal hash; up to 1 MiB output budget, shared read lock, no writes. Use everyday `tdt_project_cleanup_apply` with identical changes, hash and actual user instruction. Cleanup outcomes are retained by proposal hash.
 - `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Everyday apply tools use identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
 - `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
@@ -583,7 +583,7 @@ so omissions cannot silently disappear behind the reference page.
 The shared CLI scan checks at most 5000 entries in brain/work and supported text
 files up to 256 KiB; it skips hidden paths, symlinks, unsupported/unreadable files
 and possible secrets. It does not scan external project source. Literal matches
-are review hints, not ownership or permission to delete. Reference cleanup writes still use the CLI. A result-budget refusal returns no partial page.
+are review hints, not ownership or permission to delete. Everyday supports separately authorized reference cleanup writes. A result-budget refusal returns no partial page.
 
 
 ### MCP project lifecycle apply and outcomes
@@ -606,8 +606,22 @@ Changed arguments or instruction for the same retained hash refuse.
 
 `prepared` means backup/intent retained without committed completion; inspect
 before identical retry. `unknown` means no retained record, not proof it never ran
-and not permission to apply. Legacy UUID backups and cleanup are not indexed.
+and not permission to apply. Legacy UUID backups are not indexed.
 `recovery_required` means a shared transaction journal exists; use the indicated
 CLI recovery and reread. Completion and registry/note writes share the journal;
 rollback restores prepared state. Status reads share the read lock; applies use
 the exclusive workspace lock. Indexed backups refuse above 8 MiB before writes.
+
+
+### MCP reference cleanup apply
+
+Everyday exposes `tdt_project_cleanup_apply` with identical `id` and `changes`
+from `tdt_project_cleanup_preview`, `expected_sha256` and actual `user_instruction`.
+Review complete replacements and scan coverage; null content deletes the entire
+file. Archive/unregister permission alone does not authorize reference cleanup.
+CLI cleanup shares the same hashes, validation, backups and retained outcomes.
+Use `tdt_project_operation_status` after uncertainty before retry or CLI fallback.
+Identical completed retries preserve later changes even after the removed
+registration note was deleted. Keep that note until the final batch so additional
+reference scans can resolve the project. Cleanup completion and file changes share
+the recoverable transaction; legacy UUID cleanup backups remain unindexed.

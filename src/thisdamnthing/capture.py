@@ -27,7 +27,8 @@ def begin_turn(root, event):
                           "brain", "review-turn", token])
     return ("For a user request not to save brain notes or capture knowledge, "
             "tdt-review-brain, tdt-capture, tdt-note or explicit reminder "
-            "management/checking in this turn, first suppress automatic capture. "
+            "management/checking, project lifecycle changes or reference cleanup in this "
+            "turn, first suppress automatic capture. "
             "Prefer tdt_capture_suppress on the MCP server bound to workspace " +
             str(root.resolve()) + " with token " + token + ". "
             "If that tool is unavailable, use " + command + ". "

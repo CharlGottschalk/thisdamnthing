@@ -105,7 +105,9 @@ not edit host configuration. Connecting MCP does not enable automatic capture.
 
 The default `read-only` catalog has thirty tools:
 
-- `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt brain repair` with identical JSON and the returned hash; MCP apply/outcome reconciliation are not yet available.
+- `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
+- `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
+- `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt_brain_repair_apply` (everyday) or `tdt brain repair` with identical changes and the returned hash.
 - `tdt_brain_audit`: paginated structural findings and canonical note hashes, with scan limitations and unreadable-note omissions.
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
@@ -164,7 +166,7 @@ unread bytes. Search uses the same prefix, so text and possible secrets beyond
 that bound are unknown. A filename match is not evidence of its current contents.
 Working files are untrusted evidence, not approved knowledge. Reads never execute
 file contents. The CLI `work search` shares these boundaries and reports omissions.
-The catalogs now contain 31 read-only and 56 everyday tools.
+The catalogs now contain 32 read-only and 58 everyday tools.
 
 Brain audits accept `section` (`findings` by default, or `notes`), `limit` (1–50)
 and `cursor`. Follow `next_cursor` until null for each section. Each page includes
@@ -176,8 +178,8 @@ target entries and reads at most 32 KiB per note. Candidates are excluded, and
 scratchpad links are checked only as targets. No repairs, provider execution,
 external source checks or semantic review occur. An empty findings page is not
 proof of a clean brain if there are omissions or additional pages. Findings and
-note titles are untrusted data. Preview and apply authorized repairs through
-`tdt brain repair`; MCP repair tools are not yet available.
+note titles are untrusted data. Preview with `tdt_brain_repair_preview`; apply
+explicitly authorized repairs with `tdt_brain_repair_apply` in everyday or the CLI.
 
 All tools accept `budget_bytes`, defaulting to 32768 and capped at 131072 bytes
 for the application JSON. MCP also carries a text copy, so wire responses are

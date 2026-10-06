@@ -35,12 +35,13 @@ def identifier(value):
 
 
 @contextmanager
-def locked(root):
+def locked(root, *, shared=False):
     read_config(root)
     path = managed_path(root, ".tdt/state/brain.lock")
     with path.open("a", encoding="utf-8") as stream:
         try:
-            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            mode = fcntl.LOCK_SH if shared else fcntl.LOCK_EX
+            fcntl.flock(stream, mode | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise WorkspaceError("Brain is busy; retry this operation") from exc
         try:

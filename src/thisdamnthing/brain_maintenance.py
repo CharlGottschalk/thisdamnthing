@@ -3,9 +3,8 @@ from collections import defaultdict
 import json
 import re
 import stat
-import uuid
 
-from . import brain, stacks
+from . import brain, constitution, stacks
 from .workspace import WorkspaceError, managed_path
 
 CATEGORIES = ('knowledge', 'projects', 'sessions')
@@ -52,7 +51,7 @@ def read_text(root, path):
 
 
 def scan(root):
-    with brain.locked(root):
+    with brain.locked(root, shared=True):
         files = inventory(root)
         findings, notes = [], []
         bodies, metadata = {}, {}
@@ -123,6 +122,45 @@ def scan(root):
                                 'An agent must inspect note contents for duplicates, conflicts and stale relationships.']}
 
 
+def outcome_path(fingerprint):
+    return '.tdt/state/brain-maintenance/' + brain.identifier(fingerprint) + '.json'
+
+
+def retained_outcome(root, fingerprint):
+    path = managed_path(root, outcome_path(fingerprint))
+    if not path.exists():
+        return None
+    record = json.loads(constitution.bounded(path, 8 * 1024 * 1024))
+    if (not isinstance(record, dict)
+            or set(record) != {'created', 'user_instruction', 'proposal_sha256',
+                               'request_sha256', 'before', 'after', 'status'}
+            or record['proposal_sha256'] != fingerprint
+            or record['status'] not in ('prepared', 'completed')
+            or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
+            or record['before'].keys() != record['after'].keys()
+            or not 1 <= len(record['before']) <= 20
+            or any(not isinstance(v, str) for v in (*record['before'].values(), *record['after'].values()))
+            or brain.digest(json.dumps({'before': record['before'], 'after': record['after']},
+                                       sort_keys=True)) != fingerprint):
+        raise WorkspaceError('Invalid retained repair outcome')
+    brain.identifier(record['request_sha256'])
+    brain.clean_text(record['user_instruction'], 'retained instruction', 500)
+    if not isinstance(record['created'], str):
+        raise WorkspaceError('Invalid retained repair timestamp')
+    return record
+
+
+def repair_status(root, fingerprint):
+    """Read historical outcome; an outstanding journal prevents a final verdict."""
+    with brain.locked(root, shared=True):
+        record = retained_outcome(root, fingerprint)
+        from .skills import JOURNAL as SKILL_JOURNAL
+        recovery = any(managed_path(root, p).exists() for p in (stacks.JOURNAL, SKILL_JOURNAL))
+        return {'proposal_sha256': fingerprint,
+                'status': 'recovery_required' if recovery else record['status'] if record else 'unknown',
+                'backup': outcome_path(fingerprint) if record else None}
+
+
 def repair(root, proposal, apply=False, expected=None, instruction=None):
     """Preview exact replacements; apply only a hash-bound batch with a backup."""
     if not isinstance(proposal, dict) or set(proposal) != {'changes'}:
@@ -130,8 +168,21 @@ def repair(root, proposal, apply=False, expected=None, instruction=None):
     items = proposal['changes']
     if not isinstance(items, list) or not 1 <= len(items) <= 20:
         raise WorkspaceError('Provide 1–20 note changes per batch')
-    with brain.locked(root):
+    with brain.locked(root, shared=not apply):
         stacks.available(root)  # Refuse to overwrite an interrupted transaction.
+        retained = None
+        if apply:
+            brain.identifier(expected)
+            instruction = brain.clean_text(instruction, 'user instruction/reference', 500)
+            request_hash = brain.digest(json.dumps(proposal, sort_keys=True))
+            retained = retained_outcome(root, expected)
+            if retained:
+                if (retained['request_sha256'] != request_hash
+                        or retained['user_instruction'] != instruction):
+                    raise WorkspaceError('Retained repair requires the identical proposal and instruction')
+                if retained['status'] == 'completed':
+                    return {'proposal_sha256': expected, 'replacements': retained['after'],
+                            'applied': True, 'backup': outcome_path(expected)}
         allowed = set(inventory(root))
         changes, before = {}, {}
         for item in items:
@@ -176,10 +227,15 @@ def repair(root, proposal, apply=False, expected=None, instruction=None):
             return result
         if expected != fingerprint:
             raise WorkspaceError('Proposal changed; preview and approve the exact replacements again')
-        instruction = brain.clean_text(instruction, 'user instruction/reference', 500)
-        backup = '.tdt/state/brain-maintenance/' + uuid.uuid4().hex + '.json'
-        brain.save_json(root, backup, {'created': brain.now(), 'user_instruction': instruction,
-                                     'proposal_sha256': fingerprint, 'before': before, 'after': changes})
-        stacks.transaction(root, changes)
+        backup = outcome_path(fingerprint)
+        record = retained or {'created': brain.now(), 'user_instruction': instruction,
+                              'proposal_sha256': fingerprint, 'request_sha256': request_hash,
+                              'before': before, 'after': changes, 'status': 'prepared'}
+        if not retained:
+            brain.save_json(root, backup, record)
+        # Completion and note writes share one journal. Rollback restores prepared;
+        # a crash with a journal cannot be mistaken for a completed operation.
+        stacks.transaction(root, {**changes, backup: json.dumps(
+            {**record, 'status': 'completed'}, indent=2, ensure_ascii=False) + '\n'})
         result.update(applied=True, backup=backup)
         return result

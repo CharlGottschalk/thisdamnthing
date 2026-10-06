@@ -2,6 +2,8 @@
 from .maintenance import (
     BrainAuditInput, AuditNote, AuditFinding, BrainAuditPage, brain_audit,
     RepairChange, BrainRepairPreviewInput, BrainRepairPreview, brain_repair_preview,
+    BrainRepairStatusInput, BrainRepairApplyInput, BrainRepairOutcome,
+    brain_repair_status, brain_repair_apply,
 )
 from .models import (
     Model,

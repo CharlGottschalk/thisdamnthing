@@ -340,5 +340,11 @@ Findings and note hashes are separately paginated, with report-bound cursors,
 totals, limitations and unreadable-note omissions. Audits do not repair notes or
 replace semantic review. Both profiles also expose `tdt_brain_repair_preview`
 for complete, hash-bound replacements through shared core validation, without
-writing notes or backups. Authorized apply and outcome reconciliation remain on
-the CLI. Read-only has 31 tools; everyday has 56.
+writing notes or backups. Both profiles expose exact retained outcome reads;
+everyday applies explicitly authorized replacements with the preview hash and actual approval reference.
+Completion is recorded with note writes in the shared transaction. Identical
+completed retries return historical success without overwriting later changes.
+Interrupted transactions require CLI recovery and a fresh outcome read.
+Audit, preview and outcome reads share a read lock so parallel model calls do
+not contend with one another; apply retains the exclusive workspace lock.
+Read-only has 32 tools; everyday has 58.

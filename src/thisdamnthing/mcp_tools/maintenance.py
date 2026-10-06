@@ -1,4 +1,4 @@
-"""Structural audits and exact repair previews through the shared core."""
+"""Structural audits, reviewed repairs and retained outcomes through the shared core."""
 from typing import Annotated, Literal
 
 from pydantic import Field
@@ -75,3 +75,30 @@ def brain_repair_preview(root, args):
     proposal = {'changes': [change.model_dump() for change in args.changes]}
     result = brain_maintenance.repair(root, proposal)
     return BrainRepairPreview(**result), []
+
+
+class BrainRepairStatusInput(ReadInput):
+    proposal_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+
+
+class BrainRepairApplyInput(BrainRepairPreviewInput):
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class BrainRepairOutcome(Model):
+    proposal_sha256: str
+    status: Literal['unknown', 'prepared', 'completed', 'recovery_required']
+    backup: str | None
+
+
+def brain_repair_status(root, args):
+    return BrainRepairOutcome(**brain_maintenance.repair_status(root, args.proposal_sha256)), []
+
+
+def brain_repair_apply(root, args):
+    proposal = {'changes': [change.model_dump() for change in args.changes]}
+    result = brain_maintenance.repair(root, proposal, apply=True,
+                                     expected=args.expected_sha256, instruction=args.user_instruction)
+    return BrainRepairOutcome(proposal_sha256=result['proposal_sha256'],
+                              status='completed', backup=result['backup']), []

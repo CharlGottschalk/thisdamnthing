@@ -52,6 +52,7 @@ def main(argv=None):
     repair.add_argument("--apply", action="store_true")
     repair.add_argument("--expected-sha256")
     repair.add_argument("--user-instruction")
+    actions.add_parser("repair-status", help="read retained outcome by exact proposal hash").add_argument("proposal_sha256")
     names = actions.add_parser("migrate-names", help="preview readable brain filenames and link updates")
     names.add_argument("--apply", action="store_true", help="apply the migration with recoverable writes")
     review = actions.add_parser("review", help="apply an explicitly instructed user review")
@@ -334,6 +335,9 @@ def main(argv=None):
             elif args.action == "review":
                 print(brain.review(root, args.id, args.decision, args.user_instruction,
                                    args.expected_sha256, input_json() if args.decision == "edit" else None))
+            elif args.action == "repair-status":
+                from . import brain_maintenance
+                print(json.dumps(brain_maintenance.repair_status(root, args.proposal_sha256), indent=2))
             elif args.action in ("audit", "repair"):
                 from . import brain_maintenance
                 result = (brain_maintenance.scan(root) if args.action == "audit" else

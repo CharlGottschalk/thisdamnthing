@@ -246,7 +246,8 @@ def recover(root):
         brain_note = relative == 'brain/index.md' or (
             relative.startswith(('brain/knowledge/', 'brain/projects/', 'brain/sessions/', 'work/notes/'))
             and relative.endswith('.md'))
-        if not (brain_note or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/', 'brain/', 'work/'))):
+        repair_outcome = re.fullmatch(r'\.tdt/state/brain-maintenance/[a-f0-9]{64}\.json', relative)
+        if not (brain_note or repair_outcome or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/', 'brain/', 'work/'))):
             raise WorkspaceError('Unexpected recovery path')
         after = record['after'][relative]
         for value in (before, after):

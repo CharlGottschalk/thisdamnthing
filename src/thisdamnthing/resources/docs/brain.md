@@ -324,3 +324,26 @@ then applies the batch through a recoverable transaction. Keep these backups
 private, like the brain itself. Interrupted transactions use `tdt stack recover`;
 completed repairs can be reversed with a reviewed repair against current hashes.
 Run `tdt brain audit` again to check the result.
+
+MCP offers `tdt_brain_repair_preview` and `tdt_brain_repair_status` in both
+profiles; everyday also offers `tdt_brain_repair_apply`. Apply takes identical
+`changes`, `expected_sha256` from the preview and the actual `user_instruction`.
+It returns a small receipt rather than repeating replacement text.
+
+After an uncertain response, read `tdt_brain_repair_status` with the exact
+`proposal_sha256` or run `tdt brain repair-status <hash>` before retry/fallback:
+
+- `completed`: retained historical success, even if notes have since changed.
+  Identical retries (including the original instruction) return that outcome
+  without writing notes or new backups. Inspect current notes before further work.
+- `prepared`: before/after backup exists without committed completion. Inspect
+  current notes before an identical retry; changed notes still fail hash checks.
+- `unknown`: no retained record for this hash. This does not prove the repair
+  never ran (older UUID backups are not indexed) and is not authorization to apply.
+- `recovery_required`: an outstanding shared transaction prevents a final verdict.
+  Inspect and recover through the CLI, then reread the outcome before proceeding.
+
+Backups now use the proposal hash as their filename. Older UUID-named backups
+remain intact but are not indexed by status. Completion and replacements share
+one transaction; rollback restores the prepared outcome. Retained outcomes are
+local records, not evidence of current note content or a power-loss guarantee.

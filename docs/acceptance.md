@@ -883,4 +883,70 @@ symlink and interrupted-transaction refusals, and complete 20-note responses
 with a raised budget (default budget refuses without writes). Existing tool
 schemas and relative order are unchanged; only the audit description changed.
 No live-model routing verification. Apply and retained-outcome reconciliation
-over MCP remain future work.
+were verified separately in the following slice.
+
+
+## MCP repair apply and retained outcomes — 2026-10-06
+
+Both profiles expose `tdt_brain_repair_status`; everyday adds
+`tdt_brain_repair_apply` (32 read-only / 58 everyday). Apply requires the exact
+preview hash, identical changes and actual approval instruction/reference.
+Check unknown/prepared/completed/recovery_required states, strict schemas,
+profile boundaries, a completion receipt within the minimum 1024-byte budget,
+and identical retries after later user edits. Changed request content or approval
+context must refuse a retained hash. Completion is historical, not current-note
+verification. Older UUID backups remain intact and are not indexed.
+
+Interrupt a disposable apply after writing notes and the completion record but
+before removing the journal. Status must report recovery_required and apply must
+refuse. Shared CLI-core recovery must restore original notes and prepared state;
+an identical retry must complete. Also inject a handled write failure and check
+rollback. Refuse symlink, FIFO, oversized, malformed and invalid UTF-8 outcome
+records; preserve outside control files. Exercise a 20-note Unicode batch and
+shared-lock contention. Do not infer power-loss guarantees from these probes.
+
+Source and packaged verification passed 28 SDK calls each across auto/legacy
+and both profiles. The packaged preview regression passed a further 40 calls,
+including stale/escaping/duplicate input, link and result-budget refusals with
+unchanged workspace hashes. Direct core and actual CLI checks passed retained
+outcome parity, metadata preservation, uncertain-response retries, changed
+approval refusal, simulated interruption/recovery and handled failure/rollback.
+Outcome record boundaries passed. A 20-note Unicode batch retained a roughly
+1-MiB backup and returned a 344-byte receipt; retry and lock refusals passed.
+All 97 packaged files matched source and installed bytes; dependency and
+whitespace checks passed. Existing schemas/relative order are unchanged; only
+audit/preview descriptions changed. Build dependency access and bounded local
+SDK runs used approved outside-sandbox execution after sandbox network/discovery
+failures. No automated tests added, live-model routing verification, host setting
+changes, staging, commit or push.
+
+
+Live MCP routing follow-up passed on Linux with Codex CLI 0.156.1 and Claude
+Code 2.1.289. Task-level prompts asked each model to select the installed
+maintenance workflow and its tool sequence; no prescribed repair API sequence
+was supplied. Final runs exited 0 with 24 Codex / 25 Claude MCP calls. Both
+selected the skill through MCP discovery, suppressed the supplied fixture turn,
+read current notes, previewed and applied exactly the authorized replacement,
+and completed both sections of the before/after audit. Retained history was
+reconciled without retry; a later user edit, stale approval, legacy operation
+and instruction-like control content were preserved. Both correctly described
+unknown legacy outcome as uncertainty, not proof that it never ran. Only the
+approved note, its retained backup and the suppression record changed.
+
+Live verification exposed and corrected two issues: unknown-outcome guidance
+needed to explicitly exclude “never ran” conclusions, and parallel maintenance
+reads contended for an exclusive lock. Audit, preview and status now use shared
+read locks; apply and all existing default lock users remain exclusive. Source
+and packaged auto/legacy SDK probes each passed 36 calls under held shared and
+exclusive locks, admitting concurrent reads while refusing conflicting writes.
+The final packaged direct CLI/core rollback, retry and record-boundary probe
+also passed. All 97 wheel files match source and installation; dependency and
+whitespace checks passed. Codex recovered from a refused oversized skill-list
+limit; both hosts respected the approved-note reader's index refusal and reported
+that semantic-coverage limitation. No maintenance lock-contention errors remained.
+
+This verifies model-selected MCP discovery/routing, not native slash/skill-picker
+activation. Suppression context was issued by the real core function for a
+fixture; live host hooks were disabled. Uncertain responses were pre-seeded,
+not actual network disconnects. Saved host configuration was unchanged. No
+staging, commit or push was performed.

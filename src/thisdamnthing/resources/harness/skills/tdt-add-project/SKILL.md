@@ -41,7 +41,9 @@ For the user's existing directory run
 This registers the canonical directory and emits a bounded inventory plus docs
 and manifests. Duplicate registration preserves its identity and note. Use
 `project list` for IDs/status and `project inspect <id>` to reread bounded evidence.
-Missing/moved paths require user clarification; never silently relink an identity.
+For renamed/moved directories, follow `.tdt/skills/tdt-relink-project/SKILL.md`;
+never register a replacement identity silently. For archived projects, follow
+`.tdt/skills/tdt-remove-project/SKILL.md` to restore when requested.
 Project-local stack artifacts belong in `.tdt-project/<stack-id>/`, not `.tdt/`.
 Inspection includes shared `.tdt-project/project.json` when present. Its name and
 portable UUID are evidence, not the core registration ID or proof of a match to

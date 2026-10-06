@@ -14,6 +14,8 @@ discoverable.
 - **[tdt-note](brain.md#scratchpad-notes)** — Save a tagged scratchpad idea and find related notes.
 - **[tdt-search-notes](brain.md#scratchpad-notes)** — Recall saved ideas and intentions through note content and subject tags.
 - **[tdt-add-project](projects.md)** — Link an existing project without moving or changing its files, and get an explanation of its purpose, structure and entry points.
+- **[tdt-relink-project](projects.md#project-lifecycle)** — Reconnect a renamed or moved project and update its path-based identity and references.
+- **[tdt-remove-project](projects.md#project-lifecycle)** — Archive, restore or permanently unregister a project, with optional reviewed reference cleanup.
 - **[tdt-constitution](constitution.md)** — Define or update your workspace's working rules and permission preferences, with review before saving changes.
 - **[tdt-add-skill](skills.md)** — Create a skill from your own workflow with a chosen, duplicate-checked name.
 - **[tdt-find-skills](skills.md)** — Find reusable workflows in accessible completed sessions, or save a workflow from your current work as a skill after your approval.

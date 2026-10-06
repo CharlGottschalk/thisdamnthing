@@ -214,7 +214,7 @@ def diagnose(root):
                 entries = registry(root)
                 lines.append(f"Registered projects: {len(entries)}")
                 for entry in entries:
-                    if status(entry) != "available":
+                    if status(entry) == "missing or moved":
                         lines.append(f"WARNING: project {entry['id']} missing or moved: {entry['path']}")
         except WorkspaceError as exc:
             lines.append(f"ERROR: {exc}")

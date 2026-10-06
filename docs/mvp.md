@@ -119,6 +119,10 @@ tdt doctor
 tdt brain search <query>
 tdt project add <path>
 tdt project list
+tdt project relink <old-project> <new-path>
+tdt project remove <project> [--permanent]
+tdt project restore <project>
+tdt project references <project>
 tdt stack validate <directory>
 tdt stack install <directory-or-catalog-id>
 tdt stack list
@@ -169,6 +173,14 @@ note based on a bounded read of project docs and manifests. It offers onboarding
 and explains purpose, structure, entry points, and unknowns with source references.
 It never copies project source or writes into the external project. Work inside
 that project still follows its own instructions and the user's authorization.
+
+`/tdt-relink-project` explicitly reconnects moved or renamed directories, updates
+path-derived project IDs and structured references, and preserves note links and
+history. Missing arguments require user selection. `/tdt-remove-project` archives
+(reversibly) or permanently unregisters projects without deleting source. Brain
+and work reference cleanup is separately requested and reviewed. Lifecycle writes
+use hash-bound previews, backups and shared transaction recovery. See the
+[project lifecycle guide](../src/thisdamnthing/resources/docs/projects.md#project-lifecycle).
 
 Explicit user saves use `/tdt-capture` to write approved knowledge with source,
 provenance and an approval record. `/tdt-note` saves tagged scratchpad ideas in

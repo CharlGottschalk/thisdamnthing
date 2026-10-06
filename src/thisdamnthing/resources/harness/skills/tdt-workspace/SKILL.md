@@ -1,6 +1,6 @@
 ---
 name: tdt-workspace
-description: Create/register/resume projects; workspace setup, policy, files, UI, reminder settings.
+description: Create, resume, relink or remove projects; workspace setup, policy, files and UI.
 ---
 
 For a focused request, read and follow only the matching specialist below, then
@@ -10,6 +10,9 @@ containing .tdt/config.json):
 - Workspace permission rules: `.tdt/skills/tdt-constitution/SKILL.md`.
 - Create, register or resume projects; find working files or templates:
   `.tdt/skills/tdt-add-project/SKILL.md`.
+- Relink a renamed or moved project: `.tdt/skills/tdt-relink-project/SKILL.md`.
+- Archive, restore or permanently unregister a project; review reference cleanup:
+  `.tdt/skills/tdt-remove-project/SKILL.md`.
 - “Use UI”, browser questions or interactive pages: `.tdt/skills/tdt-ui/SKILL.md`.
 
 For workspace onboarding, orientation, diagnosis or preferences, continue below.

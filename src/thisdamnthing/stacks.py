@@ -234,14 +234,15 @@ def recover(root):
     from .ui_resources import RESOURCES as UI_RESOURCES, MANIFEST as UI_MANIFEST
     bootstrap_paths = {*RESOURCES, *UI_RESOURCES, MANIFEST, UI_MANIFEST,
                        '.tdt/config.json', '.tdt/state/owned-files.json',
-                       '.tdt/state/user-skills.json', '.tdt/state/capability-state.json', 'README.md',
+                       '.tdt/state/user-skills.json', '.tdt/state/capability-state.json',
+                       '.tdt/state/projects.json', 'README.md',
                        *(p for provider in PROVIDERS.values() for p in (provider[0], provider[2]))}
     for relative, before in record['before'].items():
         safe_path(relative)
         brain_note = relative == 'brain/index.md' or (
             relative.startswith(('brain/knowledge/', 'brain/projects/', 'brain/sessions/', 'work/notes/'))
             and relative.endswith('.md'))
-        if not (brain_note or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/'))):
+        if not (brain_note or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/', 'brain/', 'work/'))):
             raise WorkspaceError('Unexpected recovery path')
         after = record['after'][relative]
         for value in (before, after):

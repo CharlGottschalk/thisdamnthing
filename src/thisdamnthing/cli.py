@@ -75,6 +75,17 @@ def main(argv=None):
     project_create = project_actions.add_parser("create", help="create below work/; path is relative to work")
     project_create.add_argument("path")
     project_actions.add_parser("list")
+    for action in ("relink", "remove", "restore", "references", "cleanup"):
+        command = project_actions.add_parser(action)
+        command.add_argument("id", help="registered project ID, path or unambiguous name")
+        if action == "relink":
+            command.add_argument("path", help="existing new project directory")
+        if action == "remove":
+            command.add_argument("--permanent", action="store_true", help="unregister; retain files for separate cleanup")
+        if action != "references":
+            command.add_argument("--apply", action="store_true")
+            command.add_argument("--expected-sha256", help="proposal hash returned by preview")
+            command.add_argument("--user-instruction", help="actual user instruction or message reference")
     work = commands.add_parser("work", help="discover internal working files")
     work_actions = work.add_subparsers(dest="action", required=True)
     work_search = work_actions.add_parser("search")
@@ -252,6 +263,21 @@ def main(argv=None):
             elif args.action == "list":
                 for entry in projects.registry(root):
                     print(f"{entry['id']}  {projects.status(entry)}  {entry['path']}")
+            elif args.action in ("relink", "remove", "restore", "references", "cleanup"):
+                from . import project_lifecycle
+                if args.action == "references":
+                    result = project_lifecycle.references(root, args.id)
+                else:
+                    options = dict(apply=args.apply, expected=args.expected_sha256,
+                                   instruction=args.user_instruction)
+                    if args.action == "relink":
+                        result = project_lifecycle.relink(root, args.id, args.path, **options)
+                    elif args.action == "cleanup":
+                        result = project_lifecycle.cleanup(root, args.id, input_json(), **options)
+                    else:
+                        result = project_lifecycle.remove(root, args.id,
+                            permanent=getattr(args, "permanent", False), restore=args.action == "restore", **options)
+                print(json.dumps(result, indent=2, ensure_ascii=False))
             elif args.action == "inspect":
                 print(json.dumps(projects.inspect(root, args.id), indent=2, ensure_ascii=False))
             else:

@@ -19,7 +19,9 @@ def registry(root):
         raise WorkspaceError('Invalid project registry')
     ids, paths = set(), set()
     for entry in records:
-        if (not isinstance(entry, dict) or set(entry) != {'id', 'path', 'created'}
+        if (not isinstance(entry, dict) or not {'id', 'path', 'created'} <= set(entry)
+                or set(entry) - {'id', 'path', 'created', 'status'}
+                or entry.get('status', 'active') not in ('active', 'archived')
                 or not isinstance(entry['id'], str)
                 or not isinstance(entry['path'], str)
                 or not Path(entry['path']).is_absolute()
@@ -33,6 +35,8 @@ def registry(root):
 
 
 def status(entry):
+    if entry.get('status') == 'archived':
+        return 'archived'
     path = Path(entry['path'])
     try:
         return 'available' if path.is_dir() and path.resolve(strict=True) == path else 'missing or moved'
@@ -40,7 +44,7 @@ def status(entry):
         return 'missing or moved'
 
 
-def add(root, directory):
+def project_path(root, directory):
     supplied = Path(directory).expanduser().absolute()
     if root in supplied.parents:
         if any(part == ".." for part in supplied.parts):
@@ -69,11 +73,19 @@ def add(root, directory):
                for name in ('.tdt', '.dryft')):
             raise WorkspaceError('Cannot register an installed ThisDamnThing workspace as a project')
     brain.clean_text(str(path), 'project path', 400)
+    return path
+
+
+def add(root, directory):
+    path = project_path(root, directory)
+    internal = root in path.parents
     with brain.locked(root):
         records = registry(root)
         key = brain.digest(str(path))
         existing = next((e for e in records if e['id'] == key), None)
         if existing:
+            if existing.get('status') == 'archived':
+                raise WorkspaceError('Project is archived; use project restore')
             return existing, False
         relative = (brain.find_note(root, 'projects', key)
                     or brain.named_path(root, 'projects', key, path.name))
@@ -99,7 +111,7 @@ def add(root, directory):
         return entry, True
 
 
-def find(root, key):
+def resolve(root, key):
     entries = registry(root)
     matches = [e for e in entries if key in (e['id'], e['path'], Path(e['path']).name)
                or (root in Path(e['path']).parents and key == str(Path(e['path']).relative_to(root / 'work')))]
@@ -108,6 +120,13 @@ def find(root, key):
     entry = matches[0] if matches else None
     if entry is None:
         raise WorkspaceError('Unknown project id; run tdt project list')
+    return entry
+
+
+def find(root, key):
+    entry = resolve(root, key)
+    if status(entry) == 'archived':
+        raise WorkspaceError('Project is archived; use project restore')
     if status(entry) != 'available':
         raise WorkspaceError('Project path is missing or moved; identity has not changed')
     return entry

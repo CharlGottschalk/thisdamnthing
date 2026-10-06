@@ -120,3 +120,31 @@ Simulate an interrupted shared transaction and run `tdt stack recover`; confirm
 original bytes are restored. Install and refresh both host skill bridges and
 check brain-router discovery. Semantic review quality and live host execution
 require a separate real conversation; structural checks do not establish them.
+
+
+## Project lifecycle (manual)
+
+Use disposable workspaces and external directories; never a personal workspace.
+
+1. Initialize both hosts; confirm both new skills, their explicit entry points,
+   workspace router and docs install. Refresh and run doctor.
+2. Register a project, add associated candidate/knowledge/scratchpad notes and a
+   working file mentioning it. Move/rename its directory. Preview and apply relink;
+   confirm the new path hash, title, metadata associations and source prefixes,
+   stable filenames/wikilinks, preserved provenance/review and unchanged source.
+3. Refuse destination collisions, invalid destinations, ambiguous old names,
+   changed preview hashes and symlinks in managed note paths without partial writes.
+4. Archive a project; confirm list marks it archived, inspect/resume refuses it,
+   knowledge remains available and files survive. Relink an archived project and
+   restore it, including while its directory is missing.
+5. Permanently unregister; confirm registry absence, retained removed project note,
+   preserved files and reference scan by full ID. Preview selected cleanup edits
+   and explicit deletions; confirm stale file hashes refuse changes, unrelated
+   content survives and retained note provenance cannot be rewritten.
+6. Check reference scan omissions for unsupported/oversized/hidden files, symlinks
+   and possible secrets. Check project source is never deleted by removal.
+7. Interrupt a multi-file lifecycle write and run shared recovery. Confirm exact
+   rollback and backups; confirm recovery refuses intervening edits.
+8. Exercise skill conversations with neither relink argument, only one argument,
+   both unambiguous arguments, ambiguous names and removal with no chosen mode.
+   Ask only for missing choices; never infer relocation or cleanup authority.

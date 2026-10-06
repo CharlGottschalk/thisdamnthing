@@ -30,6 +30,9 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-search` with the selected provider | `tdt brain search "query" --provider ID` | Select a provider for this query; repeat the option to combine rankings. |
 | `/tdt-add-project` | `tdt project add PATH` / `tdt project list` | Register an external directory unchanged, or list registrations. |
 | `/tdt-add-project` | `tdt project inspect ID` | Reread bounded onboarding evidence. |
+| `/tdt-relink-project` | `tdt project relink OLD NEW_PATH` | Preview a moved project's registration and reference updates. |
+| `/tdt-remove-project` | `tdt project remove ID [--permanent]` / `tdt project restore ID` | Preview archive, unregister or restore. |
+| Project lifecycle skills | `tdt project references ID` / `tdt project cleanup ID` | Scan references or preview exact cleanup JSON from stdin. |
 | Ask your agent to validate only; also used by `/tdt-install-stack` and optional `/tdt-stack-builder-create` | `tdt stack validate PATH` | Validate a local bundle and inspect disclosures. |
 | `/tdt-install-stack` | `tdt stack install PATH` | Install a local bundle; catalog IDs also work when the registry is available. |
 | `/tdt-install-stack` with an inspection-only request | `tdt stack install ID --inspect` | Download and verify a catalog release without installing. |
@@ -79,3 +82,6 @@ See [reminders](reminders.md) for the schema, setup and delivery recovery.
 - `tdt work search <query>` discovers internal working files separately from knowledge.
 
 Read WORK.md before choosing new locations; CLI paths are explicit and do not parse conventions.
+
+Project lifecycle mutations require `--apply`, the preview `--expected-sha256`,
+and `--user-instruction`. See [project lifecycle](projects.md#project-lifecycle).

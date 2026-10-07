@@ -1,10 +1,34 @@
 """Installed stack discovery and explicit search-provider indexing adapters."""
 import json
+from pathlib import Path
 from pydantic import Field, ValidationError
 from .. import brain, capabilities, skills, stacks
 from .common import Refused, bounded_text, inventory_page, serialized
 from .models import Model, ReadInput, ProviderPage, ProviderSummary, StackPage, StackSummary
 from .maintenance import BinaryContent
+
+
+class StackValidateInput(ReadInput):
+    source: str = Field(min_length=1, max_length=4096)
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class StackValidated(Model):
+    manifest: dict
+    files: dict[str, str | BinaryContent]
+    origin: dict
+    requires_executable_trust: bool
+
+
+def stack_validate(root, args):
+    # External reads require an explicit absolute directory, never an implicit
+    # process working directory or a downloaded/selected replacement source.
+    if not Path(args.source).is_absolute():
+        raise Refused('invalid_input', 'Select an absolute local stack directory')
+    manifest, files, origin = stacks.validate(args.source, bounded=True)
+    return StackValidated(manifest=manifest, files=files, origin=origin,
+                          requires_executable_trust=bool(manifest['hooks'] or
+                                                         manifest.get('capabilities'))), []
 
 
 class StackReadInput(ReadInput):

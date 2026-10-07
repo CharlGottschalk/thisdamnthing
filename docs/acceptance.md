@@ -1726,3 +1726,54 @@ hooks disabled. Codex logged state-lookup warnings; Claude stderr was empty.
 Native prompt selection/slash-command activation and native resource UI were not
 exercised; resource discovery/read and prompt retrieval were verified over SDK
 stdio instead. Install/update lifecycle and owned host registration remain pending.
+
+### MCP local stack source inspection
+
+Both profiles expose `tdt_stack_validate` for explicitly selected absolute local
+source directories; catalogs are 48/85. Shared CLI validation returns complete
+selected files, manifest, local origin digest and executable-trust requirement.
+Binary assets use base64; unlisted files are excluded. Existing text caps apply,
+v2 input is capped at 8 MiB and complete output at the requested budget (up to
+1 MiB). Refusal never supplies a partial inspection. Nothing is fetched, executed,
+installed or trusted. Destination conflicts, prerequisites, code safety, origin
+authenticity and runtime readiness remain separate checks. Install/update writes
+and marketplace inspection remain CLI-only.
+
+Check v1/v2 and binary source/core parity; exact content digests; executable trust
+reporting; strict schemas and absolute paths; complete output budgets; malformed,
+missing, oversized, special-file and symlink refusals; asset sizes and hashes;
+source/workspace preservation; and CLI installation/removal regression. Exercise
+SDK auto/legacy modes in both profiles and inspect model routing on the installed
+wheel with untrusted fixture instructions and inspection-only authorization.
+
+Manual source and installed-wheel checks passed v1/v2 complete core parity,
+Unicode, binary assets, executable trust reporting, small/oversized budgets,
+strict inputs, missing/malformed/invalid-UTF-8 manifests, traversal and symlink
+refusals, FIFO refusals, asset mismatches and the 8-MiB cap. Ordinary CLI validation
+still accepted the larger fixture; installation, ownership verification and
+removal passed for the bounded fixture. Selected-source and workspace hashes
+were unchanged by reads. SDK auto/legacy x both profiles passed discovery,
+48/85 catalogs, read-only annotations, input/output schemas, text/structured
+parity and error flags. No automated test suite was added or run.
+
+The system setuptools was too old for current project metadata; an isolated
+build with the declared dependency passed. Sandboxed SDK discovery timed out;
+the bounded outside-sandbox checks passed. The final wheel's 99 packaged files
+match source and installed bytes; dependency and whitespace checks passed.
+
+Final live Codex CLI 0.156.1 and Claude Code 2.1.289 runs exited successfully,
+with 13 and 9 MCP calls respectively and no builtin tool calls. Both read the
+installed router, installation specialist and stack guide, retried a too-small
+inspection budget, returned the complete selected digest/source, refused an
+invalid bundle, ignored injected instructions and correctly described the
+MCP/CLI boundary. Codex corrected two invalid listing limits; an attempted contract
+guide read was unavailable, and it used the installed stack guide plus a working
+file read of the selected invalid manifest. Validation errors remain deliberately
+generic. Independent schemas, normalized transcript/server-log agreement and
+per-call/whole-workspace hashes passed with no fixture changes. An initial Claude
+summary overstated the installed-only scope; clarified installed guidance and
+both final runs used the rebuilt wheel. Existing sign-ins and temporary MCP
+configurations were used, with native hooks disabled and no saved host registration
+changes. Codex emitted existing state lookup warnings; Claude stderr was empty.
+Install/update writes, marketplace MCP inspection and owned host registration
+remain future work.

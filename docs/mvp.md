@@ -349,7 +349,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 47 tools; everyday has 84.
+Read-only has 48 tools; everyday has 85.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -494,3 +494,12 @@ or CLI fallback. Absence does not prove success; an identical reinstall may
 reproduce the hash. Never automatically retry. Interrupted writes need reviewed
 recovery. Inspection does not authorize
 removal; stale previews must be inspected again before acting.
+
+Both profiles expose `tdt_stack_validate` for an explicitly selected absolute local
+stack directory through shared CLI validation. Complete manifests, selected source
+contents (base64 for binary) and local origin digests are returned without writes
+or execution. Existing text caps and an 8-MiB v2 bundle cap bound input; output
+must fit up to 1 MiB without partial content. Unlisted files are not inspected.
+Validation is not executable safety, provenance authenticity, destination or
+prerequisite validation, runtime readiness or user authorization. Install/update
+writes and marketplace inspection remain CLI-only.

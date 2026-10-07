@@ -21,7 +21,7 @@ MAX_OUTPUT = 256 * 1024
 STATE = '.tdt/state/capability-state.json'
 
 
-def validate_manifest(data, source, files, metadata_only=False):
+def validate_manifest(data, source, files, metadata_only=False, *, max_bundle=None):
     if not {'assets', 'capabilities', 'compatibility'} <= data.keys():
         raise WorkspaceError('v2 requires assets, capabilities and compatibility')
     compat = data['compatibility']
@@ -49,8 +49,9 @@ def validate_manifest(data, source, files, metadata_only=False):
         spellings.add(unicodedata.normalize('NFC', relative).casefold())
         path = managed_path(source, relative)
         total += asset['size']
-        if total > MAX_BUNDLE or not path.is_file() or path.stat().st_size != asset['size']:
-            raise WorkspaceError('Asset missing, size mismatch or bundle exceeds 384 MiB')
+        if total > (MAX_BUNDLE if max_bundle is None else max_bundle) or not path.is_file() or path.stat().st_size != asset['size']:
+            raise WorkspaceError('Asset missing, size mismatch or bundle exceeds byte limit: ' +
+                                 str(MAX_BUNDLE if max_bundle is None else max_bundle))
         if metadata_only:
             digest = stacks.file_sha(path)
         else:

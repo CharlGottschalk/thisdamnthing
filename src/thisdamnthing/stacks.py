@@ -77,7 +77,8 @@ def safe_path(value):
     return value
 
 
-def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=False):
+def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=False,
+             bounded=False):
     source = Path(directory).expanduser().absolute()
     for parent in (source, *source.parents):
         if parent.is_symlink():
@@ -157,7 +158,8 @@ def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=F
     asset_hashes = {}
     if data['contract_version'] == 2:
         from .capabilities import validate_manifest
-        asset_hashes = validate_manifest(data, source, files, metadata_only)
+        asset_hashes = validate_manifest(data, source, files, metadata_only,
+                                         max_bundle=8 * 1024 * 1024 if bounded else None)
     digest = sha(json.dumps(files if data['contract_version'] == 1 else {**{p: sha(v) for p, v in files.items()}, **asset_hashes}, sort_keys=True, ensure_ascii=False))
     return data, files, {'kind': 'local', 'path': str(source.resolve()), 'sha256': digest}
 

@@ -27,6 +27,11 @@ the preview hash and actual user instruction; the removal specialist explains
 CLI fallback and uncertainty handling. Never automatically retry a lost response.
 Use the CLI discovery workflow when MCP is unavailable.
 
+For explicit local source inspection, prefer `tdt_stack_validate` with an absolute
+directory and read complete selected contents before discussing trust. Validation
+does not authorize installation or establish executable safety. Install/update
+writes and marketplace inspection remain CLI-only.
+
 Read exactly the specialist needed from `.tdt/skills/` and follow it:
 
 - `tdt-install-stack` discovers, inspects and installs a stack.

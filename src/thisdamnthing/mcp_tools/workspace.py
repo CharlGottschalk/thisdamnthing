@@ -2,12 +2,31 @@
 import json
 import os
 from pathlib import Path
+from pydantic import Field
 from .. import brain, constitution, reminders
 from ..workspace import managed_path
 from .common import Refused, bounded_text, workspace_key
 from .knowledge import stored_inventory
-from .models import Context, Policy, WorkspaceStatus
+from .models import Context, Model, Policy, ReadInput, WorkspaceStatus
 from .projects import project_inventory
+
+
+class PolicySaveInput(ReadInput):
+    markdown: str = Field(min_length=1, max_length=6000)
+    expected_sha256: str = Field(pattern=r'^(missing|[a-f0-9]{64})$')
+    user_instruction: str = Field(min_length=1, max_length=240)
+
+
+class PolicySaved(Model):
+    sha256: str
+
+
+def policy_save(root, args):
+    saved = constitution.save(root, args.markdown, args.expected_sha256,
+                              args.user_instruction)
+    # Complete policy can exceed the minimum budget; return only its revision
+    # so successful writes never become output-budget errors.
+    return PolicySaved(sha256=saved['sha256']), []
 
 
 def policy_read(root, args):

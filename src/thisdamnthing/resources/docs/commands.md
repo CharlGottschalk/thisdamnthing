@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 40 tools; `everyday` has 72 in total.
+The default `read-only` catalog has 40 tools; `everyday` has 73 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Returns `proposal_sha256` binding renames and complete before/after contents, including derived catalog writes.
@@ -130,6 +130,13 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
 - `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
 - `tdt_constitution_read`: complete constitution and its revision.
+- `tdt_constitution_save` (everyday): complete approved `markdown`, current
+  `expected_sha256` (or `missing`) and actual `user_instruction` approval reference
+  (1–240 characters, one line). Uses the CLI policy lock and revision checks;
+  appends an audit reference. The final policy must fit 6000 UTF-8 bytes. Returns
+  only the saved SHA256 so the receipt fits the minimum budget. Read the complete
+  policy back. After uncertainty reread before retry or CLI fallback; no retained
+  outcome or automatic retry. Does not enable hooks or recover policy state.
 - `tdt_brain_search`: literal search of approved knowledge with bounded links.
 - `tdt_brain_read`: read an eligible note using a path or URI returned by search.
 - `tdt_candidate_list`: paginated summaries; `status` is `pending` (default), `rejected` or `all`.

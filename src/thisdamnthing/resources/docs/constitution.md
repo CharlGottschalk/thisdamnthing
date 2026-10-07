@@ -20,6 +20,13 @@ Use `/tdt-constitution` to show your current rules and guide an update. The
 skill saves the exact changes you approve. In Codex, use `$tdt-constitution`
 or the skill picker.
 
+When a workspace-bound everyday MCP server is available, the skill uses
+`tdt_constitution_read` and `tdt_constitution_save`. Saving uses the same revision
+checks and policy lock as the terminal command. The receipt contains the saved
+revision; the agent then reads the complete policy back. After an uncertain save,
+inspect current policy before retrying or switching to the terminal. There is no
+retained operation outcome, and an old revision cannot overwrite a newer policy.
+
 ### Terminal alternative
 
 To inspect the current rules:
@@ -66,7 +73,7 @@ After a save through TDT, an expectation marker detects accidental deletion.
 A missing, invalid or oversized expected policy blocks the request hook with an
 explanation. Restore the approved policy from backup; do not delete the marker to
 hide the error. A directly authored policy becomes covered by deletion detection
-after its first CLI save.
+after its first TDT save.
 
 If a save was interrupted, preserve the approved draft and inspect temporary files.
 Remove a stale `.tdt/state/constitution-write.lock` directory only after confirming

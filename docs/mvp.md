@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 40 tools; everyday has 72.
+Read-only has 40 tools; everyday has 73.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -407,3 +407,11 @@ code runs with local process permissions. There is no retained operation outcome
 after uncertainty inspect search/cache state before an authorized retry. Retries
 execute again; interrupted journals require CLI recovery. No batch indexing,
 installation, trust changes or automatic query-time indexing is added.
+
+Everyday exposes `tdt_constitution_save` for complete explicitly approved policy
+Markdown, the current revision (or `missing`) and an actual approval reference.
+It uses the existing CLI policy lock and stale-revision checks, appends the audit
+reference and enforces the 6000-byte final UTF-8 limit. The receipt returns only
+the saved SHA256; read complete policy back. After uncertainty reread before retry
+or CLI fallback; no retained operation outcome or automatic retry. Policy saving
+does not enable hooks, recover state or grant permissions beyond host boundaries.

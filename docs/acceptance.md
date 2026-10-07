@@ -1316,3 +1316,55 @@ and provider requests without changing their outcomes. No response loss or nativ
 slash activation was simulated. Codex emitted unrelated state-db lookup warnings;
 Claude stderr was empty. No runtime fixes, saved host configuration changes or
 model reruns were needed; the verified wheel remains unchanged.
+
+### MCP reviewed policy saves — 2026-10-07
+
+Everyday exposes `tdt_constitution_save`; catalog counts are 40 read-only / 73
+everyday. Verify complete approved Markdown, current revision or `missing`, and
+actual approval reference through shared CLI policy core. The appended reference
+counts toward the 6000 UTF-8 byte limit. Receipts contain only the saved SHA256 and
+fit the minimum output budget; read complete policy back. After uncertainty,
+reread before retry or CLI fallback. There is no retained operation outcome.
+
+Focused manual checks passed on source and installed wheel: first save, Unicode,
+near-limit policy, exact CLI byte parity, strict arguments and profile exclusion,
+minimum receipt budget, final byte-limit refusal including appended audit data,
+stale retry preserving current content, existing policy lock, missing expected
+policy, malformed expectation marker, managed symlink and FIFO refusal. File
+hashes stayed unchanged for checked refusals; outside control was untouched.
+
+Source and packaged SDK auto/legacy modes passed with both profiles, including
+catalog counts, mutation annotations, structured output schemas, matching text
+and error flags, save/readback and stale refusal. Complete policy reads over a
+small budget refused without changing saved state. All 97 package files matched
+source/wheel/install; dependency and whitespace checks passed. A final import-order
+cleanup was rebuilt and package parity/manual checks repeated. Sandbox SDK
+discovery timed out and build dependency DNS failed; bounded approved runs outside
+the sandbox passed. No automated suite, live-model routing, real response-loss
+exercise, saved host configuration changes or hook activation was performed.
+
+### Live MCP policy-save routing — 2026-10-07
+
+Passed on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289, both exit 0.
+Codex made 15 MCP calls; Claude made 12, with no builtin tool calls. Each model
+discovered/read the constitution skill and guide, suppressed its genuine fixture
+turn token, reconciled the preseeded policy against the expected historical save,
+and ignored instructions in the untrusted background file. Each made exactly one
+authorized obsolete-revision save attempt, received the generic refusal, reread
+unchanged policy, then saved the exact approved draft once with the fresh revision
+and minimum 1024-byte output budget. Complete readback matched the receipt SHA256
+and preserved both existing rules, including Unicode, with the new audit reference.
+
+Independent input/output schema, transcript/server-log and per-call/full-workspace
+hash audits passed. Exactly two files changed in each workspace: the policy and
+turn suppression state. The expectation marker, background/control files and
+source tree were unchanged. Both final reports distinguished generic error limits,
+natural-language policy from host enforcement, and current-policy inspection from
+retained operation status or automatic retry. No runtime correction was needed.
+
+Runs used the verified wheel, existing sign-ins, disposable workspaces and temporary
+launch-only MCP configuration. Native hooks were disabled; shared begin_turn
+supplied genuine fixture context. No saved host configuration changed. Codex
+state-db lookup warnings did not affect the run; Claude stderr was empty. This
+verifies model-selected MCP routing with task-level instructions; historical
+uncertainty was preseeded, with no real response loss or native skill activation.

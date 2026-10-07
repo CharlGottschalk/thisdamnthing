@@ -316,6 +316,93 @@ def bridge(name, canonical):
             f'Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n')
 
 
+def installation_plan(root, data, files, origin, *, replacing=None,
+                      prerequisite_release=None, confirmed=(), bounded=False):
+    """Plan installation without writes; caller holds the workspace lock."""
+    from . import stack_docs
+    from .recovery import read_bytes
+    def read_content(root, relative):
+        if not bounded:
+            return existing_content(root, relative)
+        raw = read_bytes(root, relative, 1048576)
+        return None if raw is None else content_value(raw)
+    if bounded:
+        from .bootstrap import MANIFEST
+        for relative in (REGISTRY, '.tdt/config.json', MANIFEST,
+                         stack_docs.INDEX, stack_docs.OWNERSHIP):
+            read_bytes(root, relative, 1048576)
+    entries = available(root)
+    if bounded and len(entries) > 2000:
+        raise WorkspaceError("Stack catalog exceeds 2000 entries")
+    if prerequisite_release is not None:
+        from .marketplace import prerequisites
+        prerequisites(entries, prerequisite_release, confirmed)
+    current = next((e for e in entries if e['id'] == data['id']), None)
+    if replacing is not None:
+        if current != replacing:
+            raise WorkspaceError('Installed state changed; inspect and approve again')
+        check_owned(root, current)
+        if tuple(map(int, data['version'].split('.'))) <= tuple(map(int, current['version'].split('.'))):
+            raise WorkspaceError('Update requires a strictly newer version')
+    elif current is not None:
+        raise WorkspaceError('Stack already installed; use stack update')
+    base = f".tdt/stacks/{data['id']}"
+    if replacing is None and managed_path(root, base).exists():
+        raise WorkspaceError(f'Stack directory conflict: {base}')
+    changes = {f'{base}/{p}': t for p, t in files.items()}
+    from .agents import folders
+    skill_folders = folders(root)
+    for relative in data['skills']:
+        name = relative.split('/')[1]
+        for folder in skill_folders:
+            if (managed_path(root, f'{folder}/{name}').exists()
+                    and (replacing is None or f'{folder}/{name}/SKILL.md' not in replacing['files'])):
+                raise WorkspaceError(f'Skill directory conflict: {folder}/{name}')
+            changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name, files[relative])
+        if '.claude/skills' in skill_folders and managed_path(root, f'.claude/commands/{name}.md').exists():
+            raise WorkspaceError(f'Claude command conflict: {name}')
+    owned = {p: sha(t) for p, t in changes.items()}
+    candidates = list(replacing.get('candidates', [])) if replacing else []
+    for relative in data['knowledge']:
+        if replacing and read_content(root, f'{base}/{relative}') == files[relative]:
+            continue
+        key = sha(data['id'] + ':' + origin['sha256'] + ':' + relative)
+        from .brain import find_note, named_path
+        target = (find_note(root, 'candidates', key)
+                  or find_note(root, 'knowledge', key)
+                  or named_path(root, 'candidates', key, Path(relative).stem, changes))
+        candidates.append(target)
+        # Prior candidates/approved notes survive removal and reinstall.
+        if managed_path(root, target).exists():
+            from .brain import read_note
+            meta, body = read_note(root, target)
+            if meta.get('provenance') != {'stack': data['id'], **origin, 'file': relative}:
+                raise WorkspaceError(f'Stack candidate conflict: {target}')
+            continue
+        meta = {'format_version': 1, 'id': key, 'status': 'pending', 'title': Path(relative).stem,
+                'kind': 'fact', 'created': now(), 'updated': now(), 'review': [],
+                'provenance': {'stack': data['id'], **origin, 'file': relative},
+                'sources': [f"stack:{data['id']}@{data['version']}/{relative} sha256:{origin['sha256']}"],
+                'links': ['index']}
+        changes[target] = note_text(meta, files[relative])
+    for relative in changes:
+        if read_content(root, relative) is not None and (replacing is None or relative not in replacing['files']):
+            raise WorkspaceError(f'Install file conflict: {relative}')
+    if replacing:
+        changes.update({p: None for p in replacing['files'] if p not in owned})
+        entries = [e for e in entries if e['id'] != data['id']]
+    entries.append({'id': data['id'], 'version': data['version'], 'manifest': data,
+                    'origin': origin, 'files': owned, 'candidates': candidates,
+                    'trusted_hooks': origin['sha256'] if data['hooks'] else None,
+                    'trusted_capabilities': origin['sha256'] if data.get('capabilities') else None})
+    if replacing:
+        from .capabilities import cache_changes
+        changes.update(cache_changes(root, data['id']))
+    changes[REGISTRY] = encode(entries)
+    changes.update(stack_docs.plan(root, entries, changes))
+    return changes
+
+
 def install(root, directory, trust=None, *, provenance=None, replacing=None,
             prerequisite_release=None, confirmed=()):
     data, files, origin = validate(directory)
@@ -326,76 +413,29 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
     if (data['hooks'] or data.get('capabilities')) and trust != origin['sha256']:
         raise WorkspaceError('Executable stack content requires --trust-executable (alias --trust-hooks) ' + origin['sha256'] + ' after reviewing stack validate output and source')
     with locked(root):
-        entries = available(root)
-        if prerequisite_release is not None:
-            from .marketplace import prerequisites
-            prerequisites(entries, prerequisite_release, confirmed)
-        current = next((e for e in entries if e['id'] == data['id']), None)
-        if replacing is not None:
-            if current != replacing:
-                raise WorkspaceError('Installed state changed; inspect and approve again')
-            check_owned(root, current)
-            if tuple(map(int, data['version'].split('.'))) <= tuple(map(int, current['version'].split('.'))):
-                raise WorkspaceError('Update requires a strictly newer version')
-        elif current is not None:
-            raise WorkspaceError('Stack already installed; use stack update')
-        base = f".tdt/stacks/{data['id']}"
-        if replacing is None and managed_path(root, base).exists():
-            raise WorkspaceError(f'Stack directory conflict: {base}')
-        changes = {f'{base}/{p}': t for p, t in files.items()}
-        from .agents import folders
-        skill_folders = folders(root)
-        for relative in data['skills']:
-            name = relative.split('/')[1]
-            for folder in skill_folders:
-                if (managed_path(root, f'{folder}/{name}').exists()
-                        and (replacing is None or f'{folder}/{name}/SKILL.md' not in replacing['files'])):
-                    raise WorkspaceError(f'Skill directory conflict: {folder}/{name}')
-                changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name, files[relative])
-            if '.claude/skills' in skill_folders and managed_path(root, f'.claude/commands/{name}.md').exists():
-                raise WorkspaceError(f'Claude command conflict: {name}')
-        owned = {p: sha(t) for p, t in changes.items()}
-        candidates = list(replacing.get('candidates', [])) if replacing else []
-        for relative in data['knowledge']:
-            if replacing and existing_content(root, f'{base}/{relative}') == files[relative]:
-                continue
-            key = sha(data['id'] + ':' + origin['sha256'] + ':' + relative)
-            from .brain import find_note, named_path
-            target = (find_note(root, 'candidates', key)
-                      or find_note(root, 'knowledge', key)
-                      or named_path(root, 'candidates', key, Path(relative).stem, changes))
-            candidates.append(target)
-            # Prior candidates/approved notes survive removal and reinstall.
-            if managed_path(root, target).exists():
-                from .brain import read_note
-                meta, body = read_note(root, target)
-                if meta.get('provenance') != {'stack': data['id'], **origin, 'file': relative}:
-                    raise WorkspaceError(f'Stack candidate conflict: {target}')
-                continue
-            meta = {'format_version': 1, 'id': key, 'status': 'pending', 'title': Path(relative).stem,
-                    'kind': 'fact', 'created': now(), 'updated': now(), 'review': [],
-                    'provenance': {'stack': data['id'], **origin, 'file': relative},
-                    'sources': [f"stack:{data['id']}@{data['version']}/{relative} sha256:{origin['sha256']}"],
-                    'links': ['index']}
-            changes[target] = note_text(meta, files[relative])
-        for relative in changes:
-            if existing_content(root, relative) is not None and (replacing is None or relative not in replacing['files']):
-                raise WorkspaceError(f'Install file conflict: {relative}')
-        if replacing:
-            changes.update({p: None for p in replacing['files'] if p not in owned})
-            entries = [e for e in entries if e['id'] != data['id']]
-        entries.append({'id': data['id'], 'version': data['version'], 'manifest': data,
-                        'origin': origin, 'files': owned, 'candidates': candidates,
-                        'trusted_hooks': origin['sha256'] if data['hooks'] else None,
-                        'trusted_capabilities': origin['sha256'] if data.get('capabilities') else None})
-        if replacing:
-            from .capabilities import cache_changes
-            changes.update(cache_changes(root, data['id']))
-        changes[REGISTRY] = encode(entries)
+        changes = installation_plan(root, data, files, origin, replacing=replacing,
+                                    prerequisite_release=prerequisite_release,
+                                    confirmed=confirmed)
         transaction(root, changes)
         if replacing:
             prune(root, replacing['files'])
     return data['id']
+
+
+def installation_preview(root, directory):
+    """Complete local installation snapshot; no trust grant or apply token."""
+    from .recovery import read_bytes
+    data, files, origin = validate(directory, bounded=True)
+    changes = installation_plan(root, data, files, origin, bounded=True)
+    before = {}
+    remaining = 8 * 1048576
+    for relative in changes:
+        raw = read_bytes(root, relative, remaining)
+        before[relative] = None if raw is None else content_value(raw)
+        remaining -= len(raw) if raw is not None else 0
+    return {'id': data['id'], 'origin': origin,
+            'requires_executable_trust': bool(data['hooks'] or data.get('capabilities')),
+            'before': before, 'after': changes}
 
 
 def check_owned(root, entry, *, bounded=False):

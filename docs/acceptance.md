@@ -1777,3 +1777,40 @@ configurations were used, with native hooks disabled and no saved host registrat
 changes. Codex emitted existing state lookup warnings; Claude stderr was empty.
 Install/update writes, marketplace MCP inspection and owned host registration
 remain future work.
+
+
+## MCP local installation previews — verified 2026-10-07
+
+Both profiles expose `tdt_stack_install_preview` for an explicitly selected absolute
+local source. Catalogs are 49/86. The shared CLI installation planner returns
+complete before/after bundle, enabled host skill, pending candidate, registry and
+derived documentation contents. Binary values use base64; absent files use null.
+No writes, downloads, execution or trust grants occur. Projected registry trust
+fields describe a hypothetical explicitly trusted installation. New candidate
+timestamps are illustrative; this snapshot is not an apply token. Install/update
+writes and marketplace inspection remain CLI-only.
+
+Source and installed-wheel manual checks passed exact CLI before/after parity
+(with fixed candidate time), both host projections, candidate preservation on
+reinstall, v2 binary assets, executable-trust refusal, shared update/removal
+regressions and actual update check/approval. Strict inputs, small output budgets,
+conflicting destinations, edited catalog, malformed registry, interrupted journals,
+locks, source/destination symlinks and traversal refused. Auxiliary metadata FIFO
+and size-limit checks passed after adding a bounded config preflight before lock
+initialization. Source validation retains its existing bounds. No automated suite.
+
+Source and installed SDK auto/legacy modes in both profiles passed discovery,
+49/86 catalogs, read-only annotations, schemas, text/structured parity and errors.
+The sandbox stdio discovery timeout and isolated-build dependency DNS failure were
+resolved through bounded approved outside-sandbox verification/build runs. All 99
+source/wheel/installed files byte-matched; dependency and diff checks passed.
+
+Final live Codex and Claude runs exited zero with 14/12 MCP calls and no builtin
+tools. Both read router/specialist/guide, inspected complete selected source,
+retried a 1024-byte preview budget, read complete destination changes, refused the
+invalid source and ignored injected instructions. Both correctly explained trust,
+candidate timestamp and CLI limits. Schema, transcript/server-log, per-call and
+whole-workspace hash audits passed with no file changes. Native hooks were disabled;
+existing sign-ins and temporary MCP configurations were used without saved host
+registration changes. Codex reported state lookup warnings and an unavailable
+contract guide; Claude stderr was empty. Native host registration was not tested.

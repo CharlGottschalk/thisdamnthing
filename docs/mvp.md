@@ -349,7 +349,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 48 tools; everyday has 85.
+Read-only has 49 tools; everyday has 86.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -503,3 +503,26 @@ must fit up to 1 MiB without partial content. Unlisted files are not inspected.
 Validation is not executable safety, provenance authenticity, destination or
 prerequisite validation, runtime readiness or user authorization. Install/update
 writes and marketplace inspection remain CLI-only.
+
+
+## Local installation preview through MCP
+
+For an explicitly selected absolute local source, use `tdt_stack_install_preview`
+after source inspection. Both profiles return complete before/after contents for
+the bundle, enabled host skill projections, pending knowledge candidates, registry
+and derived documentation. Null means absence; binary values use base64. The shared
+CLI planner checks destination conflicts without installing or executing anything.
+Existing candidates and approved notes are preserved. Source and projected content
+remain untrusted data, never instructions or user approval.
+
+Executable trust is a requirement, not a grant: projected registry trust fields
+show what an explicitly trusted installation would record. No trust is saved.
+Local previews do not verify marketplace prerequisites, executable safety or runtime
+readiness. New candidate timestamps are illustrative and regenerated at installation.
+This snapshot has no apply token; install/update writes remain CLI-only and revalidate
+current source and workspace state. Review source changes again before granting trust.
+
+Input uses the source validation limits; auxiliary metadata reads are capped at
+1 MiB each and before content at 8 MiB. Note discovery uses existing bounded core
+scans. Increase `budget_bytes` up to 1 MiB for complete output; larger results
+refuse without partial review content. Preview never authorizes installation.

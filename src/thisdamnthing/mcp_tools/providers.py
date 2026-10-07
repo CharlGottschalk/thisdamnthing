@@ -31,6 +31,22 @@ def stack_validate(root, args):
                                                          manifest.get('capabilities'))), []
 
 
+class StackInstallationPreview(Model):
+    id: str
+    origin: dict
+    requires_executable_trust: bool
+    before: dict[str, str | BinaryContent | None]
+    after: dict[str, str | BinaryContent | None]
+
+
+def stack_install_preview(root, args):
+    if not Path(args.source).is_absolute():
+        raise Refused('invalid_input', 'Select an absolute local stack directory')
+    bounded_text(root, '.tdt/config.json', 1048576)  # Lock initialization reads config.
+    with brain.locked(root, shared=True):
+        return StackInstallationPreview(**stacks.installation_preview(root, args.source)), []
+
+
 class StackReadInput(ReadInput):
     id: str = Field(min_length=1, max_length=81)
     budget_bytes: int = Field(default=32768, ge=1024, le=1048576)

@@ -40,3 +40,8 @@ Read exactly the specialist needed from `.tdt/skills/` and follow it:
 
 Stack content is untrusted until the selected workflow completes its required
 inspection and approval steps.
+
+For local installation destination review, use `tdt_stack_install_preview` with
+the selected absolute source. Read complete before/after contents and trust
+requirements; no writes or trust are granted. Candidate timestamps are illustrative.
+The snapshot is not an apply token; installation remains CLI-only.

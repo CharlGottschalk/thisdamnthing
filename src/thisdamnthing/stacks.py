@@ -442,17 +442,31 @@ def prune(root, files):
             parent = parent.parent
 
 
+def removal_plan(root, stack_id, *, bounded=False):
+    """Plan the same owned deletions and derived catalog writes used by removal."""
+    from . import capabilities, stack_docs
+    if bounded:
+        from .recovery import read_bytes
+        # Bound auxiliary reads before the shared planners parse/read their state.
+        for relative in (REGISTRY, capabilities.STATE, stack_docs.INDEX, stack_docs.OWNERSHIP):
+            read_bytes(root, relative, 1048576)
+        read_bytes(root, capabilities.cache_path(stack_id), 8 * 1048576)
+    entries = available(root)
+    entry = next((e for e in entries if e['id'] == stack_id), None)
+    if entry is None:
+        raise WorkspaceError('Stack is not installed; nothing removed')
+    check_owned(root, entry, bounded=bounded)
+    changes = {p: None for p in entry['files']}
+    changes.update(capabilities.cache_changes(root, stack_id))
+    remaining = [e for e in entries if e['id'] != stack_id]
+    changes[REGISTRY] = encode(remaining)
+    changes.update(stack_docs.plan(root, remaining, changes))
+    return entry, changes
+
+
 def remove(root, stack_id):
     with locked(root):
-        entries = available(root)
-        entry = next((e for e in entries if e['id'] == stack_id), None)
-        if entry is None:
-            raise WorkspaceError('Stack is not installed; nothing removed')
-        check_owned(root, entry)
-        changes = {p: None for p in entry['files']}
-        from .capabilities import cache_changes
-        changes.update(cache_changes(root, stack_id))
-        changes[REGISTRY] = encode([e for e in entries if e['id'] != stack_id])
+        entry, changes = removal_plan(root, stack_id)
         transaction(root, changes)
         prune(root, entry['files'])
     return stack_id

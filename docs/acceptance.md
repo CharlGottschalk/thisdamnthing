@@ -1601,3 +1601,46 @@ from CLI-only install/update/remove. Both final reports described that distincti
 correctly. The final wheel matches all 99 source/installed package files and
 passes dependency checks; only those two instruction files differ from the prior
 verified wheel. Runtime code is unchanged. Whitespace checks passed.
+
+## MCP stack removal previews (2026-10-07)
+
+Both profiles expose `tdt_stack_remove_preview`, with catalogs of 47/83 tools.
+The adapter uses the same removal planner as CLI uninstall, including owned
+bundle/host skill deletions, unchanged provider cache removal, registry writes
+and derived documentation catalog/ownership. Complete before/after contents use
+null for absence/deletion and base64 objects for binary files. The preview hash
+identifies the proposal only; no CLI hash binding or MCP removal write is claimed.
+
+Source and installed-wheel manual checks passed complete planner parity and actual
+CLI removal matching every proposed change while preserving candidates and other
+files. Checks covered binary cache and owned files, Unicode, 81-character legacy
+IDs, stable repeated previews, strict inputs, result budgets, shared/exclusive
+locks, both recovery markers, edited/missing/untracked assets, malformed state,
+FIFOs/symlinks and oversized auxiliary/cache/aggregate content. The auxiliary
+per-file cap is 1 MiB; cache and aggregate before-content caps are 8 MiB. Existing
+owned integrity bounds still apply. Empty owned-directory pruning is documented.
+
+Source and installed SDK auto/legacy checks passed both profiles: catalog counts,
+input/output schemas, read-only annotations, text/structured/error parity and
+stack-list regression. Existing stack-integrity manual checks passed on source
+and wheel. All 99 source/wheel/installed files byte-match; dependency and diff
+checks passed. Sandbox SDK discovery timed out; the same bounded checks passed
+outside the sandbox. The build required isolated setuptools dependency fetching.
+No automated suite or actual power-loss test was added.
+
+Live routing passed against that wheel with Codex CLI 0.156.1 and Claude Code
+2.1.289: exits 0, 23/29 actual MCP calls, no builtin tools. Both discovered/read
+the router, removal specialist and guide, followed all three stack-list pages,
+read complete records and chose removal previews. An initial 1024-byte budget
+refused without partial content; both increased it and read complete intact and
+legacy previews, including binary cache and catalog changes. Edited/missing/
+untracked fixtures refused. Both ignored injected metadata instructions and
+explained preview-only hashes, preserved user content and CLI removal limits.
+
+Independent schemas, normalized transcript/server-log agreement, complete planner
+content/hash comparisons, per-call and whole-workspace snapshots passed. Only the
+actual fixture turn's capture-suppression state changed. Native hooks were off;
+shared begin_turn supplied genuine fixture tokens. Bounded outside-sandbox launches
+used existing sign-ins and temporary MCP configuration. Codex emitted state lookup
+warnings; Claude stderr was empty. No native slash activation, live lifecycle
+write, response-loss recovery or executable-safety verification is claimed.

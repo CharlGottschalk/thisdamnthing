@@ -4,7 +4,11 @@ description: Uninstall stacks; preserve user knowledge and work.
 ---
 
 Read docs/stacks.md. Resolve the installed ID from the request and `tdt stack
-list`; ask only for an ambiguous target. Show its owned files and explain that
+list` (or MCP `tdt_stack_list`); ask only for an ambiguous target.
+When available, use `tdt_stack_remove_preview` for the exact ID and read complete
+before/after changes, including cache and derived catalog changes. Increase the
+result budget if needed; an oversized/refused preview is not partial review. Its
+hash identifies the preview only and is not a CLI approval token. Show its owned files and explain that
 brain notes/candidates, workspace-created skills, linked projects and generated
 user artifacts remain. An explicit uninstall/remove request authorizes this scope;
 do not ask for a second confirmation. Inspection alone does not authorize removal.

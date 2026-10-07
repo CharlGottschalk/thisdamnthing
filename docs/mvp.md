@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 46 tools; everyday has 82.
+Read-only has 47 tools; everyday has 83.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -470,3 +470,18 @@ This checks recorded ownership only, not executable safety, origin authenticity,
 provider caches, candidate status or runtime readiness. It executes nothing and
 writes no stack assets. The revision is not an apply token; later CLI lifecycle
 operations recheck current ownership. Install/update/remove remain CLI-only.
+
+Both MCP profiles expose `tdt_stack_remove_preview` for an exact installed ID.
+It uses the shared CLI removal planner and returns complete before/after contents:
+owned bundle/host skill and provider cache deletions, registry changes and the
+refreshed documentation catalog/ownership. Null means deletion or absence; base64
+objects represent binary content. Candidate and approved notes, user skills and
+project artifacts remain. Removal may prune empty owned directories.
+
+Preview checks current ownership under a shared lock, executes nothing and writes
+nothing. Auxiliary metadata reads are capped at 1 MiB each; cache and total before
+content at 8 MiB. Owned integrity limits also apply. Increase `budget_bytes` up to
+1 MiB; oversized results refuse without partial review content. The proposal hash
+identifies the preview, but is not accepted as a CLI approval token. Removal writes
+remain CLI-only and recheck current ownership. Inspection does not authorize
+removal; stale previews must be inspected again before acting.

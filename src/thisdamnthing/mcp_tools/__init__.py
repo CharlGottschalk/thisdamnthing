@@ -165,6 +165,7 @@ from .projects import (
 )
 from .providers import (
     StackReadInput, StackRead, stack_read, StackVerified, stack_verify,
+    StackRemovalPreview, stack_remove_preview,
     ProviderIndexInput, ProviderIndexed, provider_index,
     installed_stacks,
     stack_list,

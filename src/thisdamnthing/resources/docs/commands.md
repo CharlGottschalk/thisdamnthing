@@ -188,6 +188,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_work_read`: bounded working text by workspace-relative path or URI.
 - `tdt_search_providers`: installed search provider metadata and recorded trust, without execution.
 - `tdt_stack_list`: installed stack versions and recorded provenance.
+- `tdt_stack_remove_preview`: complete proposed removal changes for an exact installed stack `id`; no writes.
 - `tdt_stack_verify`: bounded live owned-file integrity check for an exact installed stack `id`.
 - `tdt_stack_read`: complete recorded metadata for an exact installed stack `id`.
 - `tdt_stack_docs`: declared installed stack guides; read full content with `tdt_guide_read`.
@@ -706,3 +707,18 @@ Identical completed retries preserve later changes even after the removed
 registration note was deleted. Keep that note until the final batch so additional
 reference scans can resolve the project. Cleanup completion and file changes share
 the recoverable transaction; legacy UUID cleanup backups remain unindexed.
+
+Both MCP profiles expose `tdt_stack_remove_preview` for an exact installed ID.
+It uses the shared CLI removal planner and returns complete before/after contents:
+owned bundle/host skill and provider cache deletions, registry changes and the
+refreshed documentation catalog/ownership. Null means deletion or absence; base64
+objects represent binary content. Candidate and approved notes, user skills and
+project artifacts remain. Removal may prune empty owned directories.
+
+Preview checks current ownership under a shared lock, executes nothing and writes
+nothing. Auxiliary metadata reads are capped at 1 MiB each; cache and total before
+content at 8 MiB. Owned integrity limits also apply. Increase `budget_bytes` up to
+1 MiB; oversized results refuse without partial review content. The proposal hash
+identifies the preview, but is not accepted as a CLI approval token. Removal writes
+remain CLI-only and recheck current ownership. Inspection does not authorize
+removal; stale previews must be inspected again before acting.

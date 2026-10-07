@@ -112,6 +112,7 @@ from .projects import (
 )
 from .providers import (ProviderIndexInput, ProviderIndexed, provider_index,
                         StackReadInput, StackRead, stack_read, StackVerified, stack_verify,
+    StackRemovalPreview, stack_remove_preview,
                         search_providers, stack_list)
 from .reminders import (
     reminder_ack,
@@ -137,6 +138,17 @@ from .workspace import (PolicySaveInput, PolicySaved, context_read, policy_read,
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_stack_remove_preview': (StackReadInput, StackRemovalPreview, stack_remove_preview,
+        'Preview removal of one exact installed stack ID through the shared CLI removal planner. '
+        'Returns complete before/after contents including owned file and cache deletions, registry '
+        'and derived documentation changes; null means deletion/absence and base64 objects mean binary. '
+        'Preserves candidate/approved notes and user artifacts. Checks live ownership and refuses conflicts, '
+        'interrupted transactions and special files under a shared lock. No writes, execution or source fetch. '
+        'Auxiliary metadata is capped at 1 MiB per file, cache and total before content at 8 MiB; '
+        'owned integrity limits also apply. Increase budget_bytes up to 1 MiB; oversized output refuses '
+        'without partial review content. proposal_sha256 identifies this preview only; the CLI does not '
+        'accept it as an approval token. Removal writes remain CLI-only and recheck current ownership. '
+        'Empty owned directories may be pruned by removal. Preview does not authorize removal.'),
     'tdt_stack_verify': (StackReadInput, StackVerified, stack_verify,
         'Verify live owned files for one exact installed stack ID through the shared CLI lifecycle checker. '
         'All recorded hashes must match; missing/edited files, untracked additions and symlinks refuse. '

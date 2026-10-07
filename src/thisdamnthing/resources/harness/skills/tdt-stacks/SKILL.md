@@ -20,6 +20,9 @@ then use everyday `tdt_recovery_apply` only on explicit user authorization with
 the preview hash and actual instruction. After uncertainty inspect journal/files
 and the original operation outcome before any newly authorized retry. CLI
 `tdt stack recover` remains a fallback; do not call all recovery CLI-only.
+For removal inspection, prefer `tdt_stack_remove_preview` and read its complete
+before/after changes. Increase its budget if needed; refusal is not partial review.
+Its hash identifies the preview only; removal still uses CLI and rechecks ownership.
 Use the CLI discovery workflow when MCP is unavailable.
 
 Read exactly the specialist needed from `.tdt/skills/` and follow it:

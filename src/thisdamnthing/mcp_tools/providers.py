@@ -4,6 +4,7 @@ from pydantic import Field, ValidationError
 from .. import brain, capabilities, skills, stacks
 from .common import Refused, bounded_text, inventory_page, serialized
 from .models import Model, ReadInput, ProviderPage, ProviderSummary, StackPage, StackSummary
+from .maintenance import BinaryContent
 
 
 class StackReadInput(ReadInput):
@@ -44,6 +45,30 @@ def stack_verify(root, args):
         stacks.check_owned(root, record.record, bounded=True)
         return StackVerified(id=args.id, record_revision=record.revision,
                              verified_files=len(record.record['files'])), []
+
+
+class StackRemovalPreview(Model):
+    id: str
+    proposal_sha256: str
+    before: dict[str, str | BinaryContent | None]
+    after: dict[str, str | BinaryContent | None]
+
+
+def stack_remove_preview(root, args):
+    from ..recovery import read_bytes
+    with brain.locked(root, shared=True):
+        stack_read(root, args)  # Exact ID and bounded registry validation.
+        _, changes = stacks.removal_plan(root, args.id, bounded=True)
+        before = {}
+        remaining = 8 * 1048576
+        for relative in changes:
+            raw = read_bytes(root, relative, remaining)
+            before[relative] = None if raw is None else stacks.content_value(raw)
+            remaining -= len(raw) if raw is not None else 0
+        proposal = {'id': args.id, 'before': before, 'after': changes}
+        digest = brain.digest(json.dumps(proposal, ensure_ascii=False, sort_keys=True,
+                                         separators=(',', ':')))
+        return StackRemovalPreview(**proposal, proposal_sha256=digest), []
 
 
 def installed_stacks(root):

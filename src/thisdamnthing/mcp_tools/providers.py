@@ -77,6 +77,8 @@ class StackUpdatePreviewInput(StackValidateInput):
 
 
 class StackUpdatePreview(Model):
+    proposal_sha256: str
+    candidate_timestamp: str
     id: str
     current_version: str
     target_version: str
@@ -95,6 +97,22 @@ def stack_update_preview(root, args):
     bounded_text(root, '.tdt/config.json', 1048576)
     with brain.locked(root, shared=True):
         return StackUpdatePreview(**stack_updates.local_preview(root, args.id, args.source)), []
+
+
+class StackUpdateApplyInput(StackInstallationApplyInput):
+    id: str = Field(min_length=1, max_length=81)
+
+
+def stack_update_apply(root, args):
+    if not Path(args.source).is_absolute():
+        raise Refused('invalid_input', 'Select an absolute local replacement directory')
+    if not (stacks.ID.fullmatch(args.id) or stacks.LEGACY_ID.fullmatch(args.id)):
+        raise Refused('invalid_input', 'Invalid stack ID')
+    skills.text_checked(args.user_instruction, 'user instruction reference', 300)
+    sid = stack_updates.local_apply(
+        root, args.id, args.source, candidate_timestamp=args.candidate_timestamp,
+        expected_sha256=args.expected_sha256, trust=args.trust_executable)
+    return StackInstalled(id=sid, proposal_sha256=args.expected_sha256), []
 
 
 class StackReadInput(ReadInput):

@@ -1905,3 +1905,45 @@ it. Fresh final fixtures supplied a concise actual authorization reference and
 permitted only the intended Codex write tool. Build dependency DNS and SDK stdio
 sandbox failures were resolved with bounded approved outside-sandbox runs. Actual
 live transport loss was not injected; manual interrupted-write recovery was checked.
+
+## MCP reviewed local update apply
+
+Everyday exposes `tdt_stack_update_apply`; catalogs contain 50 read-only and 89
+everyday tools. Local update previews now include a proposal hash and canonical
+UTC candidate timestamp. Apply binds the exact ID, local source, current/target
+origins and full before/after contents under the exclusive workspace lock, using
+the shared CLI planner and transaction. Actual user authorization is required;
+executable trust is a separate explicit decision for the target digest. Existing
+knowledge is preserved and owned provider caches are invalidated. CLI update
+approval tokens and defaults remain unchanged. The receipt is not a retained
+outcome or durable approval audit; uncertain responses require state inspection
+before any newly authorized retry, never an automatic retry.
+
+Focused source and installed-wheel manual checks passed complete writes for both
+host projections, candidate preservation, binary capability updates, cache deletion,
+strict inputs/profiles/budgets, stale source/hash/timestamp/registry, old or missing
+trust, ownership and source-kind conflicts, non-newer versions, metadata/source/cache
+FIFO and size limits, symlinks, locks and pending journals. Encoded recovery journal
+limits refused before mutation. Simulated interrupted writes were rolled back through
+reviewed recovery and then applied successfully. Existing CLI update check/approval,
+installation and removal paths passed. No automated suite or actual power-loss check.
+
+Source and installed MCP SDK checks passed auto and legacy modes with both profiles:
+catalog visibility, schemas, annotations and text/structured/error parity. All 99
+source/wheel/install package files matched, pip check and git diff --check passed.
+The verification environment lacked setuptools; the isolated declared-dependency
+build succeeded. Sandbox stdio discovery timed out; bounded approved checks outside
+the sandbox passed.
+
+Live Codex and Claude routing against the final installed wheel exited successfully
+with 20 and 16 MCP calls respectively and no built-in calls. Both read installed
+routing/specialist guidance and source, increased an insufficient preview budget,
+applied the exact reviewed hash/timestamp with explicit target trust, read back the
+record, verified ownership and refused an invalid source. Injected metadata caused
+no actions. Independent input/output schema, transcript/server-log, proposal hash,
+per-call and whole-workspace audits passed: only the six expected files changed in
+each fixture. Reports correctly explained pending knowledge, fixed timestamps,
+uncertain-response handling, runtime limits and remaining marketplace CLI scope.
+Native hooks were disabled; temporary MCP configs used existing sign-ins without
+changing saved host registrations. Codex emitted state lookup warnings; Claude
+stderr was empty. No actual transport loss was injected.

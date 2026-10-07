@@ -29,8 +29,7 @@ Use the CLI discovery workflow when MCP is unavailable.
 
 For explicit local source inspection, prefer `tdt_stack_validate` with an absolute
 directory and read complete selected contents before discussing trust. Validation
-does not authorize installation or establish executable safety. Update writes and marketplace inspection remain CLI-only; everyday supports
-reviewed local installation.
+does not authorize installation or establish executable safety. Marketplace inspection remains CLI-only; everyday supports reviewed local installation and update.
 
 Read exactly the specialist needed from `.tdt/skills/` and follow it:
 
@@ -49,11 +48,17 @@ candidate_timestamp, proposal_sha256 as expected_sha256 and actual user_instruct
 Executable content requires separately authorized trust_executable with the exact
 origin digest. Read the install specialist for the complete workflow. After uncertainty
 inspect record, ownership, affected files and recovery before newly authorized retry;
-never automatically retry. The receipt is not a retained outcome. Update remains CLI-only.
+never automatically retry. The receipt is not a retained outcome. Everyday supports reviewed local update apply.
 
 For local update destination review, prefer `tdt_stack_update_preview` with the
 exact locally installed ID and explicitly selected absolute replacement source.
 Read the update specialist, complete source and full before/after preview. It
 requires a strictly newer matching version, checks ownership, preserves existing
 knowledge and reports provider cache invalidation. It does not grant trust or
-return a CLI approval token; update writes remain CLI-only.
+return a CLI approval token. After actual update authorization use
+`tdt_stack_update_apply` with identical ID/source, candidate_timestamp, preview
+proposal_sha256 as expected_sha256 and actual user_instruction. Executable content
+requires separately approved target_origin.sha256 as trust_executable. After
+uncertainty inspect record, owned files, affected paths and recovery before any
+newly authorized retry; never automatically retry. Verify record and ownership
+after success. Read `tdt-update-stack` for the complete workflow.

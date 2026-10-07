@@ -115,9 +115,14 @@ def projection_conflicts(root, sid, entry, manifest, files, *, bounded=False):
             raise WorkspaceError('Claude command conflict: ' + name)
 
 
-def local_preview(root, sid, directory):
+def local_preview(root, sid, directory, *, candidate_timestamp=None):
     """Complete local update snapshot; caller holds a shared workspace lock."""
     from .recovery import read_bytes
+    from datetime import datetime
+    candidate_timestamp = candidate_timestamp or stacks.now()
+    if (datetime.fromisoformat(candidate_timestamp).isoformat() != candidate_timestamp
+            or not candidate_timestamp.endswith('+00:00')):
+        raise WorkspaceError('Expected canonical UTC candidate timestamp')
     read_bytes(root, stacks.REGISTRY, 1048576)
     entries = stacks.available(root)
     if len(entries) > 2000 or any(not isinstance(e.get('version'), str) or
@@ -133,15 +138,39 @@ def local_preview(root, sid, directory):
             raise WorkspaceError('Replacement stack ID mismatch')
         projection_conflicts(root, sid, entry, manifest, files, bounded=True)
         changes = stacks.installation_plan(root, manifest, files, origin,
-                                           replacing=entry, bounded=True)
+                                           replacing=entry, bounded=True,
+                                           candidate_timestamp=candidate_timestamp)
     before = {}
     remaining = 8 * 1048576
     for relative in changes:
         raw = read_bytes(root, relative, remaining)
         before[relative] = None if raw is None else stacks.content_value(raw)
         remaining -= len(raw) if raw is not None else 0
-    return {'id': sid, 'current_version': entry['version'],
+    proposal = {'id': sid, 'candidate_timestamp': candidate_timestamp,
+            'current_version': entry['version'],
             'target_version': manifest['version'], 'current_origin': entry['origin'],
             'target_origin': origin,
             'requires_executable_trust': bool(manifest['hooks'] or manifest.get('capabilities')),
             'before': before, 'after': changes}
+
+    return {**proposal, 'proposal_sha256': stacks.sha(json.dumps(
+        proposal, ensure_ascii=False, sort_keys=True, separators=(',', ':')))}
+
+
+def local_apply(root, sid, directory, *, candidate_timestamp, expected_sha256, trust=None):
+    """Apply the complete reviewed local update under exclusive locking."""
+    from .recovery import read_bytes
+    read_bytes(root, '.tdt/config.json', 1048576)
+    with stacks.locked(root):
+        preview = local_preview(root, sid, directory, candidate_timestamp=candidate_timestamp)
+        if preview['proposal_sha256'] != expected_sha256:
+            raise WorkspaceError('Stack update preview changed; inspect again')
+        digest = preview['target_origin']['sha256']
+        if preview['requires_executable_trust'] and trust != digest:
+            raise WorkspaceError('Executable stack content requires explicit source digest trust')
+        if trust is not None and trust != digest:
+            raise WorkspaceError('Executable trust digest does not match source')
+        entry = next(e for e in stacks.available(root) if e['id'] == sid)
+        stacks.transaction(root, preview['after'], bounded=True)
+        stacks.prune(root, entry['files'])
+    return sid

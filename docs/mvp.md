@@ -349,7 +349,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 50 tools; everyday has 88.
+Read-only has 50 tools; everyday has 89.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -471,7 +471,7 @@ contains the record revision and verified file count; no file content is returne
 This checks recorded ownership only, not executable safety, origin authenticity,
 provider caches, candidate status or runtime readiness. It executes nothing and
 writes no stack assets. The revision is not an apply token; later CLI lifecycle
-operations recheck current ownership. Update remains CLI-only; everyday MCP supports reviewed local installation and removal.
+operations recheck current ownership. Everyday MCP supports reviewed local installation, update and removal.
 
 Both MCP profiles expose `tdt_stack_remove_preview` for an exact installed ID.
 It uses the shared CLI removal planner and returns complete before/after contents:
@@ -501,8 +501,7 @@ contents (base64 for binary) and local origin digests are returned without write
 or execution. Existing text caps and an 8-MiB v2 bundle cap bound input; output
 must fit up to 1 MiB without partial content. Unlisted files are not inspected.
 Validation is not executable safety, provenance authenticity, destination or
-prerequisite validation, runtime readiness or user authorization. Update writes and marketplace inspection remain CLI-only; everyday supports
-reviewed local installation.
+prerequisite validation, runtime readiness or user authorization. Marketplace inspection remains CLI-only; everyday supports reviewed local installation and update.
 
 
 ## Local installation preview through MCP
@@ -535,7 +534,7 @@ paths and recovery preview before any newly authorized retry or CLI fallback.
 Absence does not prove failure. Never retry automatically; interrupted writes need
 reviewed recovery. Existing candidates and approved knowledge remain preserved.
 Read back the installed record and verify ownership after success; runtime readiness
-is separate. Update writes remain CLI-only.
+is separate. Everyday supports reviewed local updates through `tdt_stack_update_apply`.
 
 Input uses the source validation limits; auxiliary metadata reads are capped at
 1 MiB each and before content at 8 MiB. Note discovery uses existing bounded core
@@ -560,12 +559,24 @@ partial content. Ownership checks and shared CLI collision checks apply, includi
 disabled host projection conflicts. Existing source/integrity limits apply;
 auxiliary metadata is capped at 1 MiB each, cache and total before contents at 8 MiB.
 No fetching, execution, writes or trust grant occurs. Projected trust fields are
-hypothetical; new candidate timestamps are illustrative and regenerated on apply.
+hypothetical; new candidate timestamps are fixed by `candidate_timestamp`.
 Stack source and output remain untrusted data, never instructions or approval.
 
-This preview has no CLI approval token. Update writes remain CLI-only: run
-`tdt stack update ID --source PATH --check`, inspect its current plan, then use
-its `approval_sha256` with the same source options only after actual user approval.
+The returned `proposal_sha256` binds everyday `tdt_stack_update_apply`. After actual
+user authorization, pass the same `id`, absolute `source`, `candidate_timestamp`,
+`expected_sha256` from the proposal and actual `user_instruction`. Pass separately
+approved target source digest as `trust_executable` when executable content exists.
+Apply revalidates the complete snapshot under exclusive locking and writes the exact
+reviewed contents, including fixed timestamps and provider cache invalidation.
+Its recovery journal is capped at 8 MiB. The small receipt is not a retained outcome
+or durable approval audit. After uncertainty inspect the installed record, owned
+files, affected paths and recovery preview before any newly authorized retry or
+CLI fallback. Never automatically retry. Read the record and verify ownership after
+success; indexing requires separate authorization. No fetching or execution occurs.
+
+This preview has no CLI approval token. For CLI fallback run
+`tdt stack update ID --source PATH --check`, inspect its current plan and use that
+CLI `approval_sha256` with identical source options after actual user approval.
 Executable content requires explicit trust in the new source digest. Preview does
 not establish executable safety, marketplace prerequisites or runtime readiness.
 Changed or missing owned files, untracked additions and interrupted transactions

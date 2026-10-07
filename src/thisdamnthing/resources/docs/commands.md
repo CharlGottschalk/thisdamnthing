@@ -188,6 +188,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_work_read`: bounded working text by workspace-relative path or URI.
 - `tdt_search_providers`: installed search provider metadata and recorded trust, without execution.
 - `tdt_stack_list`: installed stack versions and recorded provenance.
+- `tdt_stack_verify`: bounded live owned-file integrity check for an exact installed stack `id`.
 - `tdt_stack_read`: complete recorded metadata for an exact installed stack `id`.
 - `tdt_stack_docs`: declared installed stack guides; read full content with `tdt_guide_read`.
 
@@ -197,6 +198,19 @@ present. It uses a shared read lock and accepts up to 1 MiB `budget_bytes`; outp
 that exceeds the budget refuses without partial content. The revision is not an
 apply token. Recorded ownership/trust does not verify live files, and candidate
 paths do not establish current review status. No bundle/source files are read.
+
+Both MCP profiles expose `tdt_stack_verify` for one exact installed ID (including
+legacy dotted IDs). It uses the shared CLI lifecycle ownership checker under a
+shared lock: every owned file must match its recorded hash, and owned directories
+must contain no untracked additions or symlinks. Missing/edited files, interrupted
+transactions, malformed state and checks exceeding 64 MiB of file content or
+10000 scanned directory entries refuse without partial success. The small result
+contains the record revision and verified file count; no file content is returned.
+This checks recorded ownership only, not executable safety, origin authenticity,
+provider caches, candidate status or runtime readiness. It executes nothing and
+writes no stack assets. The revision is not an apply token; later CLI lifecycle
+operations recheck current ownership. Install/update/remove remain CLI-only.
+
 Install, update and remove remain CLI operations.
 
 Stack/provider catalogs accept `limit` (1–50) and inventory-bound `cursor` values.

@@ -31,6 +31,21 @@ def stack_read(root, args):
         return StackRead(id=args.id, revision=revision, record=entry), []
 
 
+
+class StackVerified(Model):
+    id: str
+    record_revision: str
+    verified_files: int
+
+
+def stack_verify(root, args):
+    with brain.locked(root, shared=True):
+        record, _ = stack_read(root, args)
+        stacks.check_owned(root, record.record, bounded=True)
+        return StackVerified(id=args.id, record_revision=record.revision,
+                             verified_files=len(record.record['files'])), []
+
+
 def installed_stacks(root):
     skills.ready(root)
     entries = stacks.validate_registry(json.loads(bounded_text(root, stacks.REGISTRY, 1048576)))

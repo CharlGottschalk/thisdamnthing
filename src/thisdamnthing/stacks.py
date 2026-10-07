@@ -384,25 +384,48 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
     return data['id']
 
 
-def check_owned(root, entry):
+def check_owned(root, entry, *, bounded=False):
     """Refuse edits, missing assets and additions before any lifecycle mutation."""
+    remaining = 64 * 1024 * 1024
+    if bounded and len(entry['files']) > 10000:
+        raise WorkspaceError('Stack ownership exceeds 10000 files')
     for relative, digest in entry['files'].items():
         path = managed_path(root, relative)
-        if not path.is_file() or file_sha(path) != digest:
+        if bounded:
+            if not path.is_file() or path.stat().st_size > remaining:
+                raise WorkspaceError('Stack ownership check exceeds 64 MiB or has a nonregular file')
+            with path.open('rb') as stream:
+                raw = stream.read(remaining + 1)
+            if len(raw) > remaining:
+                raise WorkspaceError('Stack ownership check exceeds 64 MiB')
+            remaining -= len(raw)
+            actual = hashlib.sha256(raw).hexdigest()
+        else:
+            actual = file_sha(path) if path.is_file() else None
+        if actual != digest:
             raise WorkspaceError(f'Owned stack file changed or missing; preserve edits elsewhere and restore the original: {relative}')
     directories = {f".tdt/stacks/{entry['id']}"}
     directories.update(str(Path(p).parent) for p in entry['files']
                        if not p.startswith('.tdt/stacks/'))
     allowed_dirs = {str(parent) for p in entry['files'] for parent in Path(p).parents}
+    scanned = 0
     def inspect(directory):
-        for path in managed_path(root, directory).iterdir():
-            relative = str(path.relative_to(root))
-            if path.is_symlink():
-                raise WorkspaceError(f'Untracked stack symlink; preserve/move before retry: {relative}')
-            if path.is_dir() and relative in allowed_dirs:
-                inspect(relative)
-            elif relative not in entry['files']:
-                raise WorkspaceError(f'Untracked stack addition; preserve/move before retry: {relative}')
+        nonlocal scanned
+        # Stream directory entries so a large untracked directory cannot be materialized.
+        with os.scandir(managed_path(root, directory)) as children:
+            for child in children:
+                scanned += 1
+                if bounded and scanned > 10000:
+                    raise WorkspaceError('Stack ownership scan exceeds 10000 entries')
+                inspect_child(Path(child.path))
+    def inspect_child(path):
+        relative = str(path.relative_to(root))
+        if path.is_symlink():
+            raise WorkspaceError(f'Untracked stack symlink; preserve/move before retry: {relative}')
+        if path.is_dir() and relative in allowed_dirs:
+            inspect(relative)
+        elif relative not in entry['files']:
+            raise WorkspaceError(f'Untracked stack addition; preserve/move before retry: {relative}')
     for directory in directories:
         inspect(directory)
 

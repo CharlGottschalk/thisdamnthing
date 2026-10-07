@@ -1544,3 +1544,60 @@ regression. Source/wheel/installed file parity and pip dependency checks passed.
 Sandbox dependency DNS and stdio discovery failed; bounded approved runs outside
 the sandbox passed. No automated suite or live-model routing was run. Stack
 lifecycle writes, host registration, resources and prompts remain future work.
+
+## MCP installed stack integrity checks (2026-10-07)
+
+Both profiles expose `tdt_stack_verify` for an exact installed ID, with catalogs
+of 46 read-only and 82 everyday tools. The shared CLI lifecycle ownership checker
+runs under a shared lock with a 64-MiB aggregate content limit, at most 10000
+owned files and 10000 scanned directory entries. Success returns the record
+revision and verified file count, never partial verification or file contents.
+This does not verify executable safety, provenance authenticity, provider caches,
+candidate status or runtime readiness; revisions are not lifecycle apply tokens.
+
+Source and installed-wheel manual checks passed owned hash/core parity, canonical
+and host skill projections, binary ownership, minimum-budget receipts, strict
+inputs, shared/exclusive locks, recovery markers, missing/edited assets, untracked
+files/directories, symlinks, FIFO assets/registries, malformed/oversized registries,
+escaping ownership paths and unchanged read hashes. An 81-character legacy ID
+passed, as did the actual 10000-entry scan boundary; 10002 entries and content
+above 64 MiB refused. Shared CLI removal preserved imported knowledge. Complete
+stack-record read regression checks passed in source and installed form.
+
+Source and installed SDK auto/legacy transport checks passed in both profiles:
+catalogs, input/output schemas, read-only annotations, structured/text parity,
+error signaling and stack-list regression. All 99 source/wheel/installed package
+files matched; dependency and whitespace checks passed. Sandbox SDK discovery
+timed out and build dependency DNS failed; bounded outside-sandbox checks and
+build succeeded. No automated suite or live-model routing was run. Installation,
+update and removal remain CLI workflows.
+
+### Live MCP stack integrity routing — 2026-10-07
+
+Codex CLI 0.156.1 and Claude Code 2.1.289 both exited successfully against the
+final installed wheel, making 21 and 22 MCP calls respectively with no builtin
+tool calls. Both read the installed stack router and guide, paginated five stacks
+in three pages, read every complete record and selected live integrity checks
+for every exact ID. Intact current and legacy dotted-ID stacks passed with file
+counts and matching record revisions; edited, missing and untracked assets
+refused. Both treated refusals as unverified, preserved user edits, ignored the
+embedded registry instruction and distinguished ownership from executable safety,
+source authenticity, runtime readiness, caches and current candidate status.
+
+Independent input/output schema validation, normalized host transcripts versus
+server logs, per-call snapshots and whole-workspace hashes passed. Only the
+actual fixture capture-suppression state changed; stack/control files and source
+were unchanged. Native hooks were disabled; shared begin_turn provided genuine
+fixture tokens. Existing sign-ins and launch-only MCP configuration were used in
+bounded outside-sandbox runs. Codex emitted state lookup warnings; Claude stderr
+was empty. No recovery or lifecycle writes, native slash-command activation,
+response loss or interrupted-transaction handling was exercised by these runs.
+
+An initial fixture removed a declared guide and correctly blocked guide discovery;
+the final missing-file fixture removes a template so guide reading is exercised.
+An intermediate Claude report incorrectly called recovery CLI-only. Updated the
+installed router and stack guide to distinguish available reviewed MCP recovery
+from CLI-only install/update/remove. Both final reports described that distinction
+correctly. The final wheel matches all 99 source/installed package files and
+passes dependency checks; only those two instruction files differ from the prior
+verified wheel. Runtime code is unchanged. Whitespace checks passed.

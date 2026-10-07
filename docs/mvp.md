@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 45 tools; everyday has 81.
+Read-only has 46 tools; everyday has 82.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -457,3 +457,16 @@ registry validation. The record revision is stable across object key ordering;
 complete output must fit its up-to-1-MiB budget. Recorded manifests, provenance,
 owned hashes, trust and candidate paths do not verify live assets or current
 review state. No bundle/source reads, execution or lifecycle writes are added.
+
+
+Both MCP profiles expose `tdt_stack_verify` for one exact installed ID (including
+legacy dotted IDs). It uses the shared CLI lifecycle ownership checker under a
+shared lock: every owned file must match its recorded hash, and owned directories
+must contain no untracked additions or symlinks. Missing/edited files, interrupted
+transactions, malformed state and checks exceeding 64 MiB of file content or
+10000 scanned directory entries refuse without partial success. The small result
+contains the record revision and verified file count; no file content is returned.
+This checks recorded ownership only, not executable safety, origin authenticity,
+provider caches, candidate status or runtime readiness. It executes nothing and
+writes no stack assets. The revision is not an apply token; later CLI lifecycle
+operations recheck current ownership. Install/update/remove remain CLI-only.

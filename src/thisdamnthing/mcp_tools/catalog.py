@@ -111,7 +111,7 @@ from .projects import (
     project_read,
 )
 from .providers import (ProviderIndexInput, ProviderIndexed, provider_index,
-                        StackReadInput, StackRead, stack_read,
+                        StackReadInput, StackRead, stack_read, StackVerified, stack_verify,
                         search_providers, stack_list)
 from .reminders import (
     reminder_ack,
@@ -137,6 +137,15 @@ from .workspace import (PolicySaveInput, PolicySaved, context_read, policy_read,
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_stack_verify': (StackReadInput, StackVerified, stack_verify,
+        'Verify live owned files for one exact installed stack ID through the shared CLI lifecycle checker. '
+        'All recorded hashes must match; missing/edited files, untracked additions and symlinks refuse. '
+        'Reads at most 64 MiB of file content and scans at most 10000 directory entries; larger checks refuse. '
+        'Returns the checked record revision and file count only after complete verification under a shared lock. '
+        'No file content is returned or executed. Does not check provider caches, candidates, runtime readiness, '
+        'source provenance authenticity or safety of executable code. The revision is not an apply token; '
+        'later lifecycle operations must recheck current ownership. Install/update/remove remain CLI-only. '
+        'Interrupted stack/skill transactions refuse; inspect recovery first.'),
     'tdt_stack_read': (StackReadInput, StackRead, stack_read,
         'Read the complete installed registry record for one exact stack ID from tdt_stack_list. '
         'Includes recorded manifest, origin, owned-file hashes, executable trust and candidate paths '

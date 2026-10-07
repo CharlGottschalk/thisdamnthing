@@ -46,8 +46,18 @@ def main(argv=None):
     listing = actions.add_parser("candidates", help="show candidate proposals and review hashes")
     listing.add_argument("--status", choices=("pending", "approved", "rejected", "all"), default="pending")
     actions.add_parser("requests", help="list incomplete capture request ids for recovery")
+    actions.add_parser("request", help="read exact saved capture request status as JSON").add_argument("id")
+    actions.add_parser("audit", help="inspect brain links, metadata and disconnected notes")
+    repair = actions.add_parser("repair", help="preview reviewed note replacements from JSON stdin")
+    repair.add_argument("--apply", action="store_true")
+    repair.add_argument("--expected-sha256")
+    repair.add_argument("--user-instruction")
+    actions.add_parser("repair-status", help="read retained outcome by exact proposal hash").add_argument("proposal_sha256")
     names = actions.add_parser("migrate-names", help="preview readable brain filenames and link updates")
     names.add_argument("--apply", action="store_true", help="apply the migration with recoverable writes")
+    names.add_argument("--expected-sha256")
+    names.add_argument("--user-instruction")
+    actions.add_parser("names-status", help="read retained filename migration outcome").add_argument("proposal_sha256")
     review = actions.add_parser("review", help="apply an explicitly instructed user review")
     review.add_argument("id")
     review.add_argument("--decision", choices=("approve", "reject", "edit"), required=True)
@@ -70,6 +80,18 @@ def main(argv=None):
     project_create = project_actions.add_parser("create", help="create below work/; path is relative to work")
     project_create.add_argument("path")
     project_actions.add_parser("list")
+    project_actions.add_parser("operation-status", help="read retained lifecycle outcome by exact proposal hash").add_argument("proposal_sha256")
+    for action in ("relink", "remove", "restore", "references", "cleanup"):
+        command = project_actions.add_parser(action)
+        command.add_argument("id", help="registered project ID, path or unambiguous name")
+        if action == "relink":
+            command.add_argument("path", help="existing new project directory")
+        if action == "remove":
+            command.add_argument("--permanent", action="store_true", help="unregister; retain files for separate cleanup")
+        if action != "references":
+            command.add_argument("--apply", action="store_true")
+            command.add_argument("--expected-sha256", help="proposal hash returned by preview")
+            command.add_argument("--user-instruction", help="actual user instruction or message reference")
     work = commands.add_parser("work", help="discover internal working files")
     work_actions = work.add_subparsers(dest="action", required=True)
     work_search = work_actions.add_parser("search")
@@ -120,8 +142,33 @@ def main(argv=None):
     skills.add_parser(commands)
     from . import ui
     ui.add_parser(commands)
+    mcp = commands.add_parser("mcp", help="serve and register workspace-local MCP tools")
+    mcp_actions = mcp.add_subparsers(dest="action", required=True)
+    serve = mcp_actions.add_parser("serve")
+    serve.add_argument("--profile", choices=("read-only", "everyday"), default="read-only")
+    for action in ("register", "unregister", "status"):
+        command = mcp_actions.add_parser(action, help="manage a workspace-owned host MCP entry")
+        command.add_argument("host", choices=("claude", "codex"))
+        if action == "register":
+            command.add_argument("--profile", choices=("read-only", "everyday"), default="read-only")
     args = parser.parse_args(argv)
     try:
+        if args.command == "mcp":
+            if not args.workspace:
+                raise WorkspaceError("MCP requires an explicit --workspace path")
+            if args.action != "serve":
+                from pathlib import Path
+                from .mcp_registration import text
+                text(Path(args.workspace).expanduser().resolve(), ".tdt/config.json")
+            root = resolve_workspace(args.workspace)
+            if args.action == "serve":
+                from .mcp_server import serve
+                serve(root, args.profile)
+            else:
+                from .mcp_registration import configure
+                print(json.dumps(configure(root, args.host, args.action,
+                    getattr(args, "profile", "read-only")), indent=2))
+            return 0
         if args.command == "init":
             if args.workspace:
                 parser.error("init uses its directory argument; --workspace is for workspace commands")
@@ -221,10 +268,10 @@ def main(argv=None):
             else:
                 print(json.dumps(stacks.available(root), indent=2))
             return 0
-        def input_json():
-            raw = sys.stdin.read(16385)
-            if len(raw) > 16384:
-                raise ValueError("JSON input exceeds 16 KiB")
+        def input_json(limit=16384):
+            raw = sys.stdin.read(limit + 1)
+            if len(raw) > limit:
+                raise ValueError(f"JSON input exceeds {limit} characters")
             return json.loads(raw)
         if args.command == "reminder":
             data = input_json() if args.action in ("add", "edit", "snooze") else None
@@ -247,6 +294,24 @@ def main(argv=None):
             elif args.action == "list":
                 for entry in projects.registry(root):
                     print(f"{entry['id']}  {projects.status(entry)}  {entry['path']}")
+            elif args.action == "operation-status":
+                from . import project_lifecycle
+                print(json.dumps(project_lifecycle.operation_status(root, args.proposal_sha256), indent=2))
+            elif args.action in ("relink", "remove", "restore", "references", "cleanup"):
+                from . import project_lifecycle
+                if args.action == "references":
+                    result = project_lifecycle.references(root, args.id)
+                else:
+                    options = dict(apply=args.apply, expected=args.expected_sha256,
+                                   instruction=args.user_instruction)
+                    if args.action == "relink":
+                        result = project_lifecycle.relink(root, args.id, args.path, **options)
+                    elif args.action == "cleanup":
+                        result = project_lifecycle.cleanup(root, args.id, input_json(), **options)
+                    else:
+                        result = project_lifecycle.remove(root, args.id,
+                            permanent=getattr(args, "permanent", False), restore=args.action == "restore", **options)
+                print(json.dumps(result, indent=2, ensure_ascii=False))
             elif args.action == "inspect":
                 print(json.dumps(projects.inspect(root, args.id), indent=2, ensure_ascii=False))
             else:
@@ -272,6 +337,8 @@ def main(argv=None):
                 print(suppress_review_turn(root, args.token))
             elif args.action == "capture":
                 print(brain.capture(root, args.id, input_json()))
+            elif args.action == "request":
+                print(json.dumps(brain.read_request(root, args.id), indent=2, ensure_ascii=False))
             elif args.action == "candidates":
                 with brain.locked(root):
                     for meta, body in brain.candidates(root, args.status):
@@ -289,9 +356,23 @@ def main(argv=None):
             elif args.action == "review":
                 print(brain.review(root, args.id, args.decision, args.user_instruction,
                                    args.expected_sha256, input_json() if args.decision == "edit" else None))
+            elif args.action == "repair-status":
+                from . import brain_maintenance
+                print(json.dumps(brain_maintenance.repair_status(root, args.proposal_sha256), indent=2))
+            elif args.action in ("audit", "repair"):
+                from . import brain_maintenance
+                result = (brain_maintenance.scan(root) if args.action == "audit" else
+                          brain_maintenance.repair(root, input_json(524288), args.apply,
+                                                   args.expected_sha256, args.user_instruction))
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+            elif args.action == "names-status":
+                from .brain_names import migration_status
+                print(json.dumps(migration_status(root, args.proposal_sha256), indent=2))
             elif args.action == "migrate-names":
                 from .brain_names import migrate
-                print(json.dumps(migrate(root, args.apply), indent=2, ensure_ascii=False))
+                result = migrate(root, args.apply, include_replacements=not args.apply,
+                                 expected=args.expected_sha256, instruction=args.user_instruction)
+                print(json.dumps(result, indent=2, ensure_ascii=False))
             elif args.action in ("providers", "index"):
                 from . import capabilities
                 if args.action == "providers":

@@ -72,6 +72,11 @@ do not bake their source into the core distribution. Stack-builder owns its
 starter templates in its separate repository; they install under its bundle
 directory through the ordinary optional templates list.
 
+MCP transport stays in `mcp_server.py`. The `mcp_tools/` package groups adapters
+by domain, with shared models and helpers, explicit catalog assembly and separate
+dispatch. Its package imports preserve the existing model and operation names;
+domain adapters call the same core functions as the CLI.
+
 ## Installed layout
 
 ```text
@@ -119,6 +124,10 @@ tdt doctor
 tdt brain search <query>
 tdt project add <path>
 tdt project list
+tdt project relink <old-project> <new-path>
+tdt project remove <project> [--permanent]
+tdt project restore <project>
+tdt project references <project>
 tdt stack validate <directory>
 tdt stack install <directory-or-catalog-id>
 tdt stack list
@@ -170,12 +179,27 @@ and explains purpose, structure, entry points, and unknowns with source referenc
 It never copies project source or writes into the external project. Work inside
 that project still follows its own instructions and the user's authorization.
 
+`/tdt-relink-project` explicitly reconnects moved or renamed directories, updates
+path-derived project IDs and structured references, and preserves note links and
+history. Missing arguments require user selection. `/tdt-remove-project` archives
+(reversibly) or permanently unregisters projects without deleting source. Brain
+and work reference cleanup is separately requested and reviewed. Lifecycle writes
+use hash-bound previews, backups and shared transaction recovery. See the
+[project lifecycle guide](../src/thisdamnthing/resources/docs/projects.md#project-lifecycle).
+
 Explicit user saves use `/tdt-capture` to write approved knowledge with source,
 provenance and an approval record. `/tdt-note` saves tagged scratchpad ideas in
 `work/notes/`, with no promotion. `/tdt-search-notes` retrieves scratchpad content
 and subject tags, labels it as unapproved, and follows shared-tag relationships.
 Default knowledge search still excludes scratchpad notes. Explicit saving uses
 the turn suppression guard to avoid duplicate automatic candidates.
+
+Brain maintenance uses `/tdt-maintain-brain` and `tdt brain audit` to inspect
+canonical note links and structure, followed by agent review of meaning. Reviewed
+repairs use `tdt brain repair`: hash-bound previews, preserved identities and
+provenance, local backups and recoverable writes. Consolidation retains original
+notes; candidate approval remains a separate operation. See the installed
+[brain guide](../src/thisdamnthing/resources/docs/brain.md#maintain-the-brain).
 
 ## Reminders
 
@@ -249,3 +273,359 @@ core resources. See [the UI implementation guide](ui.md) for session handling,
 browser boundaries and verification procedures.
 
 Internal work and project resolution follow the [project guide](../src/thisdamnthing/resources/docs/projects.md). WORK.md is user-owned; refresh preserves edits. Stack skills respect it when scaffolding requested work.
+
+## Local MCP retrieval
+
+The optional `mcp` dependency enables `tdt --workspace PATH mcp serve` over stdio.
+The initial read-only catalog exposes current policy/context and built-in approved
+knowledge search/read through the existing core, plus paginated candidate and
+scratchpad inventories and complete reads with explicit status labels. Workspace
+status and paginated project registry/registration reads are also available;
+external project source is not read. Paginated guide and canonical skill catalogs
+provide complete, bounded reads without executing instructions. Reminder lists and
+complete reads expose task and delivery state without claiming or acknowledging
+notifications. Workspace selection is explicit
+and fixed for the process. Incoming stdio messages are bounded to 8 MiB before
+decoding or parsing; oversized frames close the connection. The opt-in `everyday` profile adds reminder creation and revision-checked editing,
+snoozing, completion and cancellation on explicit user instruction, using the shared
+core lock. Settings are readable in both profiles; everyday also configures
+preferences, claims due reminders with expiring leases, and acknowledges delivery
+without completing tasks. Claim responses are budget-checked before writing.
+Both profiles also provide bounded capture request inventories and exact status reads,
+without reading transcripts. Everyday submits summary/skip to existing hook requests
+and suppresses capture using current hook turn tokens through shared core locking;
+candidates remain pending and completed submissions preserve their saved outcome.
+Enabled hooks prefer workspace-bound MCP capture/suppression tools, with CLI
+fallback. Uncertain capture responses require an exact status read before retry;
+completed outcomes are retained. MCP does not establish host/session identity or
+enable capture hooks.
+Both profiles expose exact candidate review status across promotion, including full
+review history. Everyday supports hash-bound approval, rejection and editing on an
+explicit user decision; edits remain pending for fresh approval. Shared core checks
+retain provenance and refuse conflicting interrupted promotions.
+Everyday also saves explicitly requested approved knowledge and tagged scratchpad
+notes through the shared core, preserving deterministic identities and existing
+content on identical retries. Save skills prefer MCP with CLI fallback.
+Everyday also registers existing directories and creates internal project folders,
+returning small receipts through shared locked core operations. The add-project
+skill prefers these tools with CLI fallback. Both profiles support explicit
+registered-project inspection, including bounded external source evidence with
+reported omissions. Everyday also submits onboarding interpretations as pending
+candidates; identical retries preserve prior content and review status. Retries preserve exact interrupted registration
+notes and existing identities. Read-only remains the default. Explicit CLI
+`mcp register/unregister/status` manages owned workspace-local Claude and Codex
+entries independently of skill/hook enablement, preserving unrelated settings and
+refusing ownership conflicts. The callable `tdt-mcp` skill explains Read-only and
+Everyday presets, asks for missing host/preset choices and registers only after
+the user chooses. It works through the CLI before MCP is connected. Host trust
+and tool approval remain host-managed.
+Marketplace source inspection/install/update remain CLI-only. Both profiles expose bounded context/policy
+resources and the argument-free `tdt-start` prompt. See the installed
+[command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).
+
+Both MCP profiles also expose paginated scratchpad literal search and shared-tag
+related-note discovery, keeping results explicitly unapproved. Working-file
+search/read stay below work/, exclude dedicated stores and nested workspaces,
+and report scan limits, omitted entries and bounded text prefixes. They neither
+read external projects nor execute working-file content.
+
+Both profiles expose paginated installed stack provenance, declared stack guides
+and search provider metadata through bounded registry reads. Provider trust is
+the recorded installation decision; discovery does not verify assets or runtime
+readiness, execute provider code, index content or fetch sources. Full stack guide
+reads use the existing guide reader. Everyday also exposes `tdt_brain_search_providers` for 1–8 explicitly selected
+providers through shared core search. It validates trust/assets/compatibility,
+rechecks current approved evidence, and never implicitly indexes. Provider code
+runs with local process permissions, outside any OS or network sandbox.
+
+Everyday MCP also exposes the eight UI lifecycle tools through shared CLI core
+functions. Structured pages, complete paginated events with original prompts,
+bounded waits, explicit acknowledgements, retained close and authorized cleanup
+follow the [UI guide](ui.md).
+
+Both profiles expose `tdt_brain_audit` through the shared structural scanner.
+Findings and note hashes are separately paginated, with report-bound cursors,
+totals, limitations and unreadable-note omissions. Audits do not repair notes or
+replace semantic review. Both profiles also expose `tdt_brain_repair_preview`
+for complete, hash-bound replacements through shared core validation, without
+writing notes or backups. Both profiles expose exact retained outcome reads;
+everyday applies explicitly authorized replacements with the preview hash and actual approval reference.
+Completion is recorded with note writes in the shared transaction. Identical
+completed retries return historical success without overwriting later changes.
+Interrupted transactions require CLI recovery and a fresh outcome read.
+Audit, preview and outcome reads share a read lock so parallel model calls do
+not contend with one another; apply retains the exclusive workspace lock.
+Read-only has 52 tools; everyday has 91.
+
+Both profiles expose `tdt_brain_names_preview` through the shared filename
+migration core, returning all renames and complete replacements, including null
+old-path deletions. Preview uses a shared lock and refuses output beyond its
+up-to-1-MiB budget without partial content. The proposal hash binds renames and complete
+before/after contents, including derived stack catalog writes. Everyday exposes
+`tdt_brain_names_apply` with the preview hash and actual user instruction; both
+profiles expose `tdt_brain_names_status`. CLI apply requires the same hash and
+instruction. Prepared/completed backups are bounded to 8 MiB; completion shares
+the file transaction. Identical completed retries preserve later edits. After an
+uncertain result read status before retry or CLI fallback; journals require CLI
+recovery and a fresh status read. Unknown is not proof an operation never ran.
+A no-op apply retains a completion record without changing notes.
+
+Both MCP profiles expose `tdt_project_references` for explicit project IDs through
+the shared lifecycle scanner, including retained removed registrations. Reference
+and skipped-entry pages bind the complete scan revision and report totals, scan
+truncation and limitations. Matches do not establish ownership or authorize
+cleanup. Reference cleanup requires separate explicit authorization.
+
+Both profiles expose project archive/unregister, restore and relink previews with
+complete replacements and shared CLI proposal hashes. Lifecycle previews use
+shared read locks; applies keep exclusive locks. Preview result budgets support
+up to 1 MiB and refuse oversized output without partial review content. Everyday
+applies explicitly authorized lifecycle changes using identical preview inputs,
+hash and actual approval reference. Both profiles read retained outcomes
+by proposal hash. Completion shares the registry/note transaction; identical
+completed retries return historical success without resolving the old registration
+or overwriting later changes. Prepared outcomes require inspection; interrupted
+journals require CLI recovery and a fresh status read. Unknown is not proof an
+operation never ran; legacy UUID backups are not indexed. Indexed
+backups are bounded to 8 MiB before writes. Everyday also exposes hash-bound reference cleanup apply.
+
+
+Both MCP profiles expose `tdt_project_cleanup_preview` with an exact project ID
+and 1–20 changes (`path`, current `expected_sha256`, complete `content`, or
+explicit null for whole-file deletion). It uses the shared CLI cleanup validation
+and returns complete replacements, proposal hash and scan coverage without writes
+or backups. Preview reads share the workspace lock; applies remain exclusive.
+Output budgets allow up to 1 MiB and refuse oversized results without partial
+review content. Everyday exposes `tdt_project_cleanup_apply` with identical `id` and `changes`,
+`expected_sha256` from the preview and the actual `user_instruction`; the CLI accepts
+the same proposal and hash. Apply only separately authorized changes. Cleanup now
+retains prepared/completed outcomes through the shared transaction, including
+whole-file deletions. Read `tdt_project_operation_status` after uncertainty before
+retry or CLI fallback. Identical completed retries return historical success even
+after deleting the removed registration note, preserving later file edits.
+Changed inputs/instruction refuse; old UUID backups remain unindexed. Backups are
+bounded to 8 MiB before writes.
+
+Everyday also exposes `tdt_brain_index` for one explicitly selected installed
+provider and actual user instruction. `rebuild` defaults false; true starts with
+an empty cache. Shared CLI core validates trust/assets/compatibility and cache
+ownership, indexes current approved evidence under its exclusive lock and writes
+cache/ownership together. The small receipt fits the minimum budget. Provider
+code runs with local process permissions. There is no retained operation outcome;
+after uncertainty inspect search/cache state before an authorized retry. Retries
+execute again; interrupted journals require CLI recovery. No batch indexing,
+installation, trust changes or automatic query-time indexing is added.
+
+Everyday exposes `tdt_constitution_save` for complete explicitly approved policy
+Markdown, the current revision (or `missing`) and an actual approval reference.
+It uses the existing CLI policy lock and stale-revision checks, appends the audit
+reference and enforces the 6000-byte final UTF-8 limit. The receipt returns only
+the saved SHA256; read complete policy back. After uncertainty reread before retry
+or CLI fallback; no retained operation outcome or automatic retry. Policy saving
+does not enable hooks, recover state or grant permissions beyond host boundaries.
+
+Both MCP profiles expose retained user skill proposals with pending/approved/declined/all
+filters, revision-bound pagination and complete exact-ID reads. Reads include
+behavior, source references, decision reference, original ownership snapshot and
+current recorded ownership. Historical approval and recorded ownership do not
+verify live skill files. Shared read locks and a 2-MiB registry cap protect reads;
+interrupted skill/stack journals refuse discovery. Output budgets refuse partial
+review content. Everyday exposes `tdt_skill_propose` and single-ID `tdt_skill_review` through
+shared CLI core, exclusive locking and ownership checks. Review requires the
+actual user decision reference. Small receipts fit minimum budgets; full proposal
+reads precede review. After uncertainty inspect retained decisions and live files
+before retry; historical proposals can reopen, so retries are not automatic.
+CLI recovery remains required for interrupted transactions. Shared registry reads
+and proposed writes are capped at 2 MiB. Host history remains CLI-only.
+
+Both profiles expose `tdt_skill_inventory` for overlap review across canonical and
+host skill folders using the shared bounded CLI inventory. Paginated content
+prefixes report truncation; owner labels do not verify assets. Retained proposals
+remain a separate inventory. No skill execution or host history access is added.
+
+Both profiles expose `tdt_recovery_preview` with an explicit `stack` or `skill`
+journal selection. Shared CLI recovery validation checks every current file
+against its journal versions under a shared read lock. Complete before/after
+contents include null deletions and base64 binary values; output beyond the
+up-to-1-MiB budget refuses without partial content. Journal input is capped at
+8 MiB; special files, escaping paths and conflicting local edits refuse.
+The semantic journal hash binds a snapshot for everyday `tdt_recovery_apply`,
+which requires the selected kind, `expected_sha256` and actual user instruction.
+Shared CLI rollback revalidates bounded current files and the journal hash under
+an exclusive lock; absent/changed journals refuse. The fixed-size receipt is not
+a durable outcome or approval audit. After uncertainty inspect preview, affected
+files and original operation outcomes before any newly authorized retry; absence
+does not prove success. Interrupted rollback retains its journal. CLI recovery
+remains available without hash binding. Other CLI recovery references above may
+use this reviewed tool for stack/skill journals; no policy-lock recovery is added. An absent selected journal is not a clean-workspace assessment.
+
+Both profiles expose `tdt_stack_read` for complete installed registry metadata by
+exact normalized or legacy dotted ID, using a shared lock and the existing bounded
+registry validation. The record revision is stable across object key ordering;
+complete output must fit its up-to-1-MiB budget. Recorded manifests, provenance,
+owned hashes, trust and candidate paths do not verify live assets or current
+review state. No bundle/source reads, execution or lifecycle writes are added.
+
+
+Both MCP profiles expose `tdt_stack_verify` for one exact installed ID (including
+legacy dotted IDs). It uses the shared CLI lifecycle ownership checker under a
+shared lock: every owned file must match its recorded hash, and owned directories
+must contain no untracked additions or symlinks. Missing/edited files, interrupted
+transactions, malformed state and checks exceeding 64 MiB of file content or
+10000 scanned directory entries refuse without partial success. The small result
+contains the record revision and verified file count; no file content is returned.
+This checks recorded ownership only, not executable safety, origin authenticity,
+provider caches, candidate status or runtime readiness. It executes nothing and
+writes no stack assets. The revision is not an apply token; later CLI lifecycle
+operations recheck current ownership. Everyday MCP supports reviewed local installation, update and removal.
+
+Both MCP profiles expose `tdt_stack_remove_preview` for an exact installed ID.
+It uses the shared CLI removal planner and returns complete before/after contents:
+owned bundle/host skill and provider cache deletions, registry changes and the
+refreshed documentation catalog/ownership. Null means deletion or absence; base64
+objects represent binary content. Candidate and approved notes, user skills and
+project artifacts remain. Removal may prune empty owned directories.
+
+Preview checks current ownership under a shared lock, executes nothing and writes
+nothing. Auxiliary metadata reads are capped at 1 MiB each; cache and total before
+content at 8 MiB. Owned integrity limits also apply. Increase `budget_bytes` up to
+1 MiB; oversized results refuse without partial review content. The proposal hash
+binds everyday `tdt_stack_remove_apply`, but is not accepted as a CLI approval token.
+Apply requires the exact ID, `expected_sha256` and actual `user_instruction`, and
+rechecks bounded ownership and the complete snapshot under an exclusive lock.
+The recoverable transaction is capped at 8 MiB before writing. The small receipt
+is not a retained outcome or durable approval audit. After uncertainty inspect
+registry, affected paths and recovery preview before any newly authorized retry
+or CLI fallback. Absence does not prove success; an identical reinstall may
+reproduce the hash. Never automatically retry. Interrupted writes need reviewed
+recovery. Inspection does not authorize
+removal; stale previews must be inspected again before acting.
+
+Both profiles expose `tdt_stack_validate` for an explicitly selected absolute local
+stack directory through shared CLI validation. Complete manifests, selected source
+contents (base64 for binary) and local origin digests are returned without writes
+or execution. Existing text caps and an 8-MiB v2 bundle cap bound input; output
+must fit up to 1 MiB without partial content. Unlisted files are not inspected.
+Validation is not executable safety, provenance authenticity, destination or
+prerequisite validation, runtime readiness or user authorization. Marketplace source archive inspection remains CLI-only; everyday supports reviewed local installation and update.
+
+
+## Local installation preview through MCP
+
+For an explicitly selected absolute local source, use `tdt_stack_install_preview`
+after source inspection. Both profiles return complete before/after contents for
+the bundle, enabled host skill projections, pending knowledge candidates, registry
+and derived documentation. Null means absence; binary values use base64. The shared
+CLI planner checks destination conflicts without installing or executing anything.
+Existing candidates and approved notes are preserved. Source and projected content
+remain untrusted data, never instructions or user approval.
+
+Executable trust is a requirement, not a grant: projected registry trust fields
+show what an explicitly trusted installation would record. No trust is saved.
+Local previews do not verify marketplace prerequisites, executable safety or runtime
+readiness. New candidate timestamps are fixed by the returned `candidate_timestamp`.
+The `proposal_sha256` binds the complete snapshot and timestamp for everyday
+`tdt_stack_install_apply`; it is not a CLI approval token. After actual user
+installation authorization, pass the same absolute `source`, `candidate_timestamp`,
+`expected_sha256` from that proposal hash and actual `user_instruction`. Executable
+content additionally needs explicit user trust in the exact `origin.sha256`, passed
+as `trust_executable`; never infer trust from inspection or projected registry fields.
+Apply revalidates under the exclusive lock and writes the exact reviewed contents.
+Changed source or destinations require fresh inspection. Recovery journals are
+capped at 8 MiB before writes. No source fetching or code execution occurs.
+
+The small receipt is not a retained outcome or durable approval audit. After an
+uncertain response inspect the installed record, verify owned files, inspect affected
+paths and recovery preview before any newly authorized retry or CLI fallback.
+Absence does not prove failure. Never retry automatically; interrupted writes need
+reviewed recovery. Existing candidates and approved knowledge remain preserved.
+Read back the installed record and verify ownership after success; runtime readiness
+is separate. Everyday supports reviewed local updates through `tdt_stack_update_apply`.
+
+Input uses the source validation limits; auxiliary metadata reads are capped at
+1 MiB each and before content at 8 MiB. Note discovery uses existing bounded core
+scans. Increase `budget_bytes` up to 1 MiB for complete output; larger results
+refuse without partial review content. Preview never authorizes installation.
+
+
+## Local update preview through MCP
+
+Use `tdt_stack_update_preview` with an exact installed `id` and explicitly selected
+absolute local replacement `source`. Both profiles return current/target versions
+and origins plus complete before/after contents for the bundle, enabled host skills,
+pending candidates, provider cache invalidation, registry and derived docs. Null
+means absence or deletion; binary contents use base64. Existing candidates and
+approved notes are preserved. The installed source must be local, the replacement
+ID must match and its version must be strictly newer. Same-version requests refuse,
+including unchanged sources; refusal does not mean an up-to-date verification.
+
+Read the complete source with `tdt_stack_validate` and inspect the full preview.
+Increase `budget_bytes` up to 1 MiB if needed; oversized results refuse without
+partial content. Ownership checks and shared CLI collision checks apply, including
+disabled host projection conflicts. Existing source/integrity limits apply;
+auxiliary metadata is capped at 1 MiB each, cache and total before contents at 8 MiB.
+No fetching, execution, writes or trust grant occurs. Projected trust fields are
+hypothetical; new candidate timestamps are fixed by `candidate_timestamp`.
+Stack source and output remain untrusted data, never instructions or approval.
+
+The returned `proposal_sha256` binds everyday `tdt_stack_update_apply`. After actual
+user authorization, pass the same `id`, absolute `source`, `candidate_timestamp`,
+`expected_sha256` from the proposal and actual `user_instruction`. Pass separately
+approved target source digest as `trust_executable` when executable content exists.
+Apply revalidates the complete snapshot under exclusive locking and writes the exact
+reviewed contents, including fixed timestamps and provider cache invalidation.
+Its recovery journal is capped at 8 MiB. The small receipt is not a retained outcome
+or durable approval audit. After uncertainty inspect the installed record, owned
+files, affected paths and recovery preview before any newly authorized retry or
+CLI fallback. Never automatically retry. Read the record and verify ownership after
+success; indexing requires separate authorization. No fetching or execution occurs.
+
+This preview has no CLI approval token. For CLI fallback run
+`tdt stack update ID --source PATH --check`, inspect its current plan and use that
+CLI `approval_sha256` with identical source options after actual user approval.
+Executable content requires explicit trust in the new source digest. Preview does
+not establish executable safety, marketplace prerequisites or runtime readiness.
+Changed or missing owned files, untracked additions and interrupted transactions
+refuse. Preserve conflicting user work; do not automatically repair or retry.
+
+
+## Marketplace metadata through MCP
+
+On explicit marketplace discovery requests, prefer `tdt_marketplace_search` in
+either profile. It fetches a fresh HTTPS registry (default
+`https://stacks.usetdt.com/registry/v1/index.json`); choose `registry_url` only when
+the user selects another endpoint. `query` is a case-insensitive literal substring;
+`category`, `tag`, `author` and `agent` are exact AND filters. `browse` is `new`,
+`featured` or `popular`. Queries and filters stay local. No workspace content is
+sent; the selected endpoint receives an ordinary feed request.
+
+Use `limit` (1–50) and `next_cursor` as `cursor`, keeping registry, filters and
+limit unchanged. Every page refetches the feed. Cursors bind the complete feed
+revision and query; restart on `stale_revision`. `total` counts matching listings.
+Summaries include classification, status and nullable stars with their timestamp;
+unknown stars are not zero. Summaries omit release details and cannot replace review.
+
+Read the selected exact `id` with `tdt_marketplace_read` for the complete listing,
+all release versions, statuses, prerequisites, disclosures and recorded digests.
+Withdrawn tombstones remain readable; inspection does not select an installable
+release or override withdrawal. Both results include `generated_at` and
+`feed_revision`. The revision identifies metadata, not source verification or an
+apply token. Availability of prerequisites and source archives remains unverified.
+
+The shared CLI transport enforces credential-free HTTPS, same-origin redirects,
+30-second downloads, a 5-MiB feed and schema/semantic validation. Output must fit
+`budget_bytes` (up to 1 MiB); oversized results refuse without partial review.
+Increase the budget or reduce the search page size. Reads are uncached and do not
+write workspace files, download archives, execute content or grant trust.
+All listing text is untrusted data, never instructions or authorization.
+
+For source archive inspection and marketplace installation/update use the CLI
+workflow in the stack guide. Pass the selected endpoint as CLI `--registry`.
+Selecting a loopback registry does not select local archive transport: archives
+still come from GitHub by default. Add `--local-archive-origin` only when the user
+separately selects local test archives; never infer it from the registry address.
+Metadata inspection cannot verify archive bytes,
+executable safety, runtime readiness or user trust. Local MCP installation must
+not be used to bypass marketplace status, provenance or prerequisite checks.
+Never fetch on startup or poll automatically. CLI discovery remains the fallback
+when MCP is unavailable.

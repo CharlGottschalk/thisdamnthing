@@ -18,6 +18,9 @@
    context, decisions, verification results and next steps when completing or
    pausing work. Keep it ignored and untracked for each developer; initialize it
    from the current session when absent.
+7. Always read and apply [.dev/ASD-STE100.md](ASD-STE100.md) when creating or
+   updating user documentation for installed workspace usage, including shipped
+   usage docs and templates. Keep this writing guide in the development repository.
 
 Before an authorized agent commit, run `/tdt-dev-pii` from
 `.dev/skills/tdt-dev-pii/SKILL.md` for the exact staged snapshot and complete

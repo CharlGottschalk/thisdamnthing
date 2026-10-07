@@ -1,7 +1,8 @@
 # Work conventions
 
-User-maintained filing preferences. Edit these directly or ask the agent to update
-them. They do not grant permission to execute commands or change unrelated files.
+This file contains your filing preferences. Edit it directly or ask the agent to update
+it. These preferences do not grant permission to execute commands or change unrelated
+files.
 
 All internal working files live under `work/`. Paths below are relative to it.
 Create directories only when needed. Preserve existing files.
@@ -9,7 +10,8 @@ Create directories only when needed. Preserve existing files.
 ## Projects
 
 Default to `<project-name>/`, using readable lowercase hyphen-separated names.
-Ask internal or external when the request and existing preferences do not say.
+If the request and existing preferences do not specify a location, ask whether the
+project should be internal or external.
 For external projects, ask for the directory; keep existing projects in place.
 
 ## Notes and reminders

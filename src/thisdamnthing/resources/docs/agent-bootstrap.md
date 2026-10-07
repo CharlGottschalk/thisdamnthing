@@ -4,13 +4,13 @@ Run the initial setup from a parent directory outside your projects and source
 checkout, then open the created workspace for agent work. Paths are relative to
 the current shell directory.
 
-ThisDamnThing can connect Claude Code, Codex or both to one workspace. Install and sign in
-to your chosen agent separately. ThisDamnThing's integrations are local to the workspace;
+TDT connects Claude Code, Codex or both to one workspace. Install and sign in
+to your chosen agent separately. Integrations are scoped to the workspace;
 they do not change global agent settings or register skills in linked projects.
 
 ## Choose an agent
 
-Ask your agent to set up ThisDamnThing for Claude, Codex or both, giving the workspace
+Ask your agent to set up TDT for Claude, Codex or both, giving the workspace
 path. There is no dedicated skill for installation or enabling/disabling hosts.
 Once enabled, `/tdt-workspace` checks setup and explains what is available;
 it also offers reminder preferences during onboarding, without changing host trust.
@@ -22,7 +22,7 @@ PATH. Use `--agent claude`, `--agent codex`, `--agent both` or `--agent none` to
 choose explicitly. Desktop-only apps and executables outside PATH need an explicit
 selection. Detection alone does not establish account access or hook trust.
 
-ThisDamnThing remembers enabled agents in `.tdt/config.json`. Repeating init refreshes
+TDT remembers enabled agents in `.tdt/config.json`. Repeating init refreshes
 that saved set. A changed PATH does not remove an integration, and `--agent none`
 does not disable agents already enabled.
 
@@ -34,7 +34,8 @@ tdt agent enable claude
 tdt agent enable codex
 ```
 
-Run from the workspace, or prefix the command with `tdt --workspace PATH`.
+Run from the workspace. Elsewhere, replace `PATH` with the workspace path and use
+`tdt --workspace PATH agent enable HOST`. Replace `HOST` with `claude` or `codex`.
 Enablement adds instructions, hooks and skill entry points for core, installed
 stacks and approved user skills. Repeating the command preserves existing content.
 
@@ -69,11 +70,11 @@ in `.claude/settings.json` or `.codex/hooks.json`.
 Hooks apply to sessions in this workspace and its subdirectories; outside sessions
 are excluded. Startup supplies workspace context, request hooks load the current
 [Constitution](constitution.md), and Stop hooks support [knowledge capture](brain.md).
-ThisDamnThing preserves unrelated settings and text outside its owned entries.
+TDT preserves unrelated settings and text outside its owned entries.
 
 ## Disable an integration
 
-Ask your agent to disable the selected ThisDamnThing integration in this workspace.
+Ask your agent to disable the selected TDT integration in this workspace.
 Terminal alternatives (choose the host you want to disable):
 
 ```sh
@@ -98,7 +99,7 @@ Use `/tdt-workspace` for diagnostics after recovery.
 
 Technical procedure:
 
-After upgrading ThisDamnThing or moving the workspace, repeat `tdt init PATH` to refresh
+After upgrading TDT or moving the workspace, repeat `tdt init PATH` to refresh
 unchanged owned resources and hook paths for saved agents. Keep the Python
 environment available and review changed hooks in the host.
 
@@ -107,9 +108,15 @@ Preserve your changes separately and reconcile them before retrying. Do not dele
 ownership records to force a refresh. Older workspaces infer agents from recorded
 TDT ownership; unrelated agent directories do not enable an integration.
 
-After an interrupted refresh or integration change, keep host sessions idle and
-run `tdt stack recover`, then doctor and retry. An unfinished user-skill save
-needs `tdt skill recover` first. If initial creation stopped before a valid
+If a refresh or integration change is interrupted:
+
+1. Keep host sessions idle.
+2. If a user-skill save is unfinished, run `tdt skill recover` first.
+3. Run `tdt stack recover`.
+4. Run `tdt doctor` to check the workspace.
+5. If recovery succeeds, retry the original operation.
+
+If initial creation stopped before a valid
 workspace configuration was written, preserve the partial folder and inspect it
 before retrying in an empty destination. See [workspace care](workspace-care.md).
 
@@ -119,3 +126,69 @@ During onboarding, `/tdt-workspace` offers manual, in-chat, scheduled or combine
 reminder delivery and a workspace timezone. Chat checks are opt-in through the
 existing request hook; scheduled delivery needs an available external scheduler
 and a verified job. See [reminders](reminders.md) for setup and delivery limits.
+
+## Optional MCP registration
+
+Invoke `/tdt-mcp` in Claude Code or `$tdt-mcp` in Codex (or use the skill picker).
+The skill asks whether to configure Claude Code, Codex or both, explains the
+presets and waits for your choice. You can supply the host and preset up front
+or choose different presets for each host. It also supports status and removal.
+
+- **Read-only** (`read-only`, recommended to start): retrieve and inspect workspace
+  information and supported previews, without MCP write tools. Explicit marketplace
+  reads can fetch registry metadata. Use it for answers and inspection.
+- **Everyday** (`everyday`): adds supported writes such as saving notes, reviewing
+  knowledge, managing reminders/projects and applying reviewed stack changes. Some
+  actions execute explicitly selected trusted local providers. Use it to carry out
+  requested workspace tasks through MCP.
+
+These presets select tools; they do not authorize every action. Review requirements
+and host permissions still apply. Read-only does not restrict the host shell or
+other tools, and neither preset enables automatic capture. Registration works
+through the CLI before MCP connects; it does not require an existing MCP server.
+
+Install the MCP extra first (see [commands](commands.md#local-mcp-reads)).
+Manual configuration remains
+available. Replace `/path/to/workspace` with your initialized workspace path.
+These are separate examples; select the operation and host you need:
+
+```sh
+tdt --workspace /path/to/workspace mcp register claude
+tdt --workspace /path/to/workspace mcp register codex --profile everyday
+tdt --workspace /path/to/workspace mcp status codex
+tdt --workspace /path/to/workspace mcp unregister codex
+```
+
+All MCP commands require explicit `--workspace PATH`, even from the workspace
+directory; there is no current-directory fallback. Re-run `mcp register HOST`
+with `--profile read-only` or `--profile everyday` to change an intact owned entry
+in place. An identical registration is a no-op. A refusal requires inspection and
+manual reconciliation, not an automatic unregister/register retry.
+
+Registration defaults to `read-only`; `everyday` must be selected explicitly. It
+records the current Python interpreter and absolute workspace path, so run it from
+the installation containing the MCP extra. Re-register after moving the workspace
+or replacing that environment. Restart the host after changes.
+
+Claude uses the `thisdamnthing` entry in workspace `.mcp.json`; Codex uses a marked
+`[mcp_servers.thisdamnthing]` block in workspace `.codex/config.toml`. Ownership lives
+in `.tdt/state/mcp.json`. TDT refuses unowned names and edited or missing owned entries.
+It also refuses an unowned entry with identical values. Resolve conflicts manually;
+registration never adopts them. Unregister removes only the owned entry and leaves
+configuration files in place. Claude JSON formatting may change; other settings
+retain their values. Codex preserves unrelated text and refuses TOML structures
+that cannot safely accommodate its block. Inputs and outputs are capped at 1 MiB
+per file. Transactions share the workspace lock and stack recovery journal.
+After an interruption, inspect `tdt_recovery_preview` or use `tdt stack recover`.
+Then inspect registration status. Status checks saved local ownership.
+It does not check the connection or effective settings inherited from other host scopes.
+
+Registration is independent of `tdt agent enable/disable` (skills and capture
+hooks). To remove both, unregister MCP and disable the agent separately. It does
+not edit global settings, host trust, tool approvals or linked projects, and does
+not start a host or enable automatic capture. Review Claude project MCP approval
+and Codex project trust yourself; other host configuration layers may override
+these entries. Start the host in the workspace; linked external project sessions
+do not inherit this registration. See the official
+[Codex MCP documentation](https://developers.openai.com/codex/mcp) and
+[Claude MCP scopes](https://code.claude.com/docs/en/mcp).

@@ -22,9 +22,10 @@ tdt agent disable claude
 tdt agent disable codex
 ```
 
-Enable exposes all owned skills and adds workspace-local instructions and hooks.
-Disable removes only the selected host’s owned integration, preserving canonical
-skills, brain and unrelated host content.
+Enabling a host exposes all owned skills and adds workspace-local instructions and
+hooks.
+Disabling a host removes only its owned integration.
+TDT preserves canonical skills, the brain and unrelated host content.
 Existing integrations remain enabled even when executables disappear from PATH.
 Start a new host session after enabling and review project trust and `/hooks`.
 See [agent setup](docs/agent-bootstrap.md) and [usage docs](docs/README.md).

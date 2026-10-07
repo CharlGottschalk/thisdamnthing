@@ -20,7 +20,7 @@ recovery have no dedicated skill; your agent can run those commands for you.
 | `tdt` is not found | Check the pipx installation and its application directory in PATH; reopen the shell after PATH changes. |
 | No workspace found | Run from the workspace or put `--workspace PATH` before the subcommand. `doctor` also accepts it after the subcommand. |
 | Init refuses the source directory | Choose a separate workspace outside the source checkout and other workspaces. |
-| Skills or capture are missing | Repeat init with the intended `--agent`, open a fresh session in the workspace, inspect skill discovery and review installed hooks in the host. Check for disabled hooks in other settings layers. |
+| Skills or capture are missing | Repeat init with the intended `--agent`. Open a fresh workspace session. Inspect skill discovery and review installed hooks in the host. Check for disabled hooks in other settings layers. |
 | Doctor passes but no candidate appears | Check live Stop output and `tdt brain requests`. The agent may have skipped a turn with nothing durable. File checks alone do not prove hook execution. |
 | Capture command is denied | Review the displayed capture command and summary through the host’s normal permission prompt. Hook trust and permission to run the agent’s capture command are separate. A noninteractive session that denies permission prompts can leave the request pending, even when the hook ran. Retry from available context using brain recovery below. |
 | Search misses a proposal | Use `/tdt-review-brain` to inspect pending candidates and `/tdt-search` to retry the question. Default search uses literal phrases and bounded approved links; try a shorter phrase. For selected providers, check `brain providers` and rebuild the index after changes. |
@@ -28,16 +28,35 @@ recovery have no dedicated skill; your agent can run those commands for you.
 | Init/remove reports edited or missing owned files | Save your edits separately and restore the exact recorded version from backup before retrying. Do not delete ownership state or overwrite the edits to suppress the error. |
 | A stack operation was interrupted | Ask the active `/tdt-update-stack` or `/tdt-remove-stack` workflow to recover, or ask your agent directly. Keep other host sessions idle. Technical recovery: run `tdt stack recover`, then doctor and retry. Preserve the journal if recovery fails. |
 | Workspace is busy | Let the other TDT operation finish, then retry. Do not run simultaneous init or bypass the lock. |
-| Project path is unavailable | Restore it at the recorded location or use `/tdt-add-project` to register its new path as a new identity. Approved notes are not automatically refreshed. |
+| Project path is unavailable | Restore it at the recorded location or use `/tdt-relink-project` to reconnect its new path. Approved notes are not automatically refreshed. |
 | Registry access fails | Ask `/tdt-install-stack` to explain the failure. Confirm the explicit HTTPS endpoint and connectivity. There is no cached/offline catalog fallback; local directory installation remains available. |
 | Archive/digest/withdrawal checks refuse an install | Stop and have the publisher resolve the metadata or release problem. Do not bypass validation. Existing installs are not automatically revoked. |
-| A prerequisite is unresolved | Verify the declared tool, stack or other requirement; confirm only what you actually checked. ThisDamnThing does not install dependencies or configure credentials. |
+| A prerequisite is unresolved | Verify the declared tool, stack or other requirement; confirm only what you actually checked. TDT does not install dependencies or configure credentials. |
 | UI answers seem missing | Use `/tdt-ui` to resume the session. Keep the agent active, read retained events and acknowledge handled IDs. A closed server retains answers until cleanup. See the UI guide for resuming a session. |
 
 Incomplete capture requests can be retried with a safe summary while the source
 context is still available, or skipped. Follow [brain recovery](brain.md); never
 invent lost facts. Pending candidates can contain sensitive material despite
 heuristic filtering: inspect them before approval or sharing.
+
+When MCP is available, use `tdt_workspace_status` to identify recovery markers,
+then `tdt_recovery_preview` with `kind: stack` or `kind: skill`. Review the complete
+`before` rollback contents and `after` attempted contents. Binary values use
+base64; null means absent. A conflict refuses the preview, preserving local edits.
+The journal is limited to 8 MiB and complete output to 1 MiB. A budget refusal
+is not permission to recover unseen content. The journal hash identifies the
+snapshot; CLI recovery does not accept it as an approval token. Recover only on
+user instruction, keep other sessions idle, and inspect again if anything changes.
+With everyday MCP, use `tdt_recovery_apply` for the reviewed rollback.
+Supply the selected `kind`, `expected_sha256` from `journal_sha256` and the actual `user_instruction`.
+It revalidates bounded contents and the hash under the exclusive workspace lock.
+Absent or changed journals refuse. The receipt is not a retained outcome or audit
+record. If the response is uncertain, inspect the preview, affected files and
+original operation outcomes before any newly authorized retry or CLI fallback.
+An absent journal does not prove rollback succeeded. Interrupted rollback retains
+its journal. No lock breaking or automatic retries are provided.
+After recovery, reread the original operation status before deciding to retry.
+An absent selected journal says nothing about other journals or workspace health.
 
 ## Back up, upgrade or move
 

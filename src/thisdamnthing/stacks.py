@@ -77,7 +77,8 @@ def safe_path(value):
     return value
 
 
-def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=False):
+def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=False,
+             bounded=False):
     source = Path(directory).expanduser().absolute()
     for parent in (source, *source.parents):
         if parent.is_symlink():
@@ -157,13 +158,18 @@ def validate(directory, *, legacy_skills=False, legacy_id=False, metadata_only=F
     asset_hashes = {}
     if data['contract_version'] == 2:
         from .capabilities import validate_manifest
-        asset_hashes = validate_manifest(data, source, files, metadata_only)
+        asset_hashes = validate_manifest(data, source, files, metadata_only,
+                                         max_bundle=8 * 1024 * 1024 if bounded else None)
     digest = sha(json.dumps(files if data['contract_version'] == 1 else {**{p: sha(v) for p, v in files.items()}, **asset_hashes}, sort_keys=True, ensure_ascii=False))
     return data, files, {'kind': 'local', 'path': str(source.resolve()), 'sha256': digest}
 
 
 def registry(root):
-    entries = read_json(root, REGISTRY)
+    return validate_registry(read_json(root, REGISTRY))
+
+
+def validate_registry(entries):
+    """Validate already loaded ownership data for bounded readers."""
     if not isinstance(entries, list):
         raise WorkspaceError('Invalid stack registry')
     seen = set()
@@ -194,12 +200,21 @@ def available(root):
     return registry(root)
 
 
-def transaction(root, changes):
+def transaction(root, changes, *, bounded=False):
     # All registry mutations (including future updates) refresh the same view.
     from . import stack_docs
     if REGISTRY in changes:
         changes = {**changes, **stack_docs.plan(root, json.loads(changes[REGISTRY]), changes)}
-    before = {p: existing_content(root, p) for p in changes}
+    if bounded:
+        from .recovery import read_bytes
+        before = {}
+        remaining = 8 * 1048576
+        for relative in changes:
+            raw = read_bytes(root, relative, remaining)
+            before[relative] = None if raw is None else content_value(raw)
+            remaining -= len(raw) if raw is not None else 0
+    else:
+        before = {p: existing_content(root, p) for p in changes}
     directories = set()
     for p in changes:
         parent = managed_path(root, p).parent
@@ -207,7 +222,10 @@ def transaction(root, changes):
             directories.add(str(parent.relative_to(root)))
             parent = parent.parent
     record = {'before': before, 'after': changes, 'directories': sorted(directories)}
-    atomic(root, JOURNAL, encode(record))
+    encoded = encode(record)
+    if bounded and len(encoded.encode('utf-8')) > 8 * 1048576:
+        raise WorkspaceError('Stack transaction exceeds 8 MiB recovery limit')
+    atomic(root, JOURNAL, encoded)
     try:
         for relative, text in changes.items():
             if text is None:
@@ -220,11 +238,13 @@ def transaction(root, changes):
         raise
 
 
-def recover(root):
+def recovery_plan(root, *, bounded=False):
     path = managed_path(root, JOURNAL)
     if not path.exists():
-        return 'No stack transaction to recover.'
-    record = read_json(root, JOURNAL)
+        return None
+    from .recovery import read_bytes, read_journal
+    record = (read_journal(root, JOURNAL)
+              if bounded else read_json(root, JOURNAL))
     if (not isinstance(record, dict) or set(record) != {'before', 'after', 'directories'}
             or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
             or record['before'].keys() != record['after'].keys()
@@ -234,26 +254,45 @@ def recover(root):
     from .ui_resources import RESOURCES as UI_RESOURCES, MANIFEST as UI_MANIFEST
     bootstrap_paths = {*RESOURCES, *UI_RESOURCES, MANIFEST, UI_MANIFEST,
                        '.tdt/config.json', '.tdt/state/owned-files.json',
-                       '.tdt/state/user-skills.json', '.tdt/state/capability-state.json', 'README.md',
+                       '.tdt/state/user-skills.json', '.tdt/state/capability-state.json',
+                       '.tdt/state/projects.json', '.tdt/state/mcp.json',
+                       '.mcp.json', '.codex/config.toml', 'README.md',
                        *(p for provider in PROVIDERS.values() for p in (provider[0], provider[2]))}
     for relative, before in record['before'].items():
         safe_path(relative)
         brain_note = relative == 'brain/index.md' or (
             relative.startswith(('brain/knowledge/', 'brain/projects/', 'brain/sessions/', 'work/notes/'))
             and relative.endswith('.md'))
-        if not (brain_note or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/'))):
+        repair_outcome = re.fullmatch(r'\.tdt/state/(?:brain-maintenance|brain-names|project-operations)/[a-f0-9]{64}\.json', relative)
+        if not (brain_note or repair_outcome or relative in bootstrap_paths or relative in (REGISTRY, '.tdt/stack-docs.md', '.tdt/state/stack-docs.json') or relative.startswith(('.tdt/stacks/', '.tdt/skills/', '.agents/skills/', '.claude/skills/', 'brain/candidates/', '.tdt/state/capabilities/', 'brain/', 'work/'))):
             raise WorkspaceError('Unexpected recovery path')
         after = record['after'][relative]
         for value in (before, after):
             if value is not None:
                 content_bytes(value)
-        if existing_content(root, relative) not in (before, after):
+        if bounded:
+            limit = max(len(content_bytes(v)) if v is not None else 0 for v in (before, after))
+            raw = read_bytes(root, relative, limit)
+            current = content_value(raw) if raw is not None else None
+        else:
+            current = existing_content(root, relative)
+        if current not in (before, after):
             raise WorkspaceError(f'Recovery conflict; preserve and inspect {relative}')
     for relative in record['directories']:
         safe_path(relative)
         if not any(p.startswith(relative + '/') for p in record['before']):
             raise WorkspaceError('Invalid recovery directory')
         managed_path(root, relative)
+    return record
+
+
+def recover(root, *, expected_sha256=None):
+    from .recovery import check_preview
+    record = recovery_plan(root, bounded=expected_sha256 is not None)
+    check_preview(record, expected_sha256)
+    if record is None:
+        return 'No stack transaction to recover.'
+    path = managed_path(root, JOURNAL)
     for relative, before in record['before'].items():
         if before is None:
             managed_path(root, relative).unlink(missing_ok=True)
@@ -268,9 +307,106 @@ def recover(root):
     return 'Rolled back interrupted stack operation.'
 
 
-def bridge(name):
-    return (f'---\nname: {name}\ndescription: Run the {name} workflow.\n---\n\n'
+def bridge(name, canonical):
+    # Keep the author's serialized YAML value, including quoting and escapes.
+    head = canonical[4:].split('\n---\n', 1)[0]
+    description = re.search(r'^description: ([^\n]+)$', head, re.M)
+    if description is None:
+        raise WorkspaceError(f'Missing stack skill description: {name}')
+    return (f'---\nname: {name}\ndescription: {description[1]}\n---\n\n'
             f'Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n')
+
+
+def installation_plan(root, data, files, origin, *, replacing=None,
+                      prerequisite_release=None, confirmed=(), bounded=False, candidate_timestamp=None):
+    """Plan installation without writes; caller holds the workspace lock."""
+    from . import stack_docs
+    from .recovery import read_bytes
+    def read_content(root, relative):
+        if not bounded:
+            return existing_content(root, relative)
+        limit = 8 * 1048576 if replacing and relative in replacing['files'] else 1048576
+        raw = read_bytes(root, relative, limit)
+        return None if raw is None else content_value(raw)
+    if bounded:
+        from .bootstrap import MANIFEST
+        for relative in (REGISTRY, '.tdt/config.json', MANIFEST,
+                         stack_docs.INDEX, stack_docs.OWNERSHIP):
+            read_bytes(root, relative, 1048576)
+    entries = available(root)
+    if bounded and len(entries) > 2000:
+        raise WorkspaceError("Stack catalog exceeds 2000 entries")
+    if prerequisite_release is not None:
+        from .marketplace import prerequisites
+        prerequisites(entries, prerequisite_release, confirmed)
+    current = next((e for e in entries if e['id'] == data['id']), None)
+    if replacing is not None:
+        if current != replacing:
+            raise WorkspaceError('Installed state changed; inspect and approve again')
+        check_owned(root, current, bounded=bounded)
+        if tuple(map(int, data['version'].split('.'))) <= tuple(map(int, current['version'].split('.'))):
+            raise WorkspaceError('Update requires a strictly newer version')
+    elif current is not None:
+        raise WorkspaceError('Stack already installed; use stack update')
+    base = f".tdt/stacks/{data['id']}"
+    if replacing is None and managed_path(root, base).exists():
+        raise WorkspaceError(f'Stack directory conflict: {base}')
+    changes = {f'{base}/{p}': t for p, t in files.items()}
+    from .agents import folders
+    skill_folders = folders(root)
+    for relative in data['skills']:
+        name = relative.split('/')[1]
+        for folder in skill_folders:
+            if (managed_path(root, f'{folder}/{name}').exists()
+                    and (replacing is None or f'{folder}/{name}/SKILL.md' not in replacing['files'])):
+                raise WorkspaceError(f'Skill directory conflict: {folder}/{name}')
+            changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name, files[relative])
+        if '.claude/skills' in skill_folders and managed_path(root, f'.claude/commands/{name}.md').exists():
+            raise WorkspaceError(f'Claude command conflict: {name}')
+    owned = {p: sha(t) for p, t in changes.items()}
+    candidates = list(replacing.get('candidates', [])) if replacing else []
+    for relative in data['knowledge']:
+        if replacing and read_content(root, f'{base}/{relative}') == files[relative]:
+            continue
+        key = sha(data['id'] + ':' + origin['sha256'] + ':' + relative)
+        from .brain import find_note, named_path
+        target = (find_note(root, 'candidates', key)
+                  or find_note(root, 'knowledge', key)
+                  or named_path(root, 'candidates', key, Path(relative).stem, changes))
+        candidates.append(target)
+        # Prior candidates/approved notes survive removal and reinstall.
+        if managed_path(root, target).exists():
+            from .brain import read_note
+            meta, body = read_note(root, target)
+            if meta.get('provenance') != {'stack': data['id'], **origin, 'file': relative}:
+                raise WorkspaceError(f'Stack candidate conflict: {target}')
+            continue
+        meta = {'format_version': 1, 'id': key, 'status': 'pending', 'title': Path(relative).stem,
+                'kind': 'fact', 'created': candidate_timestamp or now(),
+                'updated': candidate_timestamp or now(), 'review': [],
+                'provenance': {'stack': data['id'], **origin, 'file': relative},
+                'sources': [f"stack:{data['id']}@{data['version']}/{relative} sha256:{origin['sha256']}"],
+                'links': ['index']}
+        changes[target] = note_text(meta, files[relative])
+    for relative in changes:
+        if read_content(root, relative) is not None and (replacing is None or relative not in replacing['files']):
+            raise WorkspaceError(f'Install file conflict: {relative}')
+    if replacing:
+        changes.update({p: None for p in replacing['files'] if p not in owned})
+        entries = [e for e in entries if e['id'] != data['id']]
+    entries.append({'id': data['id'], 'version': data['version'], 'manifest': data,
+                    'origin': origin, 'files': owned, 'candidates': candidates,
+                    'trusted_hooks': origin['sha256'] if data['hooks'] else None,
+                    'trusted_capabilities': origin['sha256'] if data.get('capabilities') else None})
+    if replacing:
+        from .capabilities import cache_changes, cache_path, STATE
+        if bounded:
+            read_bytes(root, STATE, 1048576)
+            read_bytes(root, cache_path(data['id']), 8 * 1048576)
+        changes.update(cache_changes(root, data['id']))
+    changes[REGISTRY] = encode(entries)
+    changes.update(stack_docs.plan(root, entries, changes))
+    return changes
 
 
 def install(root, directory, trust=None, *, provenance=None, replacing=None,
@@ -283,97 +419,99 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
     if (data['hooks'] or data.get('capabilities')) and trust != origin['sha256']:
         raise WorkspaceError('Executable stack content requires --trust-executable (alias --trust-hooks) ' + origin['sha256'] + ' after reviewing stack validate output and source')
     with locked(root):
-        entries = available(root)
-        if prerequisite_release is not None:
-            from .marketplace import prerequisites
-            prerequisites(entries, prerequisite_release, confirmed)
-        current = next((e for e in entries if e['id'] == data['id']), None)
-        if replacing is not None:
-            if current != replacing:
-                raise WorkspaceError('Installed state changed; inspect and approve again')
-            check_owned(root, current)
-            if tuple(map(int, data['version'].split('.'))) <= tuple(map(int, current['version'].split('.'))):
-                raise WorkspaceError('Update requires a strictly newer version')
-        elif current is not None:
-            raise WorkspaceError('Stack already installed; use stack update')
-        base = f".tdt/stacks/{data['id']}"
-        if replacing is None and managed_path(root, base).exists():
-            raise WorkspaceError(f'Stack directory conflict: {base}')
-        changes = {f'{base}/{p}': t for p, t in files.items()}
-        from .agents import folders
-        skill_folders = folders(root)
-        for relative in data['skills']:
-            name = relative.split('/')[1]
-            for folder in skill_folders:
-                if (managed_path(root, f'{folder}/{name}').exists()
-                        and (replacing is None or f'{folder}/{name}/SKILL.md' not in replacing['files'])):
-                    raise WorkspaceError(f'Skill directory conflict: {folder}/{name}')
-                changes[f'{folder}/{name}/SKILL.md'] = files[relative] if folder == '.tdt/skills' else bridge(name)
-            if '.claude/skills' in skill_folders and managed_path(root, f'.claude/commands/{name}.md').exists():
-                raise WorkspaceError(f'Claude command conflict: {name}')
-        owned = {p: sha(t) for p, t in changes.items()}
-        candidates = list(replacing.get('candidates', [])) if replacing else []
-        for relative in data['knowledge']:
-            if replacing and existing_content(root, f'{base}/{relative}') == files[relative]:
-                continue
-            key = sha(data['id'] + ':' + origin['sha256'] + ':' + relative)
-            from .brain import find_note, named_path
-            target = (find_note(root, 'candidates', key)
-                      or find_note(root, 'knowledge', key)
-                      or named_path(root, 'candidates', key, Path(relative).stem, changes))
-            candidates.append(target)
-            # Prior candidates/approved notes survive removal and reinstall.
-            if managed_path(root, target).exists():
-                from .brain import read_note
-                meta, body = read_note(root, target)
-                if meta.get('provenance') != {'stack': data['id'], **origin, 'file': relative}:
-                    raise WorkspaceError(f'Stack candidate conflict: {target}')
-                continue
-            meta = {'format_version': 1, 'id': key, 'status': 'pending', 'title': Path(relative).stem,
-                    'kind': 'fact', 'created': now(), 'updated': now(), 'review': [],
-                    'provenance': {'stack': data['id'], **origin, 'file': relative},
-                    'sources': [f"stack:{data['id']}@{data['version']}/{relative} sha256:{origin['sha256']}"],
-                    'links': ['index']}
-            changes[target] = note_text(meta, files[relative])
-        for relative in changes:
-            if existing_content(root, relative) is not None and (replacing is None or relative not in replacing['files']):
-                raise WorkspaceError(f'Install file conflict: {relative}')
-        if replacing:
-            changes.update({p: None for p in replacing['files'] if p not in owned})
-            entries = [e for e in entries if e['id'] != data['id']]
-        entries.append({'id': data['id'], 'version': data['version'], 'manifest': data,
-                        'origin': origin, 'files': owned, 'candidates': candidates,
-                        'trusted_hooks': origin['sha256'] if data['hooks'] else None,
-                        'trusted_capabilities': origin['sha256'] if data.get('capabilities') else None})
-        if replacing:
-            from .capabilities import cache_changes
-            changes.update(cache_changes(root, data['id']))
-        changes[REGISTRY] = encode(entries)
+        changes = installation_plan(root, data, files, origin, replacing=replacing,
+                                    prerequisite_release=prerequisite_release,
+                                    confirmed=confirmed)
         transaction(root, changes)
         if replacing:
             prune(root, replacing['files'])
     return data['id']
 
 
-def check_owned(root, entry):
+def installation_preview(root, directory, *, candidate_timestamp=None):
+    """Complete local installation snapshot; caller holds the workspace lock."""
+    from .recovery import read_bytes
+    data, files, origin = validate(directory, bounded=True)
+    candidate_timestamp = candidate_timestamp or now()
+    from datetime import datetime
+    if datetime.fromisoformat(candidate_timestamp).isoformat() != candidate_timestamp:
+        raise WorkspaceError("Invalid candidate timestamp")
+    if not candidate_timestamp.endswith("+00:00"):
+        raise WorkspaceError("Expected UTC candidate timestamp")
+    changes = installation_plan(root, data, files, origin, bounded=True,
+                                candidate_timestamp=candidate_timestamp)
+    before = {}
+    remaining = 8 * 1048576
+    for relative in changes:
+        raw = read_bytes(root, relative, remaining)
+        before[relative] = None if raw is None else content_value(raw)
+        remaining -= len(raw) if raw is not None else 0
+    proposal = {'id': data['id'], 'origin': origin,
+                'candidate_timestamp': candidate_timestamp,
+                'requires_executable_trust': bool(data['hooks'] or data.get('capabilities')),
+                'before': before, 'after': changes}
+    return {**proposal, 'proposal_sha256': sha(json.dumps(
+        proposal, ensure_ascii=False, sort_keys=True, separators=(',', ':')))}
+
+
+def installation_apply(root, directory, *, candidate_timestamp, expected_sha256, trust=None):
+    """Apply the exact bounded local installation preview; no automatic retry."""
+    from .recovery import read_bytes
+    read_bytes(root, '.tdt/config.json', 1048576)
+    with locked(root):
+        preview = installation_preview(root, directory, candidate_timestamp=candidate_timestamp)
+        if preview['proposal_sha256'] != expected_sha256:
+            raise WorkspaceError('Stack installation preview changed; inspect again')
+        if preview['requires_executable_trust'] and trust != preview['origin']['sha256']:
+            raise WorkspaceError('Executable stack content requires explicit source digest trust')
+        if trust is not None and trust != preview['origin']['sha256']:
+            raise WorkspaceError('Executable trust digest does not match source')
+        transaction(root, preview['after'], bounded=True)
+    return preview['id']
+
+
+def check_owned(root, entry, *, bounded=False):
     """Refuse edits, missing assets and additions before any lifecycle mutation."""
+    remaining = 64 * 1024 * 1024
+    if bounded and len(entry['files']) > 10000:
+        raise WorkspaceError('Stack ownership exceeds 10000 files')
     for relative, digest in entry['files'].items():
         path = managed_path(root, relative)
-        if not path.is_file() or file_sha(path) != digest:
+        if bounded:
+            if not path.is_file() or path.stat().st_size > remaining:
+                raise WorkspaceError('Stack ownership check exceeds 64 MiB or has a nonregular file')
+            with path.open('rb') as stream:
+                raw = stream.read(remaining + 1)
+            if len(raw) > remaining:
+                raise WorkspaceError('Stack ownership check exceeds 64 MiB')
+            remaining -= len(raw)
+            actual = hashlib.sha256(raw).hexdigest()
+        else:
+            actual = file_sha(path) if path.is_file() else None
+        if actual != digest:
             raise WorkspaceError(f'Owned stack file changed or missing; preserve edits elsewhere and restore the original: {relative}')
     directories = {f".tdt/stacks/{entry['id']}"}
     directories.update(str(Path(p).parent) for p in entry['files']
                        if not p.startswith('.tdt/stacks/'))
     allowed_dirs = {str(parent) for p in entry['files'] for parent in Path(p).parents}
+    scanned = 0
     def inspect(directory):
-        for path in managed_path(root, directory).iterdir():
-            relative = str(path.relative_to(root))
-            if path.is_symlink():
-                raise WorkspaceError(f'Untracked stack symlink; preserve/move before retry: {relative}')
-            if path.is_dir() and relative in allowed_dirs:
-                inspect(relative)
-            elif relative not in entry['files']:
-                raise WorkspaceError(f'Untracked stack addition; preserve/move before retry: {relative}')
+        nonlocal scanned
+        # Stream directory entries so a large untracked directory cannot be materialized.
+        with os.scandir(managed_path(root, directory)) as children:
+            for child in children:
+                scanned += 1
+                if bounded and scanned > 10000:
+                    raise WorkspaceError('Stack ownership scan exceeds 10000 entries')
+                inspect_child(Path(child.path))
+    def inspect_child(path):
+        relative = str(path.relative_to(root))
+        if path.is_symlink():
+            raise WorkspaceError(f'Untracked stack symlink; preserve/move before retry: {relative}')
+        if path.is_dir() and relative in allowed_dirs:
+            inspect(relative)
+        elif relative not in entry['files']:
+            raise WorkspaceError(f'Untracked stack addition; preserve/move before retry: {relative}')
     for directory in directories:
         inspect(directory)
 
@@ -390,18 +528,58 @@ def prune(root, files):
             parent = parent.parent
 
 
-def remove(root, stack_id):
+def removal_plan(root, stack_id, *, bounded=False):
+    """Plan the same owned deletions and derived catalog writes used by removal."""
+    from . import capabilities, stack_docs
+    if bounded:
+        from .recovery import read_bytes
+        # Bound auxiliary reads before the shared planners parse/read their state.
+        for relative in (REGISTRY, capabilities.STATE, stack_docs.INDEX, stack_docs.OWNERSHIP):
+            read_bytes(root, relative, 1048576)
+        read_bytes(root, capabilities.cache_path(stack_id), 8 * 1048576)
+    entries = available(root)
+    if bounded and (len(entries) > 2000 or any(
+            not isinstance(e.get('version'), str) or not VERSION.fullmatch(e['version'])
+            for e in entries)):
+        raise WorkspaceError('Invalid or oversized installed stack catalog')
+    entry = next((e for e in entries if e['id'] == stack_id), None)
+    if entry is None:
+        raise WorkspaceError('Stack is not installed; nothing removed')
+    check_owned(root, entry, bounded=bounded)
+    changes = {p: None for p in entry['files']}
+    changes.update(capabilities.cache_changes(root, stack_id))
+    remaining = [e for e in entries if e['id'] != stack_id]
+    changes[REGISTRY] = encode(remaining)
+    changes.update(stack_docs.plan(root, remaining, changes))
+    return entry, changes
+
+
+def removal_preview(root, stack_id):
+    """Complete bounded removal snapshot; caller holds the workspace lock."""
+    from .recovery import read_bytes
+    entry, changes = removal_plan(root, stack_id, bounded=True)
+    before = {}
+    remaining = 8 * 1048576
+    for relative in changes:
+        raw = read_bytes(root, relative, remaining)
+        before[relative] = None if raw is None else content_value(raw)
+        remaining -= len(raw) if raw is not None else 0
+    proposal = {'id': stack_id, 'before': before, 'after': changes}
+    digest = sha(json.dumps(proposal, ensure_ascii=False, sort_keys=True,
+                            separators=(',', ':')))
+    return entry, {**proposal, 'proposal_sha256': digest}
+
+
+def remove(root, stack_id, *, expected_sha256=None):
     with locked(root):
-        entries = available(root)
-        entry = next((e for e in entries if e['id'] == stack_id), None)
-        if entry is None:
-            raise WorkspaceError('Stack is not installed; nothing removed')
-        check_owned(root, entry)
-        changes = {p: None for p in entry['files']}
-        from .capabilities import cache_changes
-        changes.update(cache_changes(root, stack_id))
-        changes[REGISTRY] = encode([e for e in entries if e['id'] != stack_id])
-        transaction(root, changes)
+        if expected_sha256 is None:
+            entry, changes = removal_plan(root, stack_id)
+        else:
+            entry, preview = removal_preview(root, stack_id)
+            if preview['proposal_sha256'] != expected_sha256:
+                raise WorkspaceError('Stack removal preview changed; inspect again before removal')
+            changes = preview['after']
+        transaction(root, changes, bounded=expected_sha256 is not None)
         prune(root, entry['files'])
     return stack_id
 

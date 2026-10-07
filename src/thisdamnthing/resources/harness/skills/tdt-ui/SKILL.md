@@ -7,8 +7,20 @@ Honor “use ui” without asking the preference again. Otherwise offer UI or
 chat/TUI when an interview would benefit. Preserve that choice for the interview.
 A complete brief needs no interview. Core works with zero stacks.
 
-Read docs/ui.md and .tdt/contracts/ui.md. Write a version 1 page JSON file,
-then run `tdt ui start --no-open` and `tdt ui present SESSION PAGE.json`.
+Read docs/ui.md and .tdt/contracts/ui.md (MCP `tdt_guide_read` references
+`core/ui` and `core/contracts/ui`). Prefer workspace-bound everyday MCP
+`tdt_ui_start` (browser opening defaults off) and `tdt_ui_present` with the
+version 1 page object directly. Use `tdt_ui_status`, `tdt_ui_read`, `tdt_ui_wait`,
+`tdt_ui_ack` and `tdt_ui_close` for the same lifecycle below. MCP inputs use
+session_id, after, timeout and event_id. Read/wait return next_after and has_more;
+page through complete events and original prompts before acting. If an event
+exceeds budget_bytes, increase it (up to 1 MiB); never infer omitted answers.
+After an uncertain present, inspect status before retrying: every present creates
+a new round. After an uncertain start, inspect retained session state before
+creating another session. Cleanup requires explicit user instruction to delete
+retained prompts and answers. If MCP is unavailable, write a version 1 page JSON
+file, then run `tdt ui start --no-open` and `tdt ui present SESSION PAGE.json`.
+The following CLI loop also describes the equivalent MCP operations.
 For source code or literal Markdown in descriptions/help, use triple-backtick
 fences with an optional language label; use single backticks for inline code.
 Other Markdown is plain text. In custom HTML, use a `pre.tdt-code` containing

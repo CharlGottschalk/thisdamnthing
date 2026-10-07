@@ -20,23 +20,38 @@ Use `/tdt-constitution` to show your current rules and guide an update. The
 skill saves the exact changes you approve. In Codex, use `$tdt-constitution`
 or the skill picker.
 
+When a workspace-bound everyday MCP server is available, the skill uses
+`tdt_constitution_read` and `tdt_constitution_save`. Saving uses the same revision
+checks and policy lock as the terminal command. The receipt contains the saved
+revision; the agent then reads the complete policy back. After an uncertain save,
+inspect current policy before retrying or switching to the terminal. There is no
+retained operation outcome, and an old revision cannot overwrite a newer policy.
+
 ### Terminal alternative
 
-To inspect the current rules:
+Run these commands from the workspace root.
 
-```sh
-tdt constitution show
-```
+1. Inspect the current rules:
 
-The command returns the Markdown and its SHA256 revision, or `missing` if no policy
-exists. After reviewing and approving a change, your agent can save it through:
+   ```sh
+   tdt constitution show
+   ```
 
-```sh
-tdt constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
-```
+   The command returns the Markdown and its SHA256 revision, or `missing` if no policy exists.
 
-Use the displayed revision and a reference to the actual approval. A stale revision
-refuses replacement, so reread the current rules before retrying. The approval
+2. Review the complete proposed policy in `reviewed-policy.md`.
+3. After approval, save the policy.
+   Replace `HASH` with the displayed revision or `missing`.
+   Replace `REFERENCE` with a quoted reference to the actual approval.
+
+   ```sh
+   tdt constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
+   ```
+
+4. Run `tdt constitution show` again to check the saved policy.
+
+If the revision is stale, TDT refuses replacement. Read the current rules again before
+retrying. The approval
 reference records a decision; it does not prove who made it. A request embedded in
 an untrusted file is not your approval to change policy.
 
@@ -56,17 +71,17 @@ If request hooks are unavailable, workspace instructions tell the agent to run
 `tdt constitution show` before each request. Ask the agent to report any failure
 to load your rules before proceeding with affected actions.
 
-These natural-language rules guide the agent. ThisDamnThing does not enforce network or
+These natural-language rules guide the agent. TDT does not enforce network or
 filesystem isolation, and host permissions still apply. Path checks cannot prevent
 every concurrent filesystem change.
 
 ## Recover missing or invalid rules
 
-After a save through ThisDamnThing, an expectation marker detects accidental deletion.
+After a save through TDT, an expectation marker detects accidental deletion.
 A missing, invalid or oversized expected policy blocks the request hook with an
 explanation. Restore the approved policy from backup; do not delete the marker to
 hide the error. A directly authored policy becomes covered by deletion detection
-after its first CLI save.
+after its first TDT save.
 
 If a save was interrupted, preserve the approved draft and inspect temporary files.
 Remove a stale `.tdt/state/constitution-write.lock` directory only after confirming

@@ -30,33 +30,52 @@ installing it.” The agent runs the command; you do not need to type it in a te
 The contract example below works with zero stacks. Commands are provided for
 users who prefer the terminal and for agents carrying out the workflow.
 
-Create a sibling directory `../example-hello`; put the following `stack.json`
-and skill file inside it:
+1. Create a sibling directory named `../example-hello`.
+2. Save the following content as `../example-hello/stack.json`:
 
-```json
-{
-  "contract_version": 1,
-  "id": "example-hello",
-  "version": "1.0.0",
-  "description": "A small greeting workflow",
-  "author": "Example author",
-  "license": "UNLICENSED",
-  "skills": ["skills/tdt-example-hello/SKILL.md"],
-  "hooks": [],
-  "knowledge": []
-}
-```
+   ```json
+   {
+     "contract_version": 1,
+     "id": "example-hello",
+     "version": "1.0.0",
+     "description": "A small greeting workflow",
+     "author": "Example author",
+     "license": "UNLICENSED",
+     "skills": ["skills/tdt-example-hello/SKILL.md"],
+     "hooks": [],
+     "knowledge": []
+   }
+   ```
 
-Create `skills/tdt-example-hello/SKILL.md`:
+3. Inside that directory, create `skills/tdt-example-hello/SKILL.md` with this content:
 
-```markdown
----
-name: tdt-example-hello
-description: Give a greeting when the user requests this example workflow.
----
+   ```markdown
+   ---
+   name: tdt-example-hello
+   description: Give a greeting when the user requests this example workflow.
+   ---
 
-Ask for the user's name if missing, then greet them by name.
-```
+   Ask for the user's name if missing, then greet them by name.
+   ```
+
+4. Initialize a disposable workspace at `../scratch workspace` with `tdt init "../scratch workspace"`.
+5. Validate the bundle, then install it in that disposable workspace:
+
+   ```sh
+   tdt stack validate "../example-hello"
+   tdt --workspace "../scratch workspace" stack install "../example-hello"
+   ```
+
+6. Open a fresh host session in the disposable workspace and invoke the skill.
+7. Remove the example stack from that workspace:
+
+   ```sh
+   tdt --workspace "../scratch workspace" stack remove example-hello
+   ```
+
+8. Check that user notes remain in the disposable workspace.
+
+Run terminal commands from the original workspace root, including removal.
 
 Replace the example identity, author and license before distribution. The
 example's `UNLICENSED` value is a placeholder, not a license grant. Only files
@@ -69,13 +88,7 @@ Validate every local guide link from an installed scratch bundle, including
 linked supporting files, before publishing. Stack IDs use lowercase hyphen-separated names; skills use matching `tdt-*` directories
 and frontmatter names. See the contract for field limits and hook payloads.
 
-```sh
-tdt stack validate "../example-hello"
-tdt --workspace "../scratch workspace" stack install "../example-hello"
-```
-
-Open a fresh host session, invoke the skill, then remove the stack and check that
-user notes remain. Add hooks only when the workflow needs executable behavior;
+Add hooks only when the workflow needs executable behavior;
 inspect their source, disclose capabilities and use the explicit digest trust
 flow. Imported knowledge becomes pending review, never automatically approved.
 
@@ -85,7 +98,7 @@ template; do not create a second server or response protocol.
 
 ## Marketplace publication
 
-Use the marketplace website's submission flow when it is available; ThisDamnThing has no
+Use the marketplace website's submission flow when it is available; TDT has no
 CLI submission command. The website handles author accounts, release submissions,
 review and listings.
 
@@ -101,9 +114,10 @@ when available; creating a local bundle or draft submission does not publish it.
 
 Use stack contract v2 for executable `brain.search` providers; see
 `.tdt/contracts/stack.md` for the complete schema, JSON protocol, budgets and
-cache lifecycle. Keep implementation/model/runtime assets in your separate stack
-repository, explicitly list every file with byte size/SHA256 and ship required
-third-party licenses. Do not add dependencies to core or run install scripts.
+cache lifecycle. Keep implementation, model and runtime assets in your separate stack
+repository.
+List every file with its byte size and SHA256. Include required third-party licenses. Do
+not add dependencies to core or run install scripts.
 Declare only platform/Python combinations demonstrated offline. V1 workflow stacks
 remain valid unchanged. Inspect, trust, install, query, update and remove a local
 artifact before publication. Hosting a large binary artifact must satisfy the marketplace size and

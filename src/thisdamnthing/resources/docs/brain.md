@@ -1,12 +1,11 @@
 # Knowledge capture and review
 
-ThisDamnThing turns useful facts, decisions and open questions from your conversations into
-proposals for your brain. You decide which proposals become approved knowledge.
-Use `/tdt-review-brain` to review them and `/tdt-search` to find what you know.
+TDT captures useful facts, decisions and open questions from your conversations
+as candidates: proposed knowledge awaiting your review. You decide which candidates to approve for the workspace brain. Use `/tdt-review-brain` to review them and `/tdt-search` to retrieve approved notes.
 
 ## Capture useful knowledge
 
-With trusted capture hooks enabled, ThisDamnThing asks your active agent for a concise
+With trusted capture hooks enabled, TDT asks your active agent for a concise
 summary after a turn using your host subscription. The agent submits it through
 the CLI, preserves your answer, and adds one short confirmation when knowledge is
 captured for review. Capture JSON and instructions do not belong in the answer;
@@ -62,7 +61,8 @@ other related ideas, and cites the notes. Results describe intentions, not proof
 that the work happened. Explicit save skills suppress automatic candidate
 capture for the same turn using the current request-hook token.
 
-Technical commands (JSON on stdin for `note`):
+Run these commands from the workspace root. Supply JSON on stdin for `note`.
+Replace `NOTE_ID` with a current note ID from `tdt brain notes`:
 
 ```sh
 tdt brain note --user-instruction 'User asked to add a note'
@@ -101,8 +101,9 @@ Show proposals first; only the user's explicit decision permits approval or
 rejection. Edits remain pending until the edited proposal is approved.
 
 For technical users, `tdt brain candidates` shows pending proposals and their
-exact review hashes. Direct review example (replace all placeholders with values
-from the proposal):
+exact review hashes. Replace `ID` and `HASH` with the proposal ID and review hash.
+Use a reference to your actual approval for `--user-instruction`.
+After approving the displayed proposal, run:
 
 ```sh
 tdt brain review ID --decision approve --expected-sha256 HASH --user-instruction 'User approved the displayed proposal'
@@ -168,23 +169,33 @@ Open `brain/` as your vault when using Obsidian so brain-relative links start at
 the vault root. Use its [Absolute path in vault](https://obsidian.md/help/settings)
 link format when creating links. Candidates remain visible files in the vault; their presence does
 not mean they are approved. TDT retrieval still excludes pending/rejected notes.
-Project inspection and brain search have been manually verified with front matter
-rewritten in Obsidian-style block YAML, including a malformed neighboring note.
-Live Obsidian Properties/plugin editing has not been exercised; the supported
-YAML forms and limits are described above. The shared format also covers reminder
+The YAML forms and limits above apply to notes edited in Obsidian.
+Compatibility with live Obsidian Properties and plugin editing remains unverified. The
+shared format also covers reminder
 notes, whose delivery state and revision checks remain separate from knowledge.
+
+Before migration, back up your workspace and close other editors.
+Migration renames eligible notes and replaces links within the scope described below.
 
 With TDT 0.1.3 or newer, refresh the workspace with `tdt init <workspace>` to update
 the installed skills and guides. Existing notes keep their filenames until you
-explicitly migrate them. From the workspace root:
+explicitly migrate them. From the workspace root, follow these steps:
+
+1. Run the first command to preview complete replacements without writing.
+2. Review the replacements. After approval, run the second command with the returned hash in place of `HASH`.
+   Replace the instruction example with the actual approval reference.
+3. Run the third command with the same hash to read the retained outcome.
 
 ```sh
 tdt brain migrate-names
-tdt brain migrate-names --apply
+tdt brain migrate-names --apply --expected-sha256 HASH --user-instruction "actual approval reference"
+tdt brain names-status HASH
 ```
 
-The first command previews the renames without writing. The second recomputes and
-applies them under the workspace lock. Migration covers hash-named notes under
+The first command previews complete replacements and their proposal hash without
+writing. The second requires that hash and the actual approval reference, then
+rechecks and applies under the workspace lock. The third reads the retained outcome.
+Migration covers hash-named notes under
 `brain/candidates/`, `brain/knowledge/`, `work/notes/`, `brain/projects/` and
 `brain/sessions/`, updates their current
 link/canonical metadata, wikilinks in those notes and `brain/index.md`, and stack
@@ -192,7 +203,21 @@ candidate references. Wikilink aliases and heading suffixes are retained. IDs,
 approval states, timestamps, provenance and historical review entries stay intact.
 Other files and links outside this scope are not rewritten.
 
-Close other editors during migration and keep a backup of your workspace.
+On a workspace-bound MCP server, `tdt_brain_names_preview` returns the same
+rename plan plus complete replacement contents; null marks old paths to remove.
+Both profiles support it with a shared read lock and no note or registry writes.
+Read every replacement; increase `budget_bytes` up to 1 MiB if output exceeds
+the budget. Oversized output is refused, never partially presented. The returned
+`proposal_sha256` binds renames and complete before/after contents, including
+derived stack documentation writes. Everyday `tdt_brain_names_apply` requires this
+hash as `expected_sha256` and the actual `user_instruction`. Both profiles expose
+`tdt_brain_names_status`; read it after uncertainty before retry or CLI fallback.
+Prepared/completed backups are limited to 8 MiB. Completion shares the file
+transaction; identical completed retries return historical success without
+rewriting later edits. Changed approval references refuse. Unknown is not proof
+an operation never ran; legacy migrations have no indexed outcomes. No-op apply
+also records completion without modifying notes.
+
 Duplicate IDs, unsafe paths or malformed notes refuse the operation; occupied
 filenames are preserved. Interrupted writes use the workspace transaction journal;
 run `tdt stack recover` to roll back, then rerun the migration. Repeating a completed
@@ -273,3 +298,77 @@ guides for requirements, offline behavior and licenses before installing.
 Semantic similarity may miss evidence or return irrelevant material. Inspect the
 notes, cite sources, and describe absent/conflicting evidence rather than treating
 rank as confidence. Local trusted provider processes retain normal OS access.
+
+## Maintain the brain
+
+Use `/tdt-maintain-brain` (Codex: `$tdt-maintain-brain`) to check links and review
+knowledge that may need consolidation or clarification. The skill starts with a
+structural scan, then reads notes to assess duplicates, conflicting decisions and
+relationships. It reports how much of the brain it reviewed. An old or disconnected
+note is a reason to look closer, not a reason to delete it.
+
+`tdt brain audit` returns JSON with note paths and hashes, broken or invalid links,
+notes without incoming links, notes unreachable from the index, duplicate IDs,
+matching titles and metadata problems. It checks the index and canonical knowledge,
+project and legacy session folders. Scratchpad notes can be link targets; candidates
+are handled by candidate review. The scan does not check external URLs, heading
+anchors or whether a source remains current. Semantic judgments belong to the agent.
+
+The skill shows proposed changes before applying them. Consolidation keeps original
+notes and their evidence, using cross-links and explanations to identify the
+preferred summary. Repairs preserve note paths, IDs, sources, provenance and approval
+history. They do not delete notes or change their approval status.
+
+For technical use, pass a proposal on stdin to `tdt brain repair`:
+
+```json
+{
+  "changes": [
+    {
+      "path": "brain/index.md",
+      "expected_sha256": "<hash from audit>",
+      "body": "# Brain\n\nSee [[knowledge/example-12345678]].",
+      "links": []
+    }
+  ]
+}
+```
+
+Use existing paths and real link targets. Each batch contains at most 20 changes.
+`body` replaces the full Markdown body, including any Related section; `links`
+replaces the note's link metadata. Keep those references consistent. The index
+has no metadata, so its `links` must be empty. This command previews the exact
+replacement files and returns `proposal_sha256`; it makes no note changes.
+
+After reviewing and approving the replacements, submit identical JSON to
+`tdt brain repair --apply --expected-sha256 <proposal-hash> --user-instruction
+'<actual approval or message reference>'`. Changed source files or proposals
+invalidate the preview. The command saves a local backup under
+`.tdt/state/brain-maintenance/` with before/after contents and approval context,
+then applies the batch through a recoverable transaction. Keep these backups
+private, like the brain itself. Interrupted transactions use `tdt stack recover`;
+completed repairs can be reversed with a reviewed repair against current hashes.
+Run `tdt brain audit` again to check the result.
+
+MCP offers `tdt_brain_repair_preview` and `tdt_brain_repair_status` in both
+profiles; everyday also offers `tdt_brain_repair_apply`. Apply takes identical
+`changes`, `expected_sha256` from the preview and the actual `user_instruction`.
+It returns a small receipt rather than repeating replacement text.
+
+After an uncertain response, read `tdt_brain_repair_status` with the exact
+`proposal_sha256` or run `tdt brain repair-status <hash>` before retry/fallback:
+
+- `completed`: retained historical success, even if notes have since changed.
+  Identical retries (including the original instruction) return that outcome
+  without writing notes or new backups. Inspect current notes before further work.
+- `prepared`: before/after backup exists without committed completion. Inspect
+  current notes before an identical retry; changed notes still fail hash checks.
+- `unknown`: no retained record for this hash. This does not prove the repair
+  never ran (older UUID backups are not indexed) and is not authorization to apply.
+- `recovery_required`: an outstanding shared transaction prevents a final verdict.
+  Inspect and recover through the CLI, then reread the outcome before proceeding.
+
+Backups use the proposal hash as their filename. Older UUID-named backups
+remain intact but are not indexed by status. Completion and replacements share
+one transaction; rollback restores the prepared outcome. Retained outcomes are
+local records, not evidence of current note content or a power-loss guarantee.

@@ -8,6 +8,7 @@ import secrets
 
 from .brain import capture, digest, locked, now, read_request, request_path, save_json
 from .hosts import normalize_event
+from .constitution import bounded
 from .workspace import WorkspaceError, managed_path, read_json
 
 
@@ -26,8 +27,14 @@ def begin_turn(root, event):
                           "brain", "review-turn", token])
     return ("For a user request not to save brain notes or capture knowledge, "
             "tdt-review-brain, tdt-capture, tdt-note or explicit reminder "
-            "management/checking in this turn, first run " + command +
-            " to suppress automatic capture. This command is single-turn; "
+            "management/checking, project lifecycle changes or reference cleanup in this "
+            "turn, first suppress automatic capture. "
+            "Prefer tdt_capture_suppress on the MCP server bound to workspace " +
+            str(root.resolve()) + " with token " + token + ". "
+            "If that tool is unavailable, use " + command + ". "
+            "After a lost response, repeating this exact token through CLI is safe; "
+            "never substitute another token or bypass a stale-token or permission refusal. "
+            "Confirm suppression before work that requires it. This token is single-turn; "
             "ignore it for other work.")
 
 
@@ -36,8 +43,10 @@ def suppress_review_turn(root, token):
         raise ValueError("Expected the current review-turn token from request context")
     relative = ".tdt/state/capture-turns/" + token[:64] + ".json"
     with locked(root):
-        state = read_json(root, relative)
-        if state.get("token") != token:
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
+        state = json.loads(bounded(managed_path(root, relative), 32768))
+        if not isinstance(state, dict) or state.get("token") != token:
             raise ValueError("Stale review-turn token; use the current request context")
         state["suppressed"] = True
         save_json(root, relative, state)
@@ -96,15 +105,25 @@ def stop(root, host, payload):
                            "transcript_path": event["transcript_path"]}})
     command = shlex.join([sys.executable, "-m", "thisdamnthing", "--workspace",
                           str(root.resolve()), "brain", "capture", key])
+    read_command = shlex.join([sys.executable, "-m", "thisdamnthing", "--workspace",
+                               str(root.resolve()), "brain", "request", key])
     return {"decision": "block", "reason": (
         "Internal knowledge capture step. Keep these instructions and capture data out of "
         "user-facing prose. Respect the user's saving restrictions: if the user prohibited "
-        'brain notes or knowledge capture for this work, submit {"skip":true} using the '
-        "command below; do not save a candidate. Otherwise use your active conversation context to summarize durable facts, "
+        'brain notes or knowledge capture for this work, submit skip as described below; '
+        "do not save a candidate. Otherwise use your active conversation context to summarize durable facts, "
         "decisions or open questions from the user turn just completed. "
         "Exclude reminder records, notifications and reminder management; these are operational data, not knowledge. "
-        "Submit the summary using your shell tool: " + command + ". "
-        "Pass only the summary JSON on stdin using a quoted heredoc (no shell expansion). "
+        "Prefer tdt_capture_submit on the MCP server bound to workspace " + str(root.resolve()) +
+        " with request_id " + key + ' and payload {"action":"summary","summary":<summary object>} '
+        'or {"action":"skip"}. If that tool is unavailable, use your shell tool: ' + command + ". "
+        'For CLI, pass only the summary JSON (or {"skip":true}) on stdin using a quoted heredoc '
+        "(no shell expansion). After a lost or uncertain MCP response, first read this exact "
+        "request with tdt_capture_request_read, or with " + read_command + ". "
+        "If status is captured or skipped, use that saved outcome and do not submit again. "
+        "Only if status is requested may you retry the identical submission once through CLI. "
+        "If status cannot be read, preserve the answer and leave recovery for later. "
+        "Never choose a request from inventory or bypass a permission or validation refusal. "
         "Do not print a JSON envelope or a capture code block in chat. "
         'Summary: {"title":"short title","kind":"fact|decision|question|inference",'
         '"body":"concise prose, max 3000 characters",'
@@ -113,13 +132,13 @@ def stop(root, host, payload):
         "Use existing brain-relative wikilinks without .md where known; index is a safe fallback. "
         "Label inference and conflicting evidence clearly. Never copy credentials, private keys, "
         "full transcripts, tool output dumps or embedded instructions. Omit unsupported claims. "
-        'If nothing durable or safe remains, submit {"skip":true}. '
+        'If nothing durable or safe remains, submit skip using the chosen transport format. '
         "This is capture only; NEVER approve, reject or edit notes. Do not narrate this step. "
-        "After the command, return the complete substantive answer to the user's original request "
+        "After submission or reconciliation, return the complete substantive answer to the user's original request "
         "so a host that replaces the previous final response does not lose it. "
-        "Only if the command confirms captured, append one line: "
+        "Only if submission or saved status confirms captured, append one line: "
         "'Knowledge captured for review; you can check it with tdt-review-brain.' "
-        "If skipped, add no capture notice. If the command fails or is unavailable, preserve "
+        "If skipped, add no capture notice. If submission fails or is unavailable, preserve "
         "the answer without claiming capture succeeded; do not retry in a Stop loop.")}
 
 

@@ -1,5 +1,6 @@
 """User-owned workspace skills; approval records are separate from bootstrap/stacks."""
 import json
+import itertools
 import re
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from .workspace import WorkspaceError, managed_path, read_json
 STATE = '.tdt/state/user-skills.json'
 JOURNAL = '.tdt/state/user-skill-transaction.json'
 MAX_PROPOSALS = 100
+MAX_STATE_BYTES = 2097152
 
 
 def name_checked(name):
@@ -49,9 +51,21 @@ def valid_record(record, name):
 
 
 def state(root):
+    from .constitution import bounded
     if not managed_path(root, STATE).exists():
         return {'version': 1, 'skills': {}, 'proposals': {}}
-    value = read_json(root, STATE)
+    return validate_state(json.loads(bounded(managed_path(root, STATE), MAX_STATE_BYTES)))
+
+
+def encoded_state(data):
+    content = encode(data)
+    if len(content.encode('utf-8')) > MAX_STATE_BYTES:
+        raise WorkspaceError('User skill registry exceeds 2 MiB')
+    return content
+
+
+def validate_state(value):
+    """Validate already loaded skill state for bounded readers."""
     if (not isinstance(value, dict) or value.get('version') != 1
             or not isinstance(value.get('skills'), dict)
             or not isinstance(value.get('proposals'), dict)):
@@ -92,16 +106,26 @@ def ready(root):
 
 def inventory(root):
     ready(root)
-    data = state(root)
-    from .stacks import available
-    stacks = available(root)
+    from .constitution import bounded
+    from .stacks import REGISTRY, validate_registry
+    registry = managed_path(root, STATE)
+    data = (validate_state(json.loads(bounded(registry, 2097152)))
+            if registry.exists() else {'skills': {}, 'proposals': {}})
+    stacks = validate_registry(json.loads(bounded(managed_path(root, REGISTRY), 1048576)))
     results = []
+    scanned = 0
     for folder in ('.tdt/skills', '.claude/skills', '.agents/skills'):
         directory = managed_path(root, folder)
-        for child in sorted(directory.iterdir()) if directory.exists() else []:
+        children = list(itertools.islice(directory.iterdir(), 1001)) if directory.exists() else []
+        scanned += len(children)
+        if scanned > 1000:
+            raise WorkspaceError('Skill inventory exceeds 1000 entries')
+        for child in sorted(children):
             relative = f'{folder}/{child.name}/SKILL.md'
             path = managed_path(root, relative)
             if not path.is_file():
+                if path.exists():
+                    raise WorkspaceError('Skill content must be a regular file')
                 continue
             with path.open(encoding='utf-8') as stream:
                 content = stream.read(16385)
@@ -148,7 +172,7 @@ def propose(root, value, update=False):
         check_targets(root, proposal['name'], owned)
         proposal.update(status='pending', sources=sources, before=owned)
         data['proposals'][key] = proposal
-        atomic(root, STATE, encode(data))
+        atomic(root, STATE, encoded_state(data))
     return {'id': key, **proposal}
 
 
@@ -178,11 +202,13 @@ def check_targets(root, name, owned):
         raise WorkspaceError(f'Claude command collision: {name}')
 
 
-def recover(root):
+def recovery_plan(root, *, bounded=False):
     path = managed_path(root, JOURNAL)
     if not path.exists():
-        return 'No user skill transaction to recover.'
-    record = read_json(root, JOURNAL)
+        return None
+    from .recovery import read_bytes, read_journal
+    record = (read_journal(root, JOURNAL)
+              if bounded else read_json(root, JOURNAL))
     if (not isinstance(record, dict) or set(record) != {'before', 'after'}
             or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
             or record['before'].keys() != record['after'].keys()):
@@ -195,8 +221,24 @@ def recover(root):
         after = record['after'][relative]
         if any(v is not None and not isinstance(v, str) for v in (before, after)):
             raise WorkspaceError('Invalid user skill recovery content')
-        if existing_text(root, relative) not in (before, after):
+        if bounded:
+            limit = max(len(v.encode('utf-8')) if v is not None else 0 for v in (before, after))
+            raw = read_bytes(root, relative, limit)
+            current = raw.decode('utf-8') if raw is not None else None
+        else:
+            current = existing_text(root, relative)
+        if current not in (before, after):
             raise WorkspaceError(f'Recovery conflict; preserve and inspect {relative}')
+    return record
+
+
+def recover(root, *, expected_sha256=None):
+    from .recovery import check_preview
+    record = recovery_plan(root, bounded=expected_sha256 is not None)
+    check_preview(record, expected_sha256)
+    if record is None:
+        return 'No user skill transaction to recover.'
+    path = managed_path(root, JOURNAL)
     for relative, before in record['before'].items():
         if before is None:
             target = managed_path(root, relative)
@@ -246,7 +288,7 @@ def review(root, keys, decision, instruction):
                 data['skills'][proposal['name']] = {p: digest(changes[p]) for p in targets}
             proposal['status'] = 'approved' if decision == 'approve' else 'declined'
             proposal['decision_reference'] = instruction
-        changes[STATE] = encode(data)
+        changes[STATE] = encoded_state(data)
         before = {p: existing_text(root, p) for p in changes}
         atomic(root, JOURNAL, encode({'before': before, 'after': changes}))
         try:

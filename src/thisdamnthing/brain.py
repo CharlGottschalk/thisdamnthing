@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import tempfile
 import sys
 import unicodedata
@@ -34,12 +35,13 @@ def identifier(value):
 
 
 @contextmanager
-def locked(root):
+def locked(root, *, shared=False):
     read_config(root)
     path = managed_path(root, ".tdt/state/brain.lock")
     with path.open("a", encoding="utf-8") as stream:
         try:
-            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            mode = fcntl.LOCK_SH if shared else fcntl.LOCK_EX
+            fcntl.flock(stream, mode | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise WorkspaceError("Brain is busy; retry this operation") from exc
         try:
@@ -82,12 +84,16 @@ class NoteError(WorkspaceError):
     """Malformed note content, distinct from unsafe paths or workspace failures."""
 
 
-def read_note(root, relative):
+def read_note(root, relative, *, include_text=False):
     path = managed_path(root, relative)
     try:
-        if path.stat().st_size > 32768:
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise ValueError("note must be a regular file")
+        with path.open('rb') as stream:
+            raw = stream.read(32769)
+        if len(raw) > 32768:
             raise ValueError("note exceeds 32 KiB")
-        text = path.read_text(encoding="utf-8")
+        text = raw.decode("utf-8")
         if not text.startswith("---\n") or "\n---\n" not in text[4:]:
             raise ValueError("expected YAML front matter between --- delimiters")
         head, body = text[4:].split("\n---\n", 1)
@@ -104,16 +110,22 @@ def read_note(root, relative):
             raise ValueError("invalid note metadata")
     except (ValueError, RecursionError) as exc:
         raise NoteError(f"Invalid note {relative}: {exc}") from exc
+    if include_text:
+        # Match the text-mode newline normalization used by candidate review.
+        return meta, body.strip(), text.replace("\r\n", "\n").replace("\r", "\n")
     return meta, body.strip()
 
 
-def scan_notes(root, categories):
+def scan_notes(root, categories, *, omissions=None):
     """Skip content failures with visible diagnostics; keep path/IO safeguards strict."""
     for relative in note_files(root, categories):
         try:
             meta, body = read_note(root, relative)
         except NoteError as exc:
-            print(f"tdt: warning: skipping {exc}", file=sys.stderr)
+            if omissions is not None:
+                omissions.append(relative)
+            else:
+                print(f"tdt: warning: skipping {exc}", file=sys.stderr)
             continue
         yield relative, meta, body
 
@@ -229,7 +241,12 @@ def request_path(key):
 
 
 def read_request(root, key):
-    request = read_json(root, request_path(key))
+    from .constitution import bounded
+    return validate_request(json.loads(bounded(managed_path(root, request_path(key)), 32768)), key)
+
+
+def validate_request(request, key):
+    """Validate capture state without reading transcript or session content."""
     if (not isinstance(request, dict) or request.get("format_version") != 1
             or request.get("id") != key
             or request.get("status") not in ("requested", "captured", "skipped")
@@ -244,6 +261,8 @@ def read_request(root, key):
 def capture(root, key, data):
     """Accept only agent summaries tied to a previously delivered host request."""
     with locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         request = read_request(root, key)
         if request.get("status") in ("captured", "skipped"):
             return request["status"] + ": " + key
@@ -287,16 +306,19 @@ def review(root, key, decision, instruction, expected, edited=None):
     if decision not in ("approve", "reject", "edit"):
         raise WorkspaceError("Expected approve, reject or edit")
     with locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         relative = find_note(root, "candidates", key)
         if relative is None:
             raise WorkspaceError("Unknown candidate id")
         path = managed_path(root, relative)
-        original = path.read_text(encoding="utf-8")
+        meta, body, original = read_note(root, relative, include_text=True)
         if digest(original) != expected:
             raise WorkspaceError("Candidate changed; show it again before review")
-        meta, body = read_note(root, relative)
         if meta.get("id") != key or meta.get("status") != "pending":
             raise WorkspaceError("Only pending candidates can be reviewed")
+        if decision != "approve" and find_note(root, "knowledge", key) is not None:
+            raise WorkspaceError("Canonical note already exists; inspect interrupted approval before review")
         record = {"at": now(), "decision": decision, "user_instruction": instruction,
                   "proposal_sha256": expected}
         if decision == "edit":
@@ -315,13 +337,16 @@ def review(root, key, decision, instruction, expected, edited=None):
             meta["canonical"] = target[6:-3]
             content = note_text(meta, body)
             destination = managed_path(root, target)
-            if destination.exists() and destination.read_text(encoding="utf-8") != content:
+            if destination.exists():
                 # Recovery after canonical write uses the stored approval, not a new timestamp.
                 prior, prior_body = read_note(root, target)
                 if (prior.get("id") != key or prior.get("status") != "approved"
                         or prior_body != body or not prior.get("review")
                         or prior["review"][-1].get("proposal_sha256") != expected
-                        or prior["review"][-1].get("user_instruction") != instruction):
+                        or prior["review"][-1].get("user_instruction") != instruction
+                        or prior != {**meta, "updated": prior.get("updated"),
+                            "review": meta["review"][:-1] + [
+                                {**record, "at": prior["review"][-1].get("at")}]}):
                     raise WorkspaceError("Canonical note conflict; existing evidence preserved")
                 meta = prior
             else:
@@ -334,14 +359,14 @@ def review(root, key, decision, instruction, expected, edited=None):
         return meta["status"] + ": " + key
 
 
-def eligible_notes(root):
+def eligible_notes(root, *, omissions=None):
     """Current canonical approvals, restricted to registered project identities."""
     if managed_path(root, ".tdt/state/stack-transaction.json").exists():
         raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
     from .projects import registry
     project_ids = {p['id'] for p in registry(root)}
     notes = {}
-    for relative, meta, body in scan_notes(root, ("knowledge", "projects", "sessions")):
+    for relative, meta, body in scan_notes(root, ("knowledge", "projects", "sessions"), omissions=omissions):
         category = relative.split("/")[1]
         if (meta["status"] == "approved"
                 and (not meta.get("project") or meta["project"] in project_ids)
@@ -350,12 +375,12 @@ def eligible_notes(root):
     return notes
 
 
-def search(root, query, limit=10, depth=1, providers=()):
+def search(root, query, limit=10, depth=1, providers=(), *, omissions=None):
     """Literal text seeds plus bounded outgoing links, always approved-only."""
     query = clean_text(query, "query", 300).casefold()
     if type(limit) is not int or not 1 <= limit <= 50 or type(depth) is not int or not 0 <= depth <= 3:
         raise WorkspaceError("Search limit must be 1–50 and depth 0–3")
-    notes = eligible_notes(root)
+    notes = eligible_notes(root, omissions=omissions)
     seeds = [key for key, (_, title, body) in notes.items()
              if query in (title + "\n" + body).casefold()][:limit]
     if providers:

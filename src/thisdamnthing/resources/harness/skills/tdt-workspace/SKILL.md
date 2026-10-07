@@ -1,15 +1,20 @@
 ---
 name: tdt-workspace
-description: Create/register/resume projects; workspace setup, policy, files, UI, reminder settings.
+description: Create, resume, relink or remove projects; workspace setup, policy, files and UI.
 ---
 
 For a focused request, read and follow only the matching specialist below, then
 return to the task. Use paths relative to the workspace root (the ancestor
 containing .tdt/config.json):
 
+- Connect workspace MCP, choose its host/preset, inspect or disconnect it:
+  `.tdt/skills/tdt-mcp/SKILL.md`.
 - Workspace permission rules: `.tdt/skills/tdt-constitution/SKILL.md`.
 - Create, register or resume projects; find working files or templates:
   `.tdt/skills/tdt-add-project/SKILL.md`.
+- Relink a renamed or moved project: `.tdt/skills/tdt-relink-project/SKILL.md`.
+- Archive, restore or permanently unregister a project; review reference cleanup:
+  `.tdt/skills/tdt-remove-project/SKILL.md`.
 - “Use UI”, browser questions or interactive pages: `.tdt/skills/tdt-ui/SKILL.md`.
 
 For workspace onboarding, orientation, diagnosis or preferences, continue below.
@@ -54,3 +59,16 @@ project and shared-asset locations. Paths are relative to work/. Save preference
 only when requested; preserve unrelated conventions. Do not create work/ or any
 starter folders during onboarding. Explain that convention edits affect future
 placement, not existing project locations.
+
+For interrupted stack/shared or user-skill writes, prefer `tdt_workspace_status`
+and `tdt_recovery_preview` (`kind: stack` or `kind: skill`) when available. Read
+complete before/after contents; null means absent and base64 objects are binary.
+Reading does not authorize recovery. Preserve journals and local edits on refusal.
+On explicit user recovery instruction, prefer everyday `tdt_recovery_apply` with
+that `kind`, `expected_sha256` from the complete preview's `journal_sha256`, and
+the actual `user_instruction`. Follow docs/troubleshooting.md for CLI fallback.
+After uncertainty inspect the preview, affected files and original operation
+outcomes before any newly authorized retry; no durable recovery outcome is saved.
+An absent journal does not prove rollback succeeded. Reread retained operation
+outcomes after recovery before retrying the original operation. Never bypass locks or assume an absent
+selected journal means the whole workspace is healthy.

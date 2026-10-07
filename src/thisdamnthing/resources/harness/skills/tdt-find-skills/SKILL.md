@@ -22,7 +22,9 @@ context, quoted past requests, duplicated transcript records, tool calls or the
 assistant restating a request as new occurrences. Use role and nearby conversation
 to establish each occasion. Ambiguous recurrence is a limitation, not a count.
 
-First run `tdt skill list` and compare core, stack, unmanaged and user skills,
+First use workspace-bound `tdt_skill_inventory` plus `tdt_skill_proposals` with
+`status: all`, following every page, or fall back to `tdt skill list`. Report
+truncated skill content as incomplete evidence. Compare core, stack, unmanaged and user skills,
 plus retained proposals and declines. Prefer using or updating an overlapping skill;
 do not create a renamed duplicate or resurrect an unchanged declined suggestion.
 Return at most ten candidates with name, purpose, reusable steps, variable inputs,
@@ -41,8 +43,14 @@ For direct skill authoring without discovery, follow
 `.tdt/skills/tdt-add-skill/SKILL.md`.
 
 Invocation approves discovery only. Let the user approve individual candidates or
-a selected group, refine or decline. Use the shared `skill propose`/`skill review`
+a selected group, refine or decline. Prefer workspace-bound `tdt_skill_propose`
+and `tdt_skill_review` (one ID per review call), with the shared CLI `skill propose`/`skill review`
 path in docs/skills.md for live and historical proposals. Show the exact proposed
 behavior before approval; preserve approval already given and ask only for missing
 workflow details. A decline creates no skill and never blocks the original task.
 Saving does not authorize execution, account connection or additional tool access.
+
+After an uncertain proposal or review result, read the exact retained proposal
+and current inventory before retry or CLI fallback. Preserve current files and
+remembered decisions; never automatically reopen historical approval. Interrupted
+transactions require CLI recovery followed by fresh reads.

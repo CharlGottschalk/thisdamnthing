@@ -385,51 +385,56 @@ def serve(root, sid):
             save(root, state)
 
 
-def cli(root, args):
-    if args.action == 'start':
-        return start(root, args.session, args.idle, args.no_open)
-    sid = args.session
+def cleanup(root, sid):
     directory(root, sid)
-    if args.action == 'cleanup':
-        with ownership(root, sid):
-            folder = directory(root, sid)
-            require({p.name for p in folder.iterdir()} <= {'session.json', 'server.lock'}, 'Unexpected session files; preserved')
-            for name in ('session.json', 'server.lock'):
-                path = managed_path(root, relative(sid, name))
-                path.unlink(missing_ok=True)
-            folder.rmdir()
-        return {'deleted': sid}
-    if args.action == 'status':
+    with ownership(root, sid):
+        folder = directory(root, sid)
+        require({p.name for p in folder.iterdir()} <= {'session.json', 'server.lock'}, 'Unexpected session files; preserved')
+        for name in ('session.json', 'server.lock'):
+            path = managed_path(root, relative(sid, name))
+            path.unlink(missing_ok=True)
+        folder.rmdir()
+    return {'deleted': sid}
+
+
+def status(root, sid):
+    state = read(root, sid)
+    try:
+        result = request(root, sid, 'status')
+        result['connected'] = True
+        return result
+    except (ValueError, TypeError):
+        return {'session_id': sid, 'status': state['status'], 'connected': False,
+                'round_id': state['round_id'], 'ack': state['ack']}
+
+
+def read_events(root, sid, after=0, seconds=0):
+    require(0 <= after <= 1000, 'Invalid event cursor')
+    require(0 <= seconds <= 30, 'Wait timeout must be 0–30 seconds')
+    deadline = time.monotonic() + seconds
+    while True:
         state = read(root, sid)
-        try:
-            result = request(root, sid, 'status')
-            result['connected'] = True
-            return result
-        except (ValueError, TypeError):
-            return {'session_id': sid, 'status': state['status'], 'connected': False,
-                    'round_id': state['round_id'], 'ack': state['ack']}
-    if args.action in ('read', 'wait'):
-        require(0 <= args.after <= 1000, 'Invalid event cursor')
-        seconds = args.timeout if args.action == 'wait' else 0
-        require(0 <= seconds <= 30, 'Wait timeout must be 0–30 seconds')
-        deadline = time.monotonic() + seconds
-        while True:
-            state = read(root, sid)
-            events = [{k: v for k, v in e.items() if k != 'request'} for e in state['events'] if e['event_id'] > args.after]
-            if events or time.monotonic() >= deadline or state['status'] in ('finished', 'cancelled'):
-                return {'events': events, 'prompts': {e['round_id']: state.get('rounds', {}).get(e['round_id']) for e in events}, 'ack': state['ack'], 'status': state['status'], 'timed_out': not events and seconds > 0}
-            time.sleep(.2)
-    if args.action == 'present':
-        path = Path(args.page)
-        require(path.stat().st_size <= LIMIT and not path.is_symlink(), 'Invalid or oversized page file')
-        return request(root, sid, 'present', validate_page(json.loads(path.read_text())))
-    payload = {'event_id': args.event_id} if args.action == 'ack' else {}
+        events = [{k: v for k, v in e.items() if k != 'request'} for e in state['events'] if e['event_id'] > after]
+        if events or time.monotonic() >= deadline or state['status'] in ('finished', 'cancelled'):
+            return {'events': events, 'prompts': {e['round_id']: state.get('rounds', {}).get(e['round_id']) for e in events}, 'ack': state['ack'], 'status': state['status'], 'timed_out': not events and seconds > 0}
+        time.sleep(.2)
+
+
+def present(root, sid, page):
+    require(len(json.dumps(page, allow_nan=False).encode()) <= LIMIT, 'Payload exceeds 256 KiB')
+    return request(root, sid, 'present', validate_page(page))
+
+
+def change_session(root, sid, action, event_id=None):
+    directory(root, sid)
+    require(action in ('ack', 'close'), 'Unknown session action')
+    payload = {'event_id': event_id} if action == 'ack' else {}
     try:
         with ownership(root, sid):
             state = read(root, sid)
-            if args.action == 'ack':
-                require(type(args.event_id) is int and state['ack'] <= args.event_id <= len(state['events']), 'Invalid acknowledgement cursor')
-                state['ack'] = args.event_id
+            if action == 'ack':
+                require(type(event_id) is int and state['ack'] <= event_id <= len(state['events']), 'Invalid acknowledgement cursor')
+                state['ack'] = event_id
                 result = {'ack': state['ack']}
             else:
                 state.update(status='finished', port=None)
@@ -437,8 +442,8 @@ def cli(root, args):
             save(root, state)
             return result
     except SessionBusy:
-        result = request(root, sid, args.action, payload)
-        if args.action == 'close':
+        result = request(root, sid, action, payload)
+        if action == 'close':
             deadline = time.monotonic() + 5
             while time.monotonic() < deadline:
                 try:
@@ -448,6 +453,23 @@ def cli(root, args):
                     time.sleep(.1)
             raise ValueError('Session is finishing; retry cleanup shortly')
         return result
+
+
+
+def cli(root, args):
+    if args.action == 'start':
+        return start(root, args.session, args.idle, args.no_open)
+    if args.action == 'cleanup':
+        return cleanup(root, args.session)
+    if args.action == 'status':
+        return status(root, args.session)
+    if args.action in ('read', 'wait'):
+        return read_events(root, args.session, args.after, args.timeout if args.action == 'wait' else 0)
+    if args.action == 'present':
+        path = Path(args.page)
+        require(path.stat().st_size <= LIMIT and not path.is_symlink(), 'Invalid or oversized page file')
+        return present(root, args.session, json.loads(path.read_text()))
+    return change_session(root, args.session, args.action, args.event_id if args.action == 'ack' else None)
 
 
 def add_parser(commands):

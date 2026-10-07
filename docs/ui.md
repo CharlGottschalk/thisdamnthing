@@ -69,3 +69,23 @@ Probe stale rounds, duplicate submission IDs, altered replays, wrong credentials
 cross-session access and oversized input. Check crash/restart, idle expiry,
 offline read and cleanup. Use actual browser submissions with each live host when
 changing the agent loop; direct HTTP requests alone do not verify that interaction.
+
+
+## MCP access
+
+Read the installed guide and contract with `tdt_guide_read` using `core/ui` and
+`core/contracts/ui`. Both profiles expose these allowlisted documents.
+
+Everyday MCP exposes `tdt_ui_start`, `tdt_ui_present`, `tdt_ui_status`,
+`tdt_ui_read`, `tdt_ui_wait`, `tdt_ui_ack`, `tdt_ui_close` and `tdt_ui_cleanup`.
+Present accepts the page object directly, using the same core validation as CLI.
+Start defaults to no browser launch and returns the private local URL. Status
+returns connection/round/cursor metadata without page content or credentials.
+Read/wait include complete events and original prompts, defaulting to one event;
+use `next_after` while `has_more` is true. Increase `budget_bytes` up to 1 MiB
+for large events. Budget refusal never acknowledges events. Waits are bounded to
+30 seconds and do not hold the MCP mutation lock. A cancelled MCP call does not
+cancel the interview. After uncertain start/present responses inspect retained
+state/current round before retrying; present always creates a new round.
+Close retains answers; cleanup deletes them and requires explicit user instruction.
+These tools do not submit answers on the user's behalf or promote them to knowledge.

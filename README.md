@@ -11,13 +11,17 @@
 
 # ThisDamnThing
 
-A local workspace for Claude Code and Codex, with a knowledge brain that grows
-with your work and stacks that extend what your agents can do.
+A persistent local workspace for AI agents. Keep your knowledge, projects, rules
+and reusable workflows together, even when you switch agents.
+
+Claude Code and Codex do the work. ThisDamnThing keeps the context: a reviewed
+knowledge brain, your workspace Constitution, linked projects, skills and Stacks.
+Use either agent, or both, with the same workspace. Your knowledge stays in
+readable Markdown files on your machine.
 
 > [!NOTE]
-> **TDT** has only been tested on Linux. Windows and macOS testing is
-> underway. You're welcome to try installing it on either platform and report
-> what works or any issues you encounter through [GitHub Issues](https://github.com/CharlGottschalk/thisdamnthing/issues).
+> **TDT** installation has been verified on Linux and macOS. Native Windows
+> installation remains unverified. Report what works or any issues through [GitHub Issues](https://github.com/CharlGottschalk/thisdamnthing/issues).
 
 ## Make your workspace your own
 
@@ -28,15 +32,12 @@ with your work and stacks that extend what your agents can do.
 | **Give your agents rules** | Set working preferences and boundaries with a workspace Constitution. |
 | **Use ThisDamnThing's UI** | Say “use ui” to answer questions and work through choices in a local browser. |
 | **Bring your projects** | Link existing project folders and get oriented without moving their source. |
-| **Extend with Stacks** | Add skills, workflows and capabilities when you need them. |
+| **Extend with Stacks** | Install optional packages of skills, workflows, knowledge, templates and local capabilities. |
 
 ## Install and create a workspace
 
 You need Python 3.11+ and pipx. Install Claude Code or Codex separately if you
 want an agent integration.
-
-The commands below describe the planned public installation. PyPI publication
-and installation from the public registry are still awaiting release verification.
 
 Ask your agent:
 

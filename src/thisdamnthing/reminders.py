@@ -67,6 +67,8 @@ def settings(root):
 
 def configure(root, tz=None, chat=None, schedule=None, clear_schedule=False):
     with brain.locked(root):
+        if managed_path(root, ".tdt/state/stack-transaction.json").exists():
+            raise WorkspaceError("Interrupted workspace operation; run tdt stack recover")
         value = settings(root)
         if tz is not None:
             zone(tz)
@@ -83,9 +85,7 @@ def configure(root, tz=None, chat=None, schedule=None, clear_schedule=False):
     return value
 
 
-def inventory(root):
-    if not managed_path(root, "work/reminders").exists():
-        return []
+def inventory(root, *, include_text=False):
     result, identities = [], set()
     for path in brain.note_files(root, ("reminders",)):
         text = bounded(root, path)
@@ -122,7 +122,10 @@ def inventory(root):
                 raise WorkspaceError("Invalid reminder delivery claim")
             brain.identifier(claim.get("token"))
             instant(claim.get("expires_at"))
-        result.append({**meta, "path": path, "body": body.strip()})
+        row = {**meta, "path": path, "body": body.strip()}
+        if include_text:
+            row["markdown"] = text
+        result.append(row)
     return sorted(result, key=lambda row: (instant(row["due_at"]), row["id"]))
 
 
@@ -170,12 +173,16 @@ def select(root, key):
     return row
 
 
+class StaleRevision(WorkspaceError):
+    """The reminder changed since the caller read it."""
+
+
 def change(root, key, action, revision, instruction, data=None):
     instruction = brain.clean_text(instruction, "user instruction/reference", 500)
     with brain.locked(root):
         row = select(root, key)
         if row["revision"] != revision:
-            raise WorkspaceError("Reminder changed; reread before editing")
+            raise StaleRevision("Reminder changed; reread before editing")
         if row["status"] != "pending":
             raise WorkspaceError("Reminder is already done or cancelled; create a new reminder")
         if action in ("done", "cancel"):
@@ -209,7 +216,7 @@ def available(row, current):
             and (row["claim"] is None or instant(row["claim"]["expires_at"]) <= current))
 
 
-def check(root, channel="manual", limit=10):
+def check(root, channel="manual", limit=10, *, before_write=None):
     if channel not in CHANNELS or not 1 <= limit <= 20:
         raise WorkspaceError("Invalid delivery channel or limit (1–20)")
     with brain.locked(root):
@@ -224,6 +231,10 @@ def check(root, channel="manual", limit=10):
             row["claim"] = {"token": secrets.token_hex(32), "channel": channel,
                             "revision": row["revision"],
                             "expires_at": (current + timedelta(minutes=10)).isoformat()}
+        # Validate the complete proposed delivery while locked, before any claim is saved.
+        if before_write is not None:
+            before_write(rows)
+        for row in rows:
             write(root, row)
     return rows
 

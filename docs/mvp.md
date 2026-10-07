@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 40 tools; everyday has 73.
+Read-only has 42 tools; everyday has 75.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -415,3 +415,11 @@ reference and enforces the 6000-byte final UTF-8 limit. The receipt returns only
 the saved SHA256; read complete policy back. After uncertainty reread before retry
 or CLI fallback; no retained operation outcome or automatic retry. Policy saving
 does not enable hooks, recover state or grant permissions beyond host boundaries.
+
+Both MCP profiles expose retained user skill proposals with pending/approved/declined/all
+filters, revision-bound pagination and complete exact-ID reads. Reads include
+behavior, source references, decision reference, original ownership snapshot and
+current recorded ownership. Historical approval and recorded ownership do not
+verify live skill files. Shared read locks and a 2-MiB registry cap protect reads;
+interrupted skill/stack journals refuse discovery. Output budgets refuse partial
+review content. Proposal/review writes and host history access remain CLI-only.

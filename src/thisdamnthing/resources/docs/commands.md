@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 40 tools; `everyday` has 73 in total.
+The default `read-only` catalog has 42 tools; `everyday` has 75 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Returns `proposal_sha256` binding renames and complete before/after contents, including derived catalog writes.
@@ -129,6 +129,11 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
 - `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
+- `tdt_skill_proposals` / `tdt_skill_proposal_read`: paginated retained user skill
+  proposals and complete behavior, sources, decisions and recorded ownership.
+  Defaults to pending; select approved, declined or all explicitly. Historical
+  approval does not prove the version is installed. These reads never execute
+  skill instructions, inspect host histories, propose or approve skills.
 - `tdt_constitution_read`: complete constitution and its revision.
 - `tdt_constitution_save` (everyday): complete approved `markdown`, current
   `expected_sha256` (or `missing`) and actual `user_instruction` approval reference

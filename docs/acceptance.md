@@ -1368,3 +1368,25 @@ supplied genuine fixture context. No saved host configuration changed. Codex
 state-db lookup warnings did not affect the run; Claude stderr was empty. This
 verifies model-selected MCP routing with task-level instructions; historical
 uncertainty was preseeded, with no real response loss or native skill activation.
+
+### MCP retained skill proposal reads — 2026-10-07
+
+Both profiles expose `tdt_skill_proposals` and `tdt_skill_proposal_read` (42/75
+tools). Verify default pending and explicit approved/declined/all filters, exact
+content IDs, complete Unicode instructions, source references, decisions and
+original/current ownership metadata. Historical approval does not verify installed
+content. Check revision-bound pagination, stale/filter-mismatched cursors, unknown
+IDs, strict inputs and complete-read budget refusal. Check absent state, malformed
+and oversized registries, symlink/FIFO refusal, shared/exclusive locks and both
+skill/stack recovery markers. Reads must preserve proposal/skill/control files.
+
+Source and installed-wheel focused manual checks passed these cases, including
+CLI-core proposal content parity and unchanged workspace hashes during reads.
+Source and packaged SDK auto/legacy modes with both profiles passed discovery,
+annotations, input/output schemas, structured/text parity and refusal envelopes.
+All 98 source/wheel/installed package files matched; dependency and whitespace
+checks passed. Sandbox SDK discovery timed out and build dependency DNS failed;
+bounded approved outside-sandbox runs passed. The initial source SDK probe loaded
+the old installed catalog; explicitly passing its source path fixed the probe.
+No automated suite, live-model routing, history access, proposal/review writes,
+host registration or recovery execution was exercised.

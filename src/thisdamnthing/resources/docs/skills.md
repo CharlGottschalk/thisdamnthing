@@ -199,3 +199,16 @@ when needed; there is no dedicated enablement skill. Terminal alternatives:
 `tdt agent enable codex` adds all existing skills to that host and keeps their
 original ownership. Restart the host session for discovery. If a pending update
 reports changed integration ownership, propose it again before reviewing it.
+
+## MCP proposal inspection
+
+When the workspace-bound MCP server is available, `tdt_skill_proposals` lists
+retained proposals (pending by default; approved, declined and all are explicit
+filters). `tdt_skill_proposal_read` reads the complete proposal by its exact content
+ID, including sources, decision reference and original/current recorded ownership.
+Read complete content before discussing a decision; increase the result budget
+if needed. Cursors expire when proposal or ownership state changes. A retained
+approval does not establish that its version is currently installed, and ownership
+metadata does not verify files on disk. These tools neither execute instructions
+nor access host history. Continue using the CLI for proposals and actual reviews,
+and inspect interrupted state before the existing CLI recovery flow.

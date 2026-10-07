@@ -119,3 +119,68 @@ During onboarding, `/tdt-workspace` offers manual, in-chat, scheduled or combine
 reminder delivery and a workspace timezone. Chat checks are opt-in through the
 existing request hook; scheduled delivery needs an available external scheduler
 and a verified job. See [reminders](reminders.md) for setup and delivery limits.
+
+## Optional MCP registration
+
+Invoke `/tdt-mcp` in Claude Code or `$tdt-mcp` in Codex (or use the skill picker).
+The skill asks whether to configure Claude Code, Codex or both, explains the
+presets and waits for your choice. You can supply the host and preset up front
+or choose different presets for each host. It also supports status and removal.
+
+- **Read-only** (`read-only`, recommended to start): retrieve and inspect workspace
+  information and supported previews, without MCP write tools. Explicit marketplace
+  reads can fetch registry metadata. Use it for answers and inspection.
+- **Everyday** (`everyday`): adds supported writes such as saving notes, reviewing
+  knowledge, managing reminders/projects and applying reviewed stack changes. Some
+  actions execute explicitly selected trusted local providers. Use it to carry out
+  requested workspace tasks through MCP.
+
+These presets select tools; they do not authorize every action. Review requirements
+and host permissions still apply. Read-only does not restrict the host shell or
+other tools, and neither preset enables automatic capture. Registration works
+through the CLI before MCP connects; it does not require an existing MCP server.
+
+Install the MCP extra first (see [commands](commands.md#local-mcp-reads)).
+Manual configuration remains
+available. For owned workspace-local registration, use:
+
+```sh
+tdt --workspace /path/to/workspace mcp register claude
+tdt --workspace /path/to/workspace mcp register codex --profile everyday
+tdt --workspace /path/to/workspace mcp status codex
+tdt --workspace /path/to/workspace mcp unregister codex
+```
+
+All MCP commands require explicit `--workspace PATH`, even from the workspace
+directory; there is no current-directory fallback. Re-run `mcp register HOST`
+with `--profile read-only` or `--profile everyday` to change an intact owned entry
+in place. An identical registration is a no-op. A refusal requires inspection and
+manual reconciliation, not an automatic unregister/register retry.
+
+Registration defaults to `read-only`; `everyday` must be selected explicitly. It
+records the current Python interpreter and absolute workspace path, so run it from
+the installation containing the MCP extra. Re-register after moving the workspace
+or replacing that environment. Restart the host after changes.
+
+Claude uses the `thisdamnthing` entry in workspace `.mcp.json`; Codex uses a marked
+`[mcp_servers.thisdamnthing]` block in workspace `.codex/config.toml`. Ownership lives
+in `.tdt/state/mcp.json`. Unowned names and edited/missing owned entries refuse,
+even when an unowned entry has identical values. Resolve conflicts manually;
+registration never adopts them. Unregister removes only the owned entry and leaves
+configuration files in place. Claude JSON formatting may change; other settings
+retain their values. Codex preserves unrelated text and refuses TOML structures
+that cannot safely accommodate its block. Inputs and outputs are capped at 1 MiB
+per file. Transactions share the workspace lock and stack recovery journal; after
+interruption inspect `tdt_recovery_preview` or use `tdt stack recover`, then inspect
+registration status. Status checks saved local ownership, not connection health or
+effective settings inherited from other host scopes.
+
+Registration is independent of `tdt agent enable/disable` (skills and capture
+hooks). To remove both, unregister MCP and disable the agent separately. It does
+not edit global settings, host trust, tool approvals or linked projects, and does
+not start a host or enable automatic capture. Review Claude project MCP approval
+and Codex project trust yourself; other host configuration layers may override
+these entries. Start the host in the workspace; linked external project sessions
+do not inherit this registration. See the official
+[Codex MCP documentation](https://developers.openai.com/codex/mcp) and
+[Claude MCP scopes](https://code.claude.com/docs/en/mcp).

@@ -13,7 +13,7 @@ MANIFEST = ".tdt/state/bootstrap.json"
 PROVIDERS = {"claude": ("CLAUDE.md", ".claude/skills", ".claude/settings.json"),
              "codex": ("AGENTS.md", ".agents/skills", ".codex/hooks.json")}
 SPECIALIST_SKILLS = ("tdt-relink-project", "tdt-remove-project", "tdt-maintain-brain", "tdt-remind", "tdt-check-reminders", "tdt-search-notes", "tdt-capture", "tdt-note", "tdt-constitution", "tdt-workspace", "tdt-review-brain", "tdt-search", "tdt-add-project", "tdt-ui", "tdt-install-stack", "tdt-find-skills", "tdt-add-skill", "tdt-update-stack", "tdt-remove-stack")
-ROUTER_SKILLS = ("tdt-brain", "tdt-reminders", "tdt-stacks", "tdt-skills")
+ROUTER_SKILLS = ("tdt-brain", "tdt-reminders", "tdt-stacks", "tdt-skills", "tdt-mcp")
 SKILLS = SPECIALIST_SKILLS + ROUTER_SKILLS
 LEGACY_SKILLS = {name.replace('tdt-', 'tdt.', 1): name for name in SKILLS}
 LEGACY_SKILLS.update({'tdt.ask-brain': 'tdt-search', 'tdt-ask-brain': 'tdt-search'})
@@ -185,7 +185,8 @@ def plan_bootstrap(root, agent, config, owned):
                 ('tdt-brain', 'Search, save, review and maintain brain knowledge or scratchpad notes.'),
                 ('tdt-reminders', 'Create, manage or check one-time reminders.'),
                 ('tdt-stacks', 'Find, install, update or remove workflow stacks.'),
-                ('tdt-skills', 'Create named skills or discover reusable workflows.')):
+                ('tdt-skills', 'Create named skills or discover reusable workflows.'),
+                ('tdt-mcp', 'Set up workspace MCP for Claude Code or Codex; choose a preset, inspect or disconnect.')):
             generated[f"{skills}/{name}/SKILL.md"] = (
                 f"---\nname: {name}\ndescription: {description}\n---\n\n"
                 f"Read and follow .tdt/skills/{name}/SKILL.md from the workspace root.\n")

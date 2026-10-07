@@ -20,6 +20,7 @@ Load the relevant installed skill for details instead of guessing:
   operational data, separate from knowledge.
 - `/tdt-install-stack`, `/tdt-update-stack` and `/tdt-remove-stack` manage
   optional capabilities and preserve user work.
+- `/tdt-mcp` helps choose a host and preset for workspace MCP registration.
 - `/tdt-workspace`, `/tdt-constitution`, `/tdt-add-project` and `/tdt-ui` handle
   setup, policy, projects, working files and local browser interaction.
 - `/tdt-relink-project` reconnects moved projects; `/tdt-remove-project` archives,

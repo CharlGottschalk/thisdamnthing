@@ -312,8 +312,14 @@ skill prefers these tools with CLI fallback. Both profiles support explicit
 registered-project inspection, including bounded external source evidence with
 reported omissions. Everyday also submits onboarding interpretations as pending
 candidates; identical retries preserve prior content and review status. Retries preserve exact interrupted registration
-notes and existing identities. Read-only remains the default. Other writes and
-owned host registration remain pending. Both profiles expose bounded context/policy
+notes and existing identities. Read-only remains the default. Explicit CLI
+`mcp register/unregister/status` manages owned workspace-local Claude and Codex
+entries independently of skill/hook enablement, preserving unrelated settings and
+refusing ownership conflicts. The callable `tdt-mcp` skill explains Read-only and
+Everyday presets, asks for missing host/preset choices and registers only after
+the user chooses. It works through the CLI before MCP is connected. Host trust
+and tool approval remain host-managed.
+Marketplace source inspection/install/update remain CLI-only. Both profiles expose bounded context/policy
 resources and the argument-free `tdt-start` prompt. See the installed
 [command reference](../src/thisdamnthing/resources/docs/commands.md#local-mcp-reads).
 

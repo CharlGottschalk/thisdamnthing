@@ -255,7 +255,8 @@ def recovery_plan(root, *, bounded=False):
     bootstrap_paths = {*RESOURCES, *UI_RESOURCES, MANIFEST, UI_MANIFEST,
                        '.tdt/config.json', '.tdt/state/owned-files.json',
                        '.tdt/state/user-skills.json', '.tdt/state/capability-state.json',
-                       '.tdt/state/projects.json', 'README.md',
+                       '.tdt/state/projects.json', '.tdt/state/mcp.json',
+                       '.mcp.json', '.codex/config.toml', 'README.md',
                        *(p for provider in PROVIDERS.values() for p in (provider[0], provider[2]))}
     for relative, before in record['before'].items():
         safe_path(relative)

@@ -18,6 +18,7 @@ values returned by inspection; a placeholder is never approval.
 | Skill or chat request | CLI command | Purpose |
 | --- | --- | --- |
 | Ask your agent to initialize or refresh setup | `tdt init [PATH] --agent both` | Initialize or refresh unchanged owned core files; omit PATH for the current directory. Select `claude`, `codex`, `both` or `none`. |
+| `/tdt-mcp` | `tdt --workspace PATH mcp register HOST --profile PRESET` | Choose a host and preset; also supports `status HOST` and `unregister HOST`. |
 | `/tdt-workspace` | `tdt doctor` | Check local layout, ownership and recovery state. |
 | Ask your agent to enable or disable an integration | `tdt agent enable codex` / `tdt agent disable codex` | Add or remove that workspace-local host integration; also supports `claude`. |
 | `/tdt-constitution` | `tdt constitution show` | Read the current workspace policy and revision hash. |
@@ -119,8 +120,9 @@ virtual environment. Configure your local MCP host to launch `tdt` with:
 ```
 
 Replace the workspace path with an initialized workspace. The process stays bound
-to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
-not edit host configuration. Connecting MCP does not enable automatic capture.
+to that directory and uses stdin/stdout for MCP. Manual configuration remains
+available. Use `/tdt-mcp` for guided host and preset selection; see
+[MCP registration](agent-bootstrap.md#optional-mcp-registration).
 
 The default `read-only` catalog has 52 tools; `everyday` has 91 in total.
 The following list covers reads and selected everyday counterparts:

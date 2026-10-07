@@ -6,7 +6,7 @@ agent. Select a skill below to read its usage guide. In Claude, invoke it with
 `/` before its name; in Codex, use `$` or the skill picker.
 
 Claude and Codex group automatic discovery under `tdt-brain`, `tdt-reminders`,
-`tdt-stacks`, `tdt-skills` and `tdt-workspace`. The specialist names below
+`tdt-stacks`, `tdt-skills`, `tdt-workspace` and `tdt-mcp`. The specialist names below
 remain directly invocable. Stack and approved user skills remain individually
 discoverable.
 
@@ -25,6 +25,7 @@ discoverable.
 - **[tdt-search](brain.md#search-and-follow-sources)** — Answer questions using approved brain knowledge, cite sources and explain missing or conflicting evidence.
 - **[tdt-ui](ui.md)** — Use local browser interviews and interactive pages, submit answers and continue the work with your agent.
 - **[tdt-update-stack](stacks.md#approved-updates-and-complete-uninstall)** — Inspect an available stack update and apply the exact replacement you approve.
+- **[tdt-mcp](agent-bootstrap.md#optional-mcp-registration)** — Connect Claude Code, Codex or both to workspace MCP; compare Read-only and Everyday presets, inspect or remove registration.
 - **[tdt-workspace](agent-bootstrap.md#open-the-workspace-and-review-trust)** — Get oriented in your workspace, check its setup and find installed stacks, skills and usage guides.
 
 - **[tdt-remind](reminders.md)** — Save, list, edit, snooze, complete or cancel one-time reminders.

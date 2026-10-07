@@ -142,18 +142,32 @@ def main(argv=None):
     skills.add_parser(commands)
     from . import ui
     ui.add_parser(commands)
-    mcp = commands.add_parser("mcp", help="serve local workspace tools over stdio")
+    mcp = commands.add_parser("mcp", help="serve and register workspace-local MCP tools")
     mcp_actions = mcp.add_subparsers(dest="action", required=True)
     serve = mcp_actions.add_parser("serve")
     serve.add_argument("--profile", choices=("read-only", "everyday"), default="read-only")
+    for action in ("register", "unregister", "status"):
+        command = mcp_actions.add_parser(action, help="manage a workspace-owned host MCP entry")
+        command.add_argument("host", choices=("claude", "codex"))
+        if action == "register":
+            command.add_argument("--profile", choices=("read-only", "everyday"), default="read-only")
     args = parser.parse_args(argv)
     try:
         if args.command == "mcp":
             if not args.workspace:
                 raise WorkspaceError("MCP requires an explicit --workspace path")
+            if args.action != "serve":
+                from pathlib import Path
+                from .mcp_registration import text
+                text(Path(args.workspace).expanduser().resolve(), ".tdt/config.json")
             root = resolve_workspace(args.workspace)
-            from .mcp_server import serve
-            serve(root, args.profile)
+            if args.action == "serve":
+                from .mcp_server import serve
+                serve(root, args.profile)
+            else:
+                from .mcp_registration import configure
+                print(json.dumps(configure(root, args.host, args.action,
+                    getattr(args, "profile", "read-only")), indent=2))
             return 0
         if args.command == "init":
             if args.workspace:

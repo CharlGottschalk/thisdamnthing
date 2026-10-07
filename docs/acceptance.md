@@ -1993,3 +1993,80 @@ watcher warnings; Claude stderr was empty. Sandbox DNS/socket/SDK discovery
 restrictions were resolved through bounded approved outside-sandbox checks.
 All 100 source/wheel/installed package files matched byte-for-byte; dependency and
 diff checks passed. No staging, commit or push was performed.
+
+### Owned workspace MCP registration
+
+In disposable workspaces and a built installation with the MCP extra, exercise
+`tdt --workspace PATH mcp register HOST`, `status HOST` and `unregister HOST` for
+Claude and Codex. Check default read-only, explicit everyday, repeated no-op
+registration, in-place profile changes, unregister and absent no-op removal.
+Preserve unrelated Claude JSON values and Codex TOML text. Refuse unowned names
+(including identical entries), edited/missing owned entries, malformed ownership,
+duplicate JSON, conflicting TOML, oversized/invalid-UTF-8 files, symlinks and FIFOs.
+Check the workspace config before ordinary resolution to avoid blocking on FIFOs.
+Exercise lock contention, interrupted journals and exact rollback after an
+interrupted registration transaction. Enable/disable agent bridges separately and
+verify that MCP registration remains independent. Do not change real host trust,
+permissions, global configuration or linked external projects.
+
+Use each generated command/args entry with SDK auto/legacy clients and both
+profiles. Check the unchanged 52/91 tool catalogs, context/status schemas and
+text/structured parity, guide discovery, complete agent-bootstrap guide reads,
+two resources and one prompt. Compare workspace hashes before and after reads.
+Check host-native discovery separately from connectivity: Claude project approval
+and Codex trusted project configuration are host decisions. For live routing,
+use disposable workspaces, existing sign-ins, hooks disabled and launch-only
+configuration derived from the generated entries; inspect transcripts, result
+schemas, actual guide contents and workspace hashes.
+
+Source and installed manual checks passed on Linux, including interrupted rollback
+and CLI failure paths. All eight installed SDK host/protocol/profile combinations
+passed. Package checks matched 101 source/wheel/installed files; dependency and
+diff checks passed. Initial checks exposed a missing recovery allowlist entry,
+then live discovery caught the command guide exceeding its input limit. Both were
+fixed: exact registration paths are recoverable and detailed registration guidance
+lives in the smaller agent-bootstrap guide. Live model feedback also prompted
+explicit mandatory-workspace and in-place-profile guidance. No automated suite,
+macOS, interactive trust UI or real power-loss validation is claimed.
+
+Final live Codex and Claude runs exited zero with four MCP read calls each and
+no builtin calls or workspace changes. Both read context, status, guide inventory
+and the complete installed agent-bootstrap guide, then correctly explained explicit
+workspace selection, in-place profile changes, ownership refusal and independent
+agent disable. Transcript result schemas and returned guide bytes matched the
+installed fixture; whole-workspace hashes were unchanged. Claude stderr was empty;
+Codex emitted state database lookup warnings. Native discovery confirmed Claude's
+project scope/pending approval and Codex discovery with temporary project trust.
+Live Codex used launch overrides parsed from the generated entry; Claude loaded the
+generated JSON explicitly. Saved user registrations and trust were unchanged.
+
+### Guided MCP setup skill
+
+Invoke `tdt-mcp` from each enabled host in a disposable initialized workspace with
+no MCP connection. Verify the installed host pointer, canonical skill, workspace
+router and setup guide. With no supplied choices, the agent must explain Read-only
+and Everyday, ask for Claude Code/Codex/both and the preset, then leave registration
+unchanged until answered. Preset defaults are not answers. With host and preset
+already supplied in a setup request, it should preserve those choices, register
+only that host and read status back without another confirmation. Check that
+saved registration is not described as a live connection or automatic capture.
+
+Source and wheel manual checks passed fresh installation, upgrade, host enable/
+disable, canonical MCP skill discovery/read, selected registration profiles and
+edited-skill preservation. Skill frontmatter validation passed. All eight installed
+SDK host/protocol/profile combinations passed with skill discovery/read added;
+102 package files matched source/wheel/installation, with unchanged 52/91 tool
+catalogs. No automated tests were added.
+
+Live Claude and Codex checks passed without an MCP connection. Both interview
+runs explained the presets, asked for missing host/preset choices and changed no
+workspace files. With choices supplied, Codex registered Claude/read-only and
+Claude registered Codex/everyday without another question; each read saved status
+back and distinguished registration from connectivity. Each chosen-case hash audit
+found exactly its host configuration and MCP ownership file changed. No other
+host registration, capture-hook changes or MCP calls occurred. An initial Claude
+fixture denied a compound status command containing echo; it preserved the workspace
+and reported the denial. Allowing the fixture's harmless echo completed the rerun.
+Codex corrected login-shell PATH selection to the installed CLI; its runtime logged
+system-skill installation/state lookup warnings. Claude stderr was empty. Native
+hooks were disabled and no interactive host trust or live reconnection was tested.

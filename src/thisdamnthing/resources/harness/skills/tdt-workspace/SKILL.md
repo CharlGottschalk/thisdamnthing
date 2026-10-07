@@ -7,6 +7,8 @@ For a focused request, read and follow only the matching specialist below, then
 return to the task. Use paths relative to the workspace root (the ancestor
 containing .tdt/config.json):
 
+- Connect workspace MCP, choose its host/preset, inspect or disconnect it:
+  `.tdt/skills/tdt-mcp/SKILL.md`.
 - Workspace permission rules: `.tdt/skills/tdt-constitution/SKILL.md`.
 - Create, register or resume projects; find working files or templates:
   `.tdt/skills/tdt-add-project/SKILL.md`.

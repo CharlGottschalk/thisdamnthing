@@ -1688,3 +1688,41 @@ passed. Earlier live passes prompted corrections of outdated CLI-only descriptio
 final routing used the rebuilt artifact. Temporary MCP configurations and existing
 sign-ins were used, with native hooks disabled and no saved host registration
 changes. Codex emitted local state lookup warnings; Claude stderr was empty.
+
+## MCP resources and startup prompt (2026-10-07)
+
+Both profiles now advertise fixed `tdt://workspace/context` and
+`tdt://workspace/policy` resources and the argument-free `tdt-start` prompt.
+Resources reuse existing tool dispatch with a 128-KiB result budget and return
+complete JSON envelopes; failures are protocol errors without partial context.
+The static startup prompt requests fresh context and preserves actual user
+permission boundaries. Catalogs remain 47 read-only / 84 everyday tools.
+
+Focused source and installed-wheel stdio checks passed with SDK auto and legacy
+negotiation across both profiles: discovery, resource/tool equality, current
+profile/tool lists, prompt shape, capability flags, empty resource templates,
+unknown URIs/prompts, unexpected arguments/cursors, Unicode/fresh rereads,
+oversized input and serialized output, escaping symlinks and policy FIFOs.
+Per-fixture hashes confirmed no read side effects. Existing removal tool SDK
+regressions also passed all four combinations, including schemas, annotations,
+text/structured result parity and read-only refusal of writes.
+
+All 99 source/wheel/installed package files matched; dependency and whitespace
+checks passed. Sandbox stdio discovery timeout and build dependency DNS failure
+were resolved by bounded outside-sandbox verification/build runs. No automated
+test suite was added. No subscriptions, change notifications, dynamic resource
+templates, arbitrary source reads or owned host registration were implemented.
+
+Live Codex CLI 0.156.1 and Claude Code 2.1.289 routing passed on the installed
+wheel, with exits 0 and 10/5 MCP calls. Each run used the actual `prompts/get`
+response supplied by a verification driver, then read fresh context, complete
+policy, the requested working file and installed guidance. Both reported the
+correct profile and fixture fact, ignored an embedded reminder instruction and
+explained that the startup prompt does not authorize writes. Codex retried two
+invalid inventory limits successfully. Independent schemas, transcript/server-log
+agreement, per-call and whole-workspace hashes passed: no writes or builtin tool
+calls. Existing sign-ins and temporary MCP configurations were used with native
+hooks disabled. Codex logged state-lookup warnings; Claude stderr was empty.
+Native prompt selection/slash-command activation and native resource UI were not
+exercised; resource discovery/read and prompt retrieval were verified over SDK
+stdio instead. Install/update lifecycle and owned host registration remain pending.

@@ -88,6 +88,25 @@ and `--user-instruction`. See [project lifecycle](projects.md#project-lifecycle)
 
 ## Local MCP reads
 
+Both profiles advertise two fixed resources, `tdt://workspace/context` and
+`tdt://workspace/policy`, and one argument-free prompt, `tdt-start`. Resources
+return the same JSON result envelopes as `tdt_workspace_context` and
+`tdt_constitution_read`, using a 128-KiB result budget. Context includes the
+selected profile and its actual tool catalog. The server reads current files on
+each request; hosts must refresh cached resources before acting. Oversized or
+unavailable context fails the resource request without partial content. Use the
+tools for explicit budgets and ordinary structured refusals. Unknown resource
+URIs and nonempty catalog cursors refuse; there are no resource templates,
+subscriptions, change notifications, arbitrary file URIs or external reads.
+
+Selecting `tdt-start` returns static startup instructions to read fresh context,
+then use the relevant installed guides/skills for the user's actual request. It
+does not embed workspace text or grant permission to write, execute, capture or
+register a host. Unknown prompts and arguments refuse. Hosts that do not expose
+resources or prompts can use the existing tools directly; connecting the server
+does not automatically invoke the prompt or activate a native slash command.
+
+
 Install the optional dependency with `pipx inject thisdamnthing 'mcp>=2.3,<3'`
 for an existing pipx installation, or install `thisdamnthing[mcp]` in a Python
 virtual environment. Configure your local MCP host to launch `tdt` with:
@@ -565,7 +584,7 @@ execute code again, and interrupted journals require CLI recovery. This tool nev
 installs or trusts a provider. Other everyday writes are not exposed. External source
 reads are limited to explicit registered-project inspection. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
-HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified
+HTTP endpoint or resource subscriptions. Read-only calls were verified
 on Linux with Codex CLI 0.156.1 and Claude Code 2.1.289 in noninteractive sessions
 using temporary MCP configuration. Completion/cancellation also passed live checks
 in both hosts, including stale-revision refusals and reads through a second

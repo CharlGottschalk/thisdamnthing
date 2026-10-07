@@ -1947,3 +1947,49 @@ uncertain-response handling, runtime limits and remaining marketplace CLI scope.
 Native hooks were disabled; temporary MCP configs used existing sign-ins without
 changing saved host registrations. Codex emitted state lookup warnings; Claude
 stderr was empty. No actual transport loss was injected.
+
+## MCP marketplace metadata discovery
+
+Both profiles expose `tdt_marketplace_search` and `tdt_marketplace_read`, bringing
+catalogs to 52 read-only and 91 everyday tools. Search shares CLI filtering and
+ordering and returns summaries with classification, status and nullable stars.
+Pagination binds the selected endpoint, query, filters, limit, workspace and full
+feed revision. Exact-ID reads return complete listings and historical releases,
+including withdrawn tombstones. Each call refetches through the shared bounded
+HTTPS transport. Source archive inspection and marketplace installation/update
+remain CLI-only; owned host registration remains pending.
+
+Focused source and installed manual checks passed profile counts, output schemas,
+CLI search parity, combined filters, browse modes, empty results, tombstone reads,
+unknown/invalid IDs, strict arguments, budget refusals, changed queries/limits/feed
+revisions, malformed/oversized feeds, invalid listing URLs/latest versions and
+unchanged workspace hashes. These checks use disposable fixtures, not a committed
+automated suite.
+
+Source and installed SDK checks passed auto/legacy protocols across both profiles:
+discovery, read-only/idempotent/open-world annotations, text/structured/error parity
+and actual verified loopback HTTPS requests. Same-origin redirects succeeded;
+cross-origin redirects, duplicate keys, oversized/invalid JSON, incorrect MIME,
+encoded and truncated bodies refused. Per-profile workspace hashes stayed intact.
+This validates the local fixture transport, not public registry availability or
+new deadline/slow-server behavior. Existing transport limits remain unchanged.
+
+Final live routing passed against the rebuilt installed wheel with Codex CLI
+0.156.1 and Claude Code 2.1.289: both exited zero, with 14/13 actual MCP calls,
+no builtin tools and no workspace file changes. Both read the installed router,
+installation specialist and stack guide, followed one-item pages, retried the
+small read budget, read complete metadata and the withdrawn tombstone, refused
+an exact missing ID and ignored embedded reminder instructions. Independent
+schemas, transcript/server-log matching, feed revisions, complete listing values,
+per-call and whole-workspace hashes passed. Request logs contained only feed
+routes with no credential/cookie headers or query/filter transmission.
+
+An initial live response incorrectly implied loopback registry selection required
+local archive transport. Clarified the separate choices in shipped guidance,
+rebuilt and reran both hosts; both final reports preserve that distinction.
+Native hooks were disabled, existing sign-ins and temporary configurations were
+used, and saved host registrations were unchanged. Codex emitted local state/file
+watcher warnings; Claude stderr was empty. Sandbox DNS/socket/SDK discovery
+restrictions were resolved through bounded approved outside-sandbox checks.
+All 100 source/wheel/installed package files matched byte-for-byte; dependency and
+diff checks passed. No staging, commit or push was performed.

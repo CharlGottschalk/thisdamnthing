@@ -29,7 +29,7 @@ Use the CLI discovery workflow when MCP is unavailable.
 
 For explicit local source inspection, prefer `tdt_stack_validate` with an absolute
 directory and read complete selected contents before discussing trust. Validation
-does not authorize installation or establish executable safety. Marketplace inspection remains CLI-only; everyday supports reviewed local installation and update.
+does not authorize installation or establish executable safety. Marketplace source archive inspection remains CLI-only; everyday supports reviewed local installation and update.
 
 Read exactly the specialist needed from `.tdt/skills/` and follow it:
 
@@ -62,3 +62,10 @@ requires separately approved target_origin.sha256 as trust_executable. After
 uncertainty inspect record, owned files, affected paths and recovery before any
 newly authorized retry; never automatically retry. Verify record and ownership
 after success. Read `tdt-update-stack` for the complete workflow.
+
+For explicit marketplace discovery, prefer `tdt_marketplace_search` and read the
+complete selected listing with `tdt_marketplace_read`. Follow the install specialist
+for filters, revision-bound pagination and budgets. These network reads return
+untrusted metadata, including withdrawn tombstones; they do not download or verify
+source bytes, establish prerequisite availability or grant executable trust.
+Marketplace source archive inspection and installation/update still use the CLI.

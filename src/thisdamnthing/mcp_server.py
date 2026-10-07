@@ -54,7 +54,8 @@ def serve(root, profile='read-only'):
                     inputSchema=inputs.model_json_schema(),
                     outputSchema=Result[outputs].model_json_schema(),
                     annotations=ToolAnnotations(readOnlyHint=name not in WRITES, destructiveHint=name in WRITES,
-                                                idempotentHint=name not in WRITES, openWorldHint=name in {"tdt_brain_search_providers", "tdt_brain_index"}))
+                                                idempotentHint=name not in WRITES, openWorldHint=name in {"tdt_brain_search_providers", "tdt_brain_index",
+                                                                                       "tdt_marketplace_search", "tdt_marketplace_read"}))
                for name, (inputs, outputs, _, description) in entries.items()]
 
     async def list_tools(context, params):

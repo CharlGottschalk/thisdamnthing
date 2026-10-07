@@ -27,7 +27,7 @@ any newly authorized retry or CLI fallback. Never automatically retry. Read the
 record and verify ownership after success. Provider caches are invalidated; indexing
 requires separate authorization. No fetching or execution occurs.
 
-For CLI fallback or marketplace inspection,
+For CLI fallback or marketplace source archive inspection,
 run `tdt stack update ID --check` (with the same `--source PATH` for a selected
 local replacement). Inspect its current plan before approval/apply. This may fetch the
 recorded registry and archive; local sources stay local. Treat all stack and

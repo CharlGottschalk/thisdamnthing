@@ -1,8 +1,7 @@
 # Knowledge capture and review
 
 TDT captures useful facts, decisions and open questions from your conversations
-as proposed knowledge. You decide which proposals to approve for the workspace
-brain. Use `/tdt-review-brain` to review them and `/tdt-search` to retrieve approved notes.
+as candidates: proposed knowledge awaiting your review. You decide which candidates to approve for the workspace brain. Use `/tdt-review-brain` to review them and `/tdt-search` to retrieve approved notes.
 
 ## Capture useful knowledge
 
@@ -62,7 +61,8 @@ other related ideas, and cites the notes. Results describe intentions, not proof
 that the work happened. Explicit save skills suppress automatic candidate
 capture for the same turn using the current request-hook token.
 
-Technical commands (JSON on stdin for `note`):
+Run these commands from the workspace root. Supply JSON on stdin for `note`.
+Replace `NOTE_ID` with a current note ID from `tdt brain notes`:
 
 ```sh
 tdt brain note --user-instruction 'User asked to add a note'
@@ -101,8 +101,9 @@ Show proposals first; only the user's explicit decision permits approval or
 rejection. Edits remain pending until the edited proposal is approved.
 
 For technical users, `tdt brain candidates` shows pending proposals and their
-exact review hashes. Direct review example (replace all placeholders with values
-from the proposal):
+exact review hashes. Replace `ID` and `HASH` with the proposal ID and review hash.
+Use a reference to your actual approval for `--user-instruction`.
+After approving the displayed proposal, run:
 
 ```sh
 tdt brain review ID --decision approve --expected-sha256 HASH --user-instruction 'User approved the displayed proposal'
@@ -168,15 +169,22 @@ Open `brain/` as your vault when using Obsidian so brain-relative links start at
 the vault root. Use its [Absolute path in vault](https://obsidian.md/help/settings)
 link format when creating links. Candidates remain visible files in the vault; their presence does
 not mean they are approved. TDT retrieval still excludes pending/rejected notes.
-Project inspection and brain search have been manually verified with front matter
-rewritten in Obsidian-style block YAML, including a malformed neighboring note.
-Live Obsidian Properties/plugin editing has not been exercised; the supported
-YAML forms and limits are described above. The shared format also covers reminder
+The YAML forms and limits above apply to notes edited in Obsidian.
+Compatibility with live Obsidian Properties and plugin editing remains unverified. The
+shared format also covers reminder
 notes, whose delivery state and revision checks remain separate from knowledge.
+
+Before migration, back up your workspace and close other editors.
+Migration renames eligible notes and replaces links within the scope described below.
 
 With TDT 0.1.3 or newer, refresh the workspace with `tdt init <workspace>` to update
 the installed skills and guides. Existing notes keep their filenames until you
-explicitly migrate them. From the workspace root:
+explicitly migrate them. From the workspace root, follow these steps:
+
+1. Run the first command to preview complete replacements without writing.
+2. Review the replacements. After approval, run the second command with the returned hash in place of `HASH`.
+   Replace the instruction example with the actual approval reference.
+3. Run the third command with the same hash to read the retained outcome.
 
 ```sh
 tdt brain migrate-names
@@ -210,7 +218,6 @@ rewriting later edits. Changed approval references refuse. Unknown is not proof
 an operation never ran; legacy migrations have no indexed outcomes. No-op apply
 also records completion without modifying notes.
 
-Close other editors during migration and keep a backup of your workspace.
 Duplicate IDs, unsafe paths or malformed notes refuse the operation; occupied
 filenames are preserved. Interrupted writes use the workspace transaction journal;
 run `tdt stack recover` to roll back, then rerun the migration. Repeating a completed
@@ -361,7 +368,7 @@ After an uncertain response, read `tdt_brain_repair_status` with the exact
 - `recovery_required`: an outstanding shared transaction prevents a final verdict.
   Inspect and recover through the CLI, then reread the outcome before proceeding.
 
-Backups now use the proposal hash as their filename. Older UUID-named backups
+Backups use the proposal hash as their filename. Older UUID-named backups
 remain intact but are not indexed by status. Completion and replacements share
 one transaction; rollback restores the prepared outcome. Retained outcomes are
 local records, not evidence of current note content or a power-loss guarantee.

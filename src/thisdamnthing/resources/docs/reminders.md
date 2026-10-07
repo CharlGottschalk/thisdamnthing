@@ -2,9 +2,11 @@
 
 Say “Remind me to review the checklist tomorrow at 15:00”, or use `/tdt-remind`.
 The agent confirms the resolved date, time and timezone. It asks when the time or
-timezone is unclear. Reminders are readable Markdown under `work/reminders/`,
-created on first save, separate from scratchpad notes, candidates and approved knowledge. They never
-appear in knowledge or scratchpad search and never authorize the reminded action.
+timezone is unclear. Reminders are readable Markdown under `work/reminders/`.
+TDT creates the folder on first save. Reminders are separate from scratchpad notes,
+candidates and approved knowledge.
+They never appear in knowledge or scratchpad search. A reminder does not authorize the
+reminded action.
 
 Ask to list, edit, snooze, mark done or cancel a reminder. Notification does not
 complete the task. A notified item stays pending until done or cancelled, without
@@ -70,7 +72,10 @@ delete the external job. Update this reference if the job is replaced.
 
 ## Technical commands
 
-Run within the workspace or prefix with `tdt --workspace <root>`:
+Run these commands within the workspace. Elsewhere, use `tdt --workspace <root> reminder ...` with your workspace path.
+Replace `ID`, revisions and `CLAIM_TOKEN` with current values returned by the commands.
+Choose future dates with offsets that match the selected timezone.
+These examples show alternative operations; do not run the whole block as a sequence:
 
 ```sh
 tdt reminder configure
@@ -121,8 +126,8 @@ execution, skill invocation, blockquote rendering and scheduler output; file
 checks or a healthy doctor report do not prove delivery.
 
 Settings live in `.tdt/state/reminders.json`; reminder files contain task and
-delivery state. Refresh with `tdt init` after upgrading to install the skills,
-and guide, preserving existing records and preferences. The folder is created on
+delivery state. After upgrading, run `tdt init` to refresh the skills and guide.
+This preserves existing records and preferences. The folder is created on
 first save. No extra hook is
 registered: the existing request adapter checks only when chat delivery is opted
 in. Reminder failures are reported without blocking constitution context. Core

@@ -34,7 +34,8 @@ tdt agent enable claude
 tdt agent enable codex
 ```
 
-Run from the workspace, or prefix the command with `tdt --workspace PATH`.
+Run from the workspace. Elsewhere, replace `PATH` with the workspace path and use
+`tdt --workspace PATH agent enable HOST`. Replace `HOST` with `claude` or `codex`.
 Enablement adds instructions, hooks and skill entry points for core, installed
 stacks and approved user skills. Repeating the command preserves existing content.
 
@@ -107,9 +108,15 @@ Preserve your changes separately and reconcile them before retrying. Do not dele
 ownership records to force a refresh. Older workspaces infer agents from recorded
 TDT ownership; unrelated agent directories do not enable an integration.
 
-After an interrupted refresh or integration change, keep host sessions idle and
-run `tdt stack recover`, then doctor and retry. An unfinished user-skill save
-needs `tdt skill recover` first. If initial creation stopped before a valid
+If a refresh or integration change is interrupted:
+
+1. Keep host sessions idle.
+2. If a user-skill save is unfinished, run `tdt skill recover` first.
+3. Run `tdt stack recover`.
+4. Run `tdt doctor` to check the workspace.
+5. If recovery succeeds, retry the original operation.
+
+If initial creation stopped before a valid
 workspace configuration was written, preserve the partial folder and inspect it
 before retrying in an empty destination. See [workspace care](workspace-care.md).
 
@@ -142,7 +149,8 @@ through the CLI before MCP connects; it does not require an existing MCP server.
 
 Install the MCP extra first (see [commands](commands.md#local-mcp-reads)).
 Manual configuration remains
-available. For owned workspace-local registration, use:
+available. Replace `/path/to/workspace` with your initialized workspace path.
+These are separate examples; select the operation and host you need:
 
 ```sh
 tdt --workspace /path/to/workspace mcp register claude
@@ -164,16 +172,16 @@ or replacing that environment. Restart the host after changes.
 
 Claude uses the `thisdamnthing` entry in workspace `.mcp.json`; Codex uses a marked
 `[mcp_servers.thisdamnthing]` block in workspace `.codex/config.toml`. Ownership lives
-in `.tdt/state/mcp.json`. Unowned names and edited/missing owned entries refuse,
-even when an unowned entry has identical values. Resolve conflicts manually;
+in `.tdt/state/mcp.json`. TDT refuses unowned names and edited or missing owned entries.
+It also refuses an unowned entry with identical values. Resolve conflicts manually;
 registration never adopts them. Unregister removes only the owned entry and leaves
 configuration files in place. Claude JSON formatting may change; other settings
 retain their values. Codex preserves unrelated text and refuses TOML structures
 that cannot safely accommodate its block. Inputs and outputs are capped at 1 MiB
-per file. Transactions share the workspace lock and stack recovery journal; after
-interruption inspect `tdt_recovery_preview` or use `tdt stack recover`, then inspect
-registration status. Status checks saved local ownership, not connection health or
-effective settings inherited from other host scopes.
+per file. Transactions share the workspace lock and stack recovery journal.
+After an interruption, inspect `tdt_recovery_preview` or use `tdt stack recover`.
+Then inspect registration status. Status checks saved local ownership.
+It does not check the connection or effective settings inherited from other host scopes.
 
 Registration is independent of `tdt agent enable/disable` (skills and capture
 hooks). To remove both, unregister MCP and disable the agent separately. It does

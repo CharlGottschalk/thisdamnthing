@@ -2,7 +2,8 @@
 
 Say “use ui” to request a local browser interview, or use `/tdt-ui`. You can
 answer in chat/TUI instead. No stack or additional model subscription is needed.
-The active agent must wait/read responses; a browser cannot wake a stopped agent.
+The active agent must wait for responses and read them. A browser cannot restart a
+stopped agent.
 In Codex, use `$tdt-ui` or the skill picker. Describe the interview you want;
 the skill prepares the page, reads your answers and handles follow-up questions.
 Ask it to resume an interrupted interview, close a session or clean up retained
@@ -11,7 +12,12 @@ responses when you no longer need them.
 ## Technical reference: session commands and page examples
 
 The skill uses the commands below. You only need these details when operating
-UI directly or authoring a custom page.
+UI directly or authoring a custom page. Run commands from the workspace root.
+Replace `SESSION` with the ID returned by `tdt ui start`.
+Create the page JSON before presenting it; the next section supplies a `business.json` example.
+Create `follow-up.json` for your next questions. Replace event ID `1` with the ID of an event you have handled.
+These examples cover separate session actions. Cleanup deletes retained answers; use it
+only when those answers are no longer needed.
 
 ```sh
 tdt ui start --no-open
@@ -82,7 +88,7 @@ the sandbox too. Do not inject user text through `innerHTML`.
 
 ## Custom interaction
 
-A stack can list a JSON template containing custom_html in its ordinary
+A stack can list a JSON template containing `custom_html` in its ordinary
 `templates` array; it needs no hooks or manifest changes. This two-dimensional
 priority pad submits structured custom data, then the agent can interpret the
 selected urgency/impact and ask a follow-up.

@@ -6,7 +6,7 @@ checkout. After `cd`, the remaining commands run from the new workspace root.
 TDT gives you a persistent local workspace for Claude Code and Codex.
 Keep reviewed knowledge, working rules, linked projects and reusable workflows
 together across sessions. You can use either agent with the same workspace and
-add optional Stacks when you need additional capabilities.
+add optional stacks when you need additional capabilities.
 
 ## Install TDT
 
@@ -26,29 +26,51 @@ use `/tdt-workspace` to check it. Throughout these guides, Codex users can use
 
 For terminal setup:
 
-```sh
-pipx install thisdamnthing
-tdt --version
-tdt --help
-```
+1. Install the package:
+
+   ```sh
+   pipx install thisdamnthing
+   ```
+
+2. Check that the command is available:
+
+   ```sh
+   tdt --version
+   tdt --help
+   ```
+
+   The commands display the installed version and available commands.
 
 The Python package is named `thisdamnthing`; the terminal command is `tdt`.
 Follow the release's installation instructions for the package you are using.
-If you are working from a supplied source checkout, run `pipx install .` from that
-checkout. If pipx asks you to update PATH, follow its instructions and reopen your
+If pipx asks you to update PATH, follow its instructions and reopen your
 shell. Keep the pipx environment installed: workspace hooks use its interpreter.
 
 ## Create your workspace
 
 Choose a folder outside your existing projects, any other TDT workspace and
 the TDT source checkout. Give your agent the chosen path and ask it to create
-the workspace. For terminal setup, replace the example path with your own:
+the workspace. For terminal setup, replace `./my workspace` with your chosen path.
 
-```sh
-tdt init "./my workspace"
-tdt --workspace "./my workspace" doctor
-cd "./my workspace"
-```
+1. Create the workspace:
+
+   ```sh
+   tdt init "./my workspace"
+   ```
+
+2. Check its files and configuration:
+
+   ```sh
+   tdt --workspace "./my workspace" doctor
+   ```
+
+   If the check reports a problem, follow [troubleshooting](troubleshooting.md).
+
+3. Enter the workspace:
+
+   ```sh
+   cd "./my workspace"
+   ```
 
 If you have already used `cd` to enter your chosen folder, run `tdt init`
 without a path to initialize that folder, then run `tdt doctor`.
@@ -68,8 +90,8 @@ See [agent setup](agent-bootstrap.md) if skills or hooks are missing.
 Discuss a useful decision with your agent, such as your team's weekly planning
 day. With capture hooks enabled and trusted, TDT asks the active agent for a
 concise summary after the turn. That extra continuation is visible in the chat.
-The summary becomes a proposal awaiting your review; a turn with nothing worth
-retaining may be skipped.
+The summary becomes a candidate awaiting your review. The agent can skip a turn that
+contains nothing worth retaining.
 
 Use `/tdt-review-brain` to approve, reject or edit proposals. Edits still need
 approval. You can inspect the queue from the terminal:

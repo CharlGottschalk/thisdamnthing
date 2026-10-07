@@ -18,9 +18,10 @@ session. In Codex, use `$tdt-add-skill` or the skill picker.
 For example, unread-email triage takes a mailbox/filter, time range, summary format
 and priority criteria. A proposed output could include subject, short summary,
 priority, evidence and uncertainty. Urgency inferred from wording must be labelled;
-sender role, explicit deadlines and user criteria supply evidence. Use the user's
-available authorized Gmail connector. Missing access is a prerequisite to explain,
-not permission to install/connect one. Saving or running a summarization workflow
+sender role, explicit deadlines and user criteria supply evidence. Use an available
+Gmail connector that the user has authorized.
+If access is missing, explain the requirement. Do not install or connect a connector
+without authorization. Saving or running a summarization workflow
 does not authorize sending, deleting, archiving or marking messages read.
 
 Choose your own readable name, such as `tdt-unread-triage`, for any discovered or
@@ -66,8 +67,9 @@ Submit a generalized proposal with `tdt skill propose` (JSON on stdin, at most
 
 Instructions should cover reusable steps, variable inputs, output expectations,
 tool prerequisites and relevant limits. Omit private content, credentials, raw
-transcripts and incidental values. Descriptions are at most 1024 characters,
-instructions 10000; up to 40 source references of 160 characters each. Live
+transcripts and incidental values. Use at most 1024 characters for the description and
+10000 for the instructions.
+Include at most 40 source references, each with at most 160 characters. Live
 suggestions may use an empty source list. Do not store raw approval messages;
 use a short user-message reference for the decision.
 
@@ -75,7 +77,10 @@ New proposals refuse names already owned by a user skill. For an intentionally
 requested update, submit the same JSON shape with `tdt skill propose --update`.
 This option requires an existing user-owned skill and retains ownership checks.
 
-Show the exact proposal and returned content ID separately from the skill name. After actual user approval:
+Show the exact proposal and its returned content ID separately from the skill name.
+Replace `<id>`, `<id1>` and `<id2>` below with proposal IDs.
+Replace `<user-message-reference>` with a quoted reference to the actual decision.
+After the user approves or declines the displayed proposals, run the matching command:
 
 ```text
 tdt skill review <id> --decision approve --user-instruction <user-message-reference>
@@ -96,9 +101,10 @@ conversation responsibility: the CLI records the supplied decision reference; it
 cannot independently authenticate user intent. Never fabricate it.
 
 Approved files live at `.tdt/skills/<name>/SKILL.md`, where the full name
-begins with `tdt-`. Names have at most 64
-lowercase ASCII letters/digits/hyphens, no edge or consecutive hyphens, and must
-match the directory. The writer emits valid quoted YAML frontmatter following the
+begins with `tdt-`. Names contain at most 64 lowercase ASCII letters, digits and hyphens.
+Do not start or end a name with a hyphen, or use consecutive hyphens.
+The name must match the directory. The writer emits valid quoted YAML frontmatter
+following the
 [Agent Skills specification](https://agentskills.io/specification). Thin bridges
 are registered at `.claude/skills/<name>/SKILL.md` and
 `.agents/skills/<name>/SKILL.md` in this workspace only, for enabled hosts. No global or external project registrations are created.

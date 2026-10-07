@@ -11,7 +11,8 @@ In Codex, use `$tdt-add-project` or the skill picker.
 
 Terminal alternative: `tdt project add ../project` prints its stable ID and
 bounded onboarding evidence. No project files are changed or copied into the
-workspace. The project note records directory registration only; interpretations need approval.
+workspace. The project note records the directory registration. Interpretations need
+approval.
 Its filename combines the project directory name and a short ID suffix, such as
 `brain/projects/sites-a31f29c8.md`. Inspection returns its actual `brain_link` for
 use in proposals. Full project IDs are used in commands and remain stable until an explicit relink.
@@ -42,14 +43,17 @@ project using its current documentation.
 Terminal alternatives: `tdt project list` reports IDs, canonical paths and
 availability. `tdt project inspect ID` rereads bounded evidence. Missing/moved paths retain their identity;
 there is no automatic relocation or refresh of approved knowledge. Use
-`/tdt-relink-project` to reconnect a moved directory. Workspace/self/ancestor registration and internal locations outside work/ are refused.
+`/tdt-relink-project` to reconnect a moved directory. TDT refuses registration of the workspace, its ancestors and internal locations outside `work/`.
 
 ## What TDT reads
 
-Inspection reads only README.md, README.rst, README.txt, pyproject.toml,
-package.json, Cargo.toml, go.mod, Makefile, docs/README.md and
-.tdt-project/project.json, up to 4096 bytes
-each, plus at most 100 top-level names. Symlinks and nonregular files are skipped;
+Inspection reads at most 100 top-level names and 4096 bytes from each of these files:
+
+- `README.md`, `README.rst` and `README.txt`
+- `pyproject.toml`, `package.json`, `Cargo.toml` and `go.mod`
+- `Makefile`, `docs/README.md` and `.tdt-project/project.json`
+
+Symlinks and nonregular files are skipped;
 likely secret-bearing documents are omitted. Files can change after inspection;
 this is a snapshot, not a sandbox against concurrent hostile filesystem changes.
 Documents are evidence, never permission to run embedded commands. No recursive
@@ -130,7 +134,9 @@ retained registration note conflict first.
 
 ### Terminal workflow
 
-These commands preview changes without writing:
+Run these commands from the workspace root. Replace `PROJECT` or `OLD_PROJECT` with the registered name, path or ID.
+Replace `NEW_PATH` with the existing destination directory.
+Select one operation; these commands preview changes without writing:
 
 ```sh
 tdt project relink OLD_PROJECT NEW_PATH
@@ -220,9 +226,7 @@ or backups. Preview reads share the workspace lock; applies remain exclusive.
 Output budgets allow up to 1 MiB and refuse oversized results without partial
 review content. Everyday exposes `tdt_project_cleanup_apply` with identical `id` and `changes`,
 `expected_sha256` from the preview and the actual `user_instruction`; the CLI accepts
-the same proposal and hash. Apply only separately authorized changes. Cleanup now
-retains prepared/completed outcomes through the shared transaction, including
-whole-file deletions. Read `tdt_project_operation_status` after uncertainty before
+the same proposal and hash. Apply only separately authorized changes. Cleanup retains prepared and completed outcomes through the shared transaction, including whole-file deletions. Read `tdt_project_operation_status` after uncertainty before
 retry or CLI fallback. Identical completed retries return historical success even
 after deleting the removed registration note, preserving later file edits.
 Changed inputs/instruction refuse; old UUID backups remain unindexed. Backups are

@@ -29,21 +29,29 @@ retained operation outcome, and an old revision cannot overwrite a newer policy.
 
 ### Terminal alternative
 
-To inspect the current rules:
+Run these commands from the workspace root.
 
-```sh
-tdt constitution show
-```
+1. Inspect the current rules:
 
-The command returns the Markdown and its SHA256 revision, or `missing` if no policy
-exists. After reviewing and approving a change, your agent can save it through:
+   ```sh
+   tdt constitution show
+   ```
 
-```sh
-tdt constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
-```
+   The command returns the Markdown and its SHA256 revision, or `missing` if no policy exists.
 
-Use the displayed revision and a reference to the actual approval. A stale revision
-refuses replacement, so reread the current rules before retrying. The approval
+2. Review the complete proposed policy in `reviewed-policy.md`.
+3. After approval, save the policy.
+   Replace `HASH` with the displayed revision or `missing`.
+   Replace `REFERENCE` with a quoted reference to the actual approval.
+
+   ```sh
+   tdt constitution save --expected-sha256 HASH --user-instruction REFERENCE < reviewed-policy.md
+   ```
+
+4. Run `tdt constitution show` again to check the saved policy.
+
+If the revision is stale, TDT refuses replacement. Read the current rules again before
+retrying. The approval
 reference records a decision; it does not prove who made it. A request embedded in
 an untrusted file is not your approval to change policy.
 

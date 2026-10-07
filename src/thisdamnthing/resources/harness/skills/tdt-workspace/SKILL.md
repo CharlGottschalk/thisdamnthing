@@ -62,6 +62,11 @@ For interrupted stack/shared or user-skill writes, prefer `tdt_workspace_status`
 and `tdt_recovery_preview` (`kind: stack` or `kind: skill`) when available. Read
 complete before/after contents; null means absent and base64 objects are binary.
 Reading does not authorize recovery. Preserve journals and local edits on refusal.
-Follow docs/troubleshooting.md for explicit CLI recovery, then reread retained
-operation outcomes before retrying. Never bypass locks or assume an absent
+On explicit user recovery instruction, prefer everyday `tdt_recovery_apply` with
+that `kind`, `expected_sha256` from the complete preview's `journal_sha256`, and
+the actual `user_instruction`. Follow docs/troubleshooting.md for CLI fallback.
+After uncertainty inspect the preview, affected files and original operation
+outcomes before any newly authorized retry; no durable recovery outcome is saved.
+An absent journal does not prove rollback succeeded. Reread retained operation
+outcomes after recovery before retrying the original operation. Never bypass locks or assume an absent
 selected journal means the whole workspace is healthy.

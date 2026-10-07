@@ -1494,3 +1494,31 @@ installed dependency checks passed. Sandbox SDK discovery timed out and isolated
 build dependency fetching failed; bounded approved outside-sandbox runs passed.
 No automated suite or live-model routing was run. No recovery write tool, host
 registration or resource/prompt surface is claimed by this increment.
+
+
+## MCP reviewed transaction recovery — 2026-10-07
+
+Added everyday `tdt_recovery_apply` for an explicit stack/skill journal, reviewed
+`expected_sha256` and actual user instruction. Shared CLI rollback validates the
+bounded journal and current files, then checks the preview hash under the
+exclusive workspace lock before writes. CLI defaults remain unchanged. Catalogs
+are 44 read-only / 80 everyday. Receipts fit the minimum budget; no durable
+recovery outcome or approval audit is claimed. Absent journals refuse apply.
+After uncertainty inspect preview, affected files and original operation outcomes
+before a newly authorized retry. Journal absence does not establish success.
+
+Source and installed manual checks passed Unicode restoration, binary creation
+rollback, deletion restoration, minimum-budget receipt/schema, stale/absent hashes,
+profile/strict-input/blank-instruction refusals, local conflicts and shared-lock
+contention. Simulated abrupt interruption after the first rollback write retained
+the journal; a fresh preview and explicitly repeated recovery restored the rest.
+Malformed/oversized journals, FIFO/symlink journals and targets, and escaping paths
+refused without changing protected content. Existing preview regressions and actual
+CLI rollback parity passed for both journal types.
+
+Source and installed SDK auto/legacy x read-only/everyday checks passed catalog,
+input/output schema, mutation annotations, text/structured parity, successful
+rollback and absent-journal error signaling. All 99 source/wheel/installed files
+byte-match; pip check and git diff --check passed. Sandbox SDK discovery timed out
+and build-dependency DNS failed; bounded approved outside-sandbox runs passed.
+No automated test suite, live-model routing or actual power-loss check was run.

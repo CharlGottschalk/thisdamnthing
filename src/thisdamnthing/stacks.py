@@ -271,8 +271,10 @@ def recovery_plan(root, *, bounded=False):
     return record
 
 
-def recover(root):
-    record = recovery_plan(root)
+def recover(root, *, expected_sha256=None):
+    from .recovery import check_preview
+    record = recovery_plan(root, bounded=expected_sha256 is not None)
+    check_preview(record, expected_sha256)
     if record is None:
         return 'No stack transaction to recover.'
     path = managed_path(root, JOURNAL)

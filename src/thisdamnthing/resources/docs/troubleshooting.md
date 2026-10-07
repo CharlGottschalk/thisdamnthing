@@ -47,7 +47,15 @@ The journal is limited to 8 MiB and complete output to 1 MiB. A budget refusal
 is not permission to recover unseen content. The journal hash identifies the
 snapshot; CLI recovery does not accept it as an approval token. Recover only on
 user instruction, keep other sessions idle, and inspect again if anything changes.
-After CLI recovery, reread the original operation status before deciding to retry.
+Everyday MCP can apply the reviewed rollback with `tdt_recovery_apply`, selected
+`kind`, `expected_sha256` from `journal_sha256` and actual `user_instruction`.
+It revalidates bounded contents and the hash under the exclusive workspace lock.
+Absent or changed journals refuse. The receipt is not a retained outcome or audit
+record. If the response is uncertain, inspect the preview, affected files and
+original operation outcomes before any newly authorized retry or CLI fallback.
+An absent journal does not prove rollback succeeded. Interrupted rollback retains
+its journal. No lock breaking or automatic retries are provided.
+After recovery, reread the original operation status before deciding to retry.
 An absent selected journal says nothing about other journals or workspace health.
 
 ## Back up, upgrade or move

@@ -1,9 +1,21 @@
-"""Bounded reads for inspection of interrupted local transactions."""
+"""Bounded journal reads and preview binding for transaction recovery."""
+import hashlib
 import json
 import os
 import stat
 
 from .workspace import WorkspaceError, managed_path
+
+
+def journal_digest(record):
+    return hashlib.sha256(json.dumps(record, ensure_ascii=False,
+                                    separators=(',', ':')).encode('utf-8')).hexdigest()
+
+
+def check_preview(record, expected_sha256):
+    if expected_sha256 is not None and (
+            record is None or journal_digest(record) != expected_sha256):
+        raise WorkspaceError('Recovery journal changed or absent; inspect again')
 
 
 def read_journal(root, relative):

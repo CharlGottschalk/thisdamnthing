@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 44 tools; everyday has 79.
+Read-only has 44 tools; everyday has 80.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -441,6 +441,12 @@ against its journal versions under a shared read lock. Complete before/after
 contents include null deletions and base64 binary values; output beyond the
 up-to-1-MiB budget refuses without partial content. Journal input is capped at
 8 MiB; special files, escaping paths and conflicting local edits refuse.
-The semantic journal hash identifies a snapshot, not an apply token. Recovery
-writes remain explicit CLI operations, which revalidate but do not accept the
-preview hash. An absent selected journal is not a clean-workspace assessment.
+The semantic journal hash binds a snapshot for everyday `tdt_recovery_apply`,
+which requires the selected kind, `expected_sha256` and actual user instruction.
+Shared CLI rollback revalidates bounded current files and the journal hash under
+an exclusive lock; absent/changed journals refuse. The fixed-size receipt is not
+a durable outcome or approval audit. After uncertainty inspect preview, affected
+files and original operation outcomes before any newly authorized retry; absence
+does not prove success. Interrupted rollback retains its journal. CLI recovery
+remains available without hash binding. Other CLI recovery references above may
+use this reviewed tool for stack/skill journals; no policy-lock recovery is added. An absent selected journal is not a clean-workspace assessment.

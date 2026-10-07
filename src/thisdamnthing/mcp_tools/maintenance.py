@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from .. import brain, brain_maintenance, brain_names, skills, stacks
+from ..recovery import journal_digest
 from .common import inventory_page, serialized
 from .models import ListInput, Model, ReadInput
 
@@ -34,9 +35,30 @@ def recovery_preview(root, args):
             return RecoveryPreview(kind=args.kind, status='absent', journal_sha256=None,
                                    before={}, after={}, directories=[]), []
         return RecoveryPreview(kind=args.kind, status='rollback_available',
-                               journal_sha256=brain.digest(serialized(record)),
+                               journal_sha256=journal_digest(record),
                                before=record['before'], after=record['after'],
                                directories=record.get('directories', [])), []
+
+
+class RecoveryApplyInput(ReadInput):
+    kind: Literal['stack', 'skill']
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=300)
+
+
+class RecoveryApplied(Model):
+    kind: Literal['stack', 'skill']
+    journal_sha256: str
+    status: Literal['rolled_back'] = 'rolled_back'
+
+
+def recovery_apply(root, args):
+    skills.text_checked(args.user_instruction, 'user instruction reference', 300)
+    core = stacks if args.kind == 'stack' else skills
+    with brain.locked(root):
+        core.recover(root, expected_sha256=args.expected_sha256)
+    # Fixed-size receipt fits the minimum budget; no durable outcome is claimed.
+    return RecoveryApplied(kind=args.kind, journal_sha256=args.expected_sha256), []
 
 
 class BrainNamesPreviewInput(ReadInput):

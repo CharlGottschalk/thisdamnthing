@@ -123,12 +123,22 @@ The following list covers reads and selected everyday counterparts:
   directories considered for empty-directory removal; skill recovery also attempts
   to remove empty skill directories for newly created files. Journal input is
   capped at 8 MiB; increase output `budget_bytes` up to 1 MiB if needed. No partial
-  output. `journal_sha256` identifies semantic journal contents, not an apply token.
+  output. `journal_sha256` binds semantic journal contents for `tdt_recovery_apply`.
   `absent` refers only to the selected journal. On explicit recovery instruction,
   use `tdt stack recover` or `tdt skill recover`; CLI revalidates current files but
   does not bind to this hash. Reread retained operation outcomes afterward. A
   refusal does not identify the specific conflict; preserve the journal and inspect
-  locally. No lock breaking, automatic retry or recovery write tool is provided.
+  locally. No lock breaking or automatic retry is provided.
+- `tdt_recovery_apply` (everyday): after complete preview review and explicit user
+  authorization, pass the selected `kind`, `expected_sha256` from the preview and
+  actual `user_instruction`. Bounded shared CLI validation and rollback run under
+  the exclusive workspace lock; absent/changed journals and local conflicts refuse.
+  The small `rolled_back` receipt fits the minimum budget. No durable outcome or
+  approval audit is retained. After uncertainty inspect the preview, affected files
+  and original operation outcomes before any newly authorized retry or CLI fallback.
+  An absent journal does not prove success. Interrupted rollback retains its journal.
+  Other references to CLI transaction recovery below can use this reviewed tool
+  for stack/skill journals; policy locks and other recovery mechanisms are excluded.
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.

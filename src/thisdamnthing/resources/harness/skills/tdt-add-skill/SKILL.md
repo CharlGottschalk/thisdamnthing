@@ -24,15 +24,21 @@ overwrite a skill, or offer a renamed copy of an unchanged declined workflow.
 
 Draft a concise trigger description and self-contained reusable instructions with
 inputs, steps, outputs, prerequisites and relevant permission boundaries. Use
-`tdt skill propose` with JSON stdin; use `--update` only for an explicitly intended
+`tdt_skill_propose` on the workspace-bound everyday MCP server, or fall back to
+`tdt skill propose` with JSON stdin; use `update: true` / `--update` only for an explicitly intended
 update to a user-owned skill. Refine an unsaved proposal by resubmitting its fields
 with the chosen name; a changed name or behavior has a new review ID. Do not claim
 this renames an already installed skill. Do not write canonical files or bridges
 directly, or create supporting files outside the proposal writer's scope.
 
-Show the exact name and behavior, then use `tdt skill review` for the approved
+Show the exact name and behavior, then use `tdt_skill_review` (one ID per call), or CLI `tdt skill review`, for the approved
 proposal ID with the actual user-message reference. Preserve approval already
 given for these exact contents; ask only for approval still missing. Saving is
 workspace-local and does not execute the workflow or authorize tool connections.
 Report the saved name, host invocation and need for a fresh session if it is not
 listed. Distributable stacks belong to the separate stack-builder workflow.
+
+After an uncertain proposal or review result, read the exact retained proposal
+and current inventory before retry or CLI fallback. Preserve current files and
+remembered decisions; never automatically reopen historical approval. Interrupted
+transactions require CLI recovery followed by fresh reads.

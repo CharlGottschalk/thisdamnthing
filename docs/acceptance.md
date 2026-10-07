@@ -1431,3 +1431,38 @@ hash audits passed. Only the genuine fixture turn's suppression state changed;
 skills, proposals, stack records, control files and source remained unchanged.
 Existing sign-ins and launch-only MCP configuration were used in bounded approved
 outside-sandbox runs; native hooks were disabled. No runtime correction was needed.
+
+## MCP skill proposal and review writes — 2026-10-07
+
+Everyday exposes `tdt_skill_propose` and `tdt_skill_review`; catalogs are 43/78.
+Use disposable workspaces to submit complete generalized behavior, read the exact
+proposal, then approve or decline one ID with the actual user decision reference.
+Verify explicitly requested updates, retained declines, unchanged retry behavior,
+historical-version reopening and refusal to overwrite locally edited files.
+Approval creates canonical content plus only enabled-host bridges; it never
+executes a skill. CLI review retains its existing batch surface.
+
+Check minimum-budget receipts, strict arguments and read-only exclusion before
+mutation, shared-lock refusal, malformed/oversized/special-file registries,
+name collisions, foreign symlinks, and interrupted skill/stack state. Registry
+reads and serialized proposed writes share a 2-MiB limit; output overflow must
+refuse before registry or skill changes. After uncertainty, inspect the retained
+proposal and live inventory before retry or CLI fallback. An interrupted journal
+requires CLI recovery and fresh reads; historical decisions are not live asset
+verification or permission to reopen a proposal automatically.
+
+Source and installed-wheel manual checks passed for proposal/read/review,
+Unicode, minimum receipts, identical retries, decline preservation, explicit
+updates, historical reopening, edited-file protection, argument/profile refusals,
+locks, malformed/oversized/FIFO state, registry-growth refusal, directory collisions
+and outside-symlink preservation. Actual CLI proposal and review matched MCP
+identities and bytes. A simulated abrupt interruption after the canonical write
+left a journal; reads refused, shared CLI recovery rolled back to pending, and
+review succeeded after reconciliation.
+
+Source and packaged SDK auto/legacy modes passed both profiles, catalog counts,
+input/output schemas, mutation annotations, structured/text parity and error
+state. All 98 packaged files matched source and installation; dependency check
+and diff check passed. Sandbox dependency DNS and SDK discovery failed; bounded
+approved outside-sandbox runs passed. No automated test suite or live-model
+routing was run, and no host registration or source commit was performed.

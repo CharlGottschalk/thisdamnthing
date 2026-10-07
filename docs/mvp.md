@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 43 tools; everyday has 76.
+Read-only has 43 tools; everyday has 78.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -422,7 +422,13 @@ behavior, source references, decision reference, original ownership snapshot and
 current recorded ownership. Historical approval and recorded ownership do not
 verify live skill files. Shared read locks and a 2-MiB registry cap protect reads;
 interrupted skill/stack journals refuse discovery. Output budgets refuse partial
-review content. Proposal/review writes and host history access remain CLI-only.
+review content. Everyday exposes `tdt_skill_propose` and single-ID `tdt_skill_review` through
+shared CLI core, exclusive locking and ownership checks. Review requires the
+actual user decision reference. Small receipts fit minimum budgets; full proposal
+reads precede review. After uncertainty inspect retained decisions and live files
+before retry; historical proposals can reopen, so retries are not automatic.
+CLI recovery remains required for interrupted transactions. Shared registry reads
+and proposed writes are capped at 2 MiB. Host history remains CLI-only.
 
 Both profiles expose `tdt_skill_inventory` for overlap review across canonical and
 host skill folders using the shared bounded CLI inventory. Paginated content

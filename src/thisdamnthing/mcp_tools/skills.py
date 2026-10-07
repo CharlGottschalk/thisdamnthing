@@ -1,4 +1,4 @@
-"""Bounded skill overlap inventory and retained proposal reads."""
+"""Bounded skill inspection and shared-core proposal/review operations."""
 import json
 from typing import Annotated, Literal
 
@@ -16,6 +16,36 @@ class SkillProposalListInput(ListInput):
 
 class SkillProposalInput(ReadInput):
     id: str = Field(pattern='^[a-f0-9]{64}$')
+
+
+class SkillProposeInput(ReadInput):
+    name: str = Field(max_length=64, pattern=r'^tdt-[a-z0-9]+(?:-[a-z0-9]+)*$')
+    description: str = Field(min_length=1, max_length=1024)
+    instructions: str = Field(min_length=1, max_length=10000)
+    sources: list[Annotated[str, Field(max_length=160, pattern=r'^[^\n]*$')]] = Field(default_factory=list, max_length=40)
+    update: bool = False
+
+
+class SkillReviewInput(SkillProposalInput):
+    decision: Literal['approve', 'decline']
+    user_instruction: str = Field(min_length=1, max_length=300)
+
+
+class SkillSaved(Model):
+    id: str
+    status: Literal['pending', 'approved', 'declined']
+
+
+def skill_propose(root, args):
+    proposal = skills.propose(root, args.model_dump(
+        include={'name', 'description', 'instructions', 'sources'}), update=args.update)
+    # A fixed-size receipt fits even the minimum budget after a successful write.
+    return SkillSaved(id=proposal['id'], status=proposal['status']), []
+
+
+def skill_review(root, args):
+    skills.review(root, [args.id], args.decision, args.user_instruction)
+    return SkillSaved(id=args.id, status='approved' if args.decision == 'approve' else 'declined'), []
 
 
 class SkillProposalSummary(Model):

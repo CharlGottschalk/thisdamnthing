@@ -11,6 +11,7 @@ from .workspace import WorkspaceError, managed_path, read_json
 STATE = '.tdt/state/user-skills.json'
 JOURNAL = '.tdt/state/user-skill-transaction.json'
 MAX_PROPOSALS = 100
+MAX_STATE_BYTES = 2097152
 
 
 def name_checked(name):
@@ -50,9 +51,17 @@ def valid_record(record, name):
 
 
 def state(root):
+    from .constitution import bounded
     if not managed_path(root, STATE).exists():
         return {'version': 1, 'skills': {}, 'proposals': {}}
-    return validate_state(read_json(root, STATE))
+    return validate_state(json.loads(bounded(managed_path(root, STATE), MAX_STATE_BYTES)))
+
+
+def encoded_state(data):
+    content = encode(data)
+    if len(content.encode('utf-8')) > MAX_STATE_BYTES:
+        raise WorkspaceError('User skill registry exceeds 2 MiB')
+    return content
 
 
 def validate_state(value):
@@ -163,7 +172,7 @@ def propose(root, value, update=False):
         check_targets(root, proposal['name'], owned)
         proposal.update(status='pending', sources=sources, before=owned)
         data['proposals'][key] = proposal
-        atomic(root, STATE, encode(data))
+        atomic(root, STATE, encoded_state(data))
     return {'id': key, **proposal}
 
 
@@ -261,7 +270,7 @@ def review(root, keys, decision, instruction):
                 data['skills'][proposal['name']] = {p: digest(changes[p]) for p in targets}
             proposal['status'] = 'approved' if decision == 'approve' else 'declined'
             proposal['decision_reference'] = instruction
-        changes[STATE] = encode(data)
+        changes[STATE] = encoded_state(data)
         before = {p: existing_text(root, p) for p in changes}
         atomic(root, JOURNAL, encode({'before': before, 'after': changes}))
         try:

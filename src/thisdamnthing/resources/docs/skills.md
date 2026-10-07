@@ -200,7 +200,7 @@ when needed; there is no dedicated enablement skill. Terminal alternatives:
 original ownership. Restart the host session for discovery. If a pending update
 reports changed integration ownership, propose it again before reviewing it.
 
-## MCP skill inspection
+## MCP skill inspection and decisions
 
 When the workspace-bound MCP server is available, `tdt_skill_proposals` lists
 retained proposals (pending by default; approved, declined and all are explicit
@@ -210,8 +210,16 @@ Read complete content before discussing a decision; increase the result budget
 if needed. Cursors expire when proposal or ownership state changes. A retained
 approval does not establish that its version is currently installed, and ownership
 metadata does not verify files on disk. These tools neither execute instructions
-nor access host history. Continue using the CLI for proposals and actual reviews,
-and inspect interrupted state before the existing CLI recovery flow.
+nor access host history. The everyday profile also exposes `tdt_skill_propose` with the same proposal
+fields and an explicit `update` boolean (default false), and `tdt_skill_review`
+with one `id`, `decision` (approve/decline) and actual `user_instruction` reference.
+CLI review still supports batches. Both return small ID/status receipts that fit
+the minimum budget; read complete proposals before review. After uncertainty,
+inspect the retained proposal and live inventory before retry or CLI fallback.
+Repeated proposals can reopen historical behavior against current ownership;
+never retry blindly. Interrupted transactions require CLI recovery and fresh reads.
+Proposal/review use the shared CLI core, exclusive lock and ownership checks.
+Registry reads and proposed writes are capped at 2 MiB before mutation.
 
 Use `tdt_skill_inventory` before proposing skills to compare live content from
 canonical, Claude and Codex skill folders, including unmanaged entries. Follow

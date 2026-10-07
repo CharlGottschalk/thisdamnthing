@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 43 tools; `everyday` has 76 in total.
+The default `read-only` catalog has 43 tools; `everyday` has 78 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Returns `proposal_sha256` binding renames and complete before/after contents, including derived catalog writes.
@@ -133,6 +133,12 @@ The following list covers reads and selected everyday counterparts:
   host folders for overlap review, including unmanaged skills. Ownership labels
   do not verify assets; truncated content is incomplete evidence. Also inspect
   retained proposals with status all. No execution or host history access.
+- `tdt_skill_propose` / `tdt_skill_review` (everyday): shared-core proposal
+  submission and explicit approve/decline for one exact ID. `update` defaults false;
+  review requires the actual `user_instruction` reference. Small ID/status receipts
+  fit the minimum budget. Read complete proposals before review and reconcile
+  proposal plus live inventory after uncertainty before retry or CLI fallback.
+  Interrupted transactions require CLI recovery. No execution or history access.
 - `tdt_skill_proposals` / `tdt_skill_proposal_read`: paginated retained user skill
   proposals and complete behavior, sources, decisions and recorded ownership.
   Defaults to pending; select approved, declined or all explicitly. Historical

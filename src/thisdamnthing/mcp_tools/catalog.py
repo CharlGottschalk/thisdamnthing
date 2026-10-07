@@ -125,13 +125,21 @@ from .reminders import (
 )
 from .work import work_read, work_search
 from .skills import (SkillProposalListInput, SkillProposalInput, SkillProposalPage,
-                     SkillProposalRead, skill_proposals, skill_proposal_read)
+                     SkillProposalRead, skill_proposals, skill_proposal_read,
+                     SkillInventoryPage, skill_inventory)
 from .workspace import (PolicySaveInput, PolicySaved, context_read, policy_read,
                         policy_save, workspace_status)
 
 
 # Fixed order and explicit typed operations; no operation-dispatch tool is exposed.
 CATALOG = {
+    'tdt_skill_inventory': (ListInput, SkillInventoryPage, skill_inventory,
+        'Compare core, stack, user and unmanaged skills across canonical and host skill folders. '
+        'Paginated live content prefixes are limited to 16384 characters per file; truncated content '
+        'is incomplete evidence. Owner labels are recorded/name-based attribution, not hash verification '
+        'or permission to overwrite. Cursors bind the returned inventory representation. '
+        'Also read tdt_skill_proposals with status all for pending and declined overlaps. '
+        'Never executes skills or reads host history. Recovery markers refuse reads.'),
     'tdt_skill_proposals': (SkillProposalListInput, SkillProposalPage, skill_proposals,
         'List retained user skill proposals, pending by default, with approved/declined/all filters. '
         'Paginated summaries are not complete review content. Read the exact proposal before review. '

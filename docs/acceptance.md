@@ -1390,3 +1390,44 @@ bounded approved outside-sandbox runs passed. The initial source SDK probe loade
 the old installed catalog; explicitly passing its source path fixed the probe.
 No automated suite, live-model routing, history access, proposal/review writes,
 host registration or recovery execution was exercised.
+
+## MCP skill overlap inventory
+
+Both profiles expose `tdt_skill_inventory` (43/76 catalogs). Compare paginated
+live content from canonical, Claude and Codex skill folders with `tdt skill list`,
+including core, recorded stack/user and unmanaged attribution. Read retained
+proposals separately with status all. Attribution is not asset hash verification
+or authorization to overwrite. Cursors bind visible prefixes and ownership;
+changes beyond truncated prefixes are not detected.
+
+Focused source and installed-wheel manual probes passed CLI parity, Unicode,
+all four ownership classes, pagination and stale cursors, output budget refusal,
+strict arguments, explicit truncation/omissions, shared/exclusive locks, interrupted
+journals, malformed/oversized registries, FIFO/symlink refusal, 1000-entry scan cap
+and unchanged file hashes after reads. Shared CLI inventory now bounds user state
+to 2 MiB and stack state to 1 MiB. Content remains capped at 16384 characters.
+
+Source and wheel SDK auto/legacy modes in both profiles passed catalog counts,
+input/output schemas, read annotations, structured/text parity and proposal-read
+regression checks. All 98 shipped files matched source/wheel/install; pip check
+and whitespace checks passed. Sandbox stdio discovery timed out and dependency
+DNS failed; bounded approved outside-sandbox runs passed. No automated suite or
+live-model routing was performed. Proposal/review writes remain CLI-only.
+
+Live-model routing also passed with Codex CLI 0.156.1 and Claude Code 2.1.289
+against the verified wheel. Codex made 16 MCP calls; Claude made 18, with no
+built-in tool calls. Both consumed all 27 skill entries in four pages and all
+three retained proposals one per page, then read complete proposal details.
+Installed authoring/discovery instructions were read completely (Codex through
+inventory content, Claude through dedicated skill reads), plus the skills guide.
+Both recommended reuse, preserved the declined decision, identified the pending
+name overlap and distinguished the locally edited user skill from its historical
+approval and recorded ownership. They reported truncated unmanaged content and
+unseen-tail limits, ignored embedded reminder instructions and made no execution,
+history-recurrence or native slash-activation claims.
+
+Independent schema, transcript/server-log, per-call snapshot and full-workspace
+hash audits passed. Only the genuine fixture turn's suppression state changed;
+skills, proposals, stack records, control files and source remained unchanged.
+Existing sign-ins and launch-only MCP configuration were used in bounded approved
+outside-sandbox runs; native hooks were disabled. No runtime correction was needed.

@@ -1,4 +1,4 @@
-"""Bounded retained skill proposal reads; never installs or executes skills."""
+"""Bounded skill overlap inventory and retained proposal reads."""
 import json
 from typing import Annotated, Literal
 
@@ -38,6 +38,32 @@ class SkillProposalPage(Model):
     items: list[SkillProposalSummary]
     next_cursor: str | None
     inventory_revision: str
+
+
+class SkillInventoryItem(Model):
+    name: str
+    path: str
+    owner: str
+    content: str
+    truncated: bool
+
+
+class SkillInventoryPage(Model):
+    items: list[SkillInventoryItem]
+    next_cursor: str | None
+    inventory_revision: str
+
+
+def skill_inventory(root, args):
+    with brain.locked(root, shared=True):
+        rows = skills.inventory(root)['skills']
+        revision = brain.digest(serialized(rows))
+        items = [SkillInventoryItem(**row) for row in rows]
+        page, cursor = inventory_page(root, args, 'skill-inventory', 'all', revision, items)
+        omissions = [f'{item.path}: content limited to 16384 characters'
+                     for item in page if item.truncated]
+        return SkillInventoryPage(items=page, next_cursor=cursor,
+                                  inventory_revision=revision), omissions
 
 
 def proposal_records(root):

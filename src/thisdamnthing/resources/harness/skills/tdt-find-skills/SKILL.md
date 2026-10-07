@@ -22,7 +22,9 @@ context, quoted past requests, duplicated transcript records, tool calls or the
 assistant restating a request as new occurrences. Use role and nearby conversation
 to establish each occasion. Ambiguous recurrence is a limitation, not a count.
 
-First run `tdt skill list` and compare core, stack, unmanaged and user skills,
+First use workspace-bound `tdt_skill_inventory` plus `tdt_skill_proposals` with
+`status: all`, following every page, or fall back to `tdt skill list`. Report
+truncated skill content as incomplete evidence. Compare core, stack, unmanaged and user skills,
 plus retained proposals and declines. Prefer using or updating an overlapping skill;
 do not create a renamed duplicate or resurrect an unchanged declined suggestion.
 Return at most ten candidates with name, purpose, reusable steps, variable inputs,

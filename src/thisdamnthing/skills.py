@@ -1,5 +1,6 @@
 """User-owned workspace skills; approval records are separate from bootstrap/stacks."""
 import json
+import itertools
 import re
 from pathlib import Path
 
@@ -96,16 +97,26 @@ def ready(root):
 
 def inventory(root):
     ready(root)
-    data = state(root)
-    from .stacks import available
-    stacks = available(root)
+    from .constitution import bounded
+    from .stacks import REGISTRY, validate_registry
+    registry = managed_path(root, STATE)
+    data = (validate_state(json.loads(bounded(registry, 2097152)))
+            if registry.exists() else {'skills': {}, 'proposals': {}})
+    stacks = validate_registry(json.loads(bounded(managed_path(root, REGISTRY), 1048576)))
     results = []
+    scanned = 0
     for folder in ('.tdt/skills', '.claude/skills', '.agents/skills'):
         directory = managed_path(root, folder)
-        for child in sorted(directory.iterdir()) if directory.exists() else []:
+        children = list(itertools.islice(directory.iterdir(), 1001)) if directory.exists() else []
+        scanned += len(children)
+        if scanned > 1000:
+            raise WorkspaceError('Skill inventory exceeds 1000 entries')
+        for child in sorted(children):
             relative = f'{folder}/{child.name}/SKILL.md'
             path = managed_path(root, relative)
             if not path.is_file():
+                if path.exists():
+                    raise WorkspaceError('Skill content must be a regular file')
                 continue
             with path.open(encoding='utf-8') as stream:
                 content = stream.read(16385)

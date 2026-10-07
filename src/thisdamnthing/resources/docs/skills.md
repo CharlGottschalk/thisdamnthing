@@ -200,7 +200,7 @@ when needed; there is no dedicated enablement skill. Terminal alternatives:
 original ownership. Restart the host session for discovery. If a pending update
 reports changed integration ownership, propose it again before reviewing it.
 
-## MCP proposal inspection
+## MCP skill inspection
 
 When the workspace-bound MCP server is available, `tdt_skill_proposals` lists
 retained proposals (pending by default; approved, declined and all are explicit
@@ -212,3 +212,14 @@ approval does not establish that its version is currently installed, and ownersh
 metadata does not verify files on disk. These tools neither execute instructions
 nor access host history. Continue using the CLI for proposals and actual reviews,
 and inspect interrupted state before the existing CLI recovery flow.
+
+Use `tdt_skill_inventory` before proposing skills to compare live content from
+canonical, Claude and Codex skill folders, including unmanaged entries. Follow
+all pages and also read `tdt_skill_proposals` with `status: all`. Content prefixes
+are capped at 16384 characters; truncated entries are incomplete evidence.
+Owner labels follow CLI attribution and do not verify hashes or grant overwrite
+permission. Cursors bind the visible inventory, including prefixes and ownership;
+changes beyond a truncated prefix are not detected. The shared CLI inventory
+refuses scans over 1000 directory entries, user registries over 2 MiB, stack
+registries over 1 MiB and interrupted skill/stack transactions. MCP reads hold
+a shared workspace lock and never execute skills or inspect host history.

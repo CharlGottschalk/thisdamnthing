@@ -210,9 +210,8 @@ contains the record revision and verified file count; no file content is returne
 This checks recorded ownership only, not executable safety, origin authenticity,
 provider caches, candidate status or runtime readiness. It executes nothing and
 writes no stack assets. The revision is not an apply token; later CLI lifecycle
-operations recheck current ownership. Install/update/remove remain CLI-only.
+operations recheck current ownership. Install/update remain CLI-only; everyday MCP also supports reviewed removal.
 
-Install, update and remove remain CLI operations.
 
 Stack/provider catalogs accept `limit` (1–50) and inventory-bound `cursor` values.
 They read at most 1 MiB of registry data and refuse interrupted stack/skill
@@ -719,6 +718,13 @@ Preview checks current ownership under a shared lock, executes nothing and write
 nothing. Auxiliary metadata reads are capped at 1 MiB each; cache and total before
 content at 8 MiB. Owned integrity limits also apply. Increase `budget_bytes` up to
 1 MiB; oversized results refuse without partial review content. The proposal hash
-identifies the preview, but is not accepted as a CLI approval token. Removal writes
-remain CLI-only and recheck current ownership. Inspection does not authorize
+binds everyday `tdt_stack_remove_apply`, but is not accepted as a CLI approval token.
+Apply requires the exact ID, `expected_sha256` and actual `user_instruction`, and
+rechecks bounded ownership and the complete snapshot under an exclusive lock.
+The recoverable transaction is capped at 8 MiB before writing. The small receipt
+is not a retained outcome or durable approval audit. After uncertainty inspect
+registry, affected paths and recovery preview before any newly authorized retry
+or CLI fallback. Absence does not prove success; an identical reinstall may
+reproduce the hash. Never automatically retry. Interrupted writes need reviewed
+recovery. Inspection does not authorize
 removal; stale previews must be inspected again before acting.

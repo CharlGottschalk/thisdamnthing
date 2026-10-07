@@ -8,13 +8,20 @@ list` (or MCP `tdt_stack_list`); ask only for an ambiguous target.
 When available, use `tdt_stack_remove_preview` for the exact ID and read complete
 before/after changes, including cache and derived catalog changes. Increase the
 result budget if needed; an oversized/refused preview is not partial review. Its
-hash identifies the preview only and is not a CLI approval token. Show its owned files and explain that
-brain notes/candidates, workspace-created skills, linked projects and generated
+hash binds everyday `tdt_stack_remove_apply` and is not a CLI approval token.
+Show its owned files and explain that brain notes/candidates, workspace-created skills, linked projects and generated
 user artifacts remain. An explicit uninstall/remove request authorizes this scope;
 do not ask for a second confirmation. Inspection alone does not authorize removal.
 
-Run `tdt stack uninstall ID` (the same operation as `stack remove ID`). On
-missing/edited owned assets or untracked additions, report exact blockers. Preserve
+Prefer `tdt_stack_remove_apply` with the exact ID, preview `proposal_sha256` as
+`expected_sha256`, and the actual removal request as `user_instruction`. If the
+tool is unavailable, use `tdt stack uninstall ID` (same as `stack remove ID`).
+A changed preview requires fresh inspection. No durable removal outcome is kept:
+after uncertainty inspect registry, affected paths and recovery preview before a
+newly authorized retry or CLI fallback. Absence does not prove success; an
+identical reinstall can reproduce a hash. Never automatically retry.
+
+On missing/edited owned assets or untracked additions, report exact blockers. Preserve
 edits/additions elsewhere and restore originals only within user authorization;
 never discard them or force-delete the bundle. Retry after resolution. A pending
 transaction requires `tdt stack recover`; preserve recovery conflicts for review.

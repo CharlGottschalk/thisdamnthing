@@ -113,6 +113,7 @@ from .projects import (
 from .providers import (ProviderIndexInput, ProviderIndexed, provider_index,
                         StackReadInput, StackRead, stack_read, StackVerified, stack_verify,
     StackRemovalPreview, stack_remove_preview,
+    StackRemovalApplyInput, StackRemoved, stack_remove_apply,
                         search_providers, stack_list)
 from .reminders import (
     reminder_ack,
@@ -146,8 +147,8 @@ CATALOG = {
         'interrupted transactions and special files under a shared lock. No writes, execution or source fetch. '
         'Auxiliary metadata is capped at 1 MiB per file, cache and total before content at 8 MiB; '
         'owned integrity limits also apply. Increase budget_bytes up to 1 MiB; oversized output refuses '
-        'without partial review content. proposal_sha256 identifies this preview only; the CLI does not '
-        'accept it as an approval token. Removal writes remain CLI-only and recheck current ownership. '
+        'without partial review content. proposal_sha256 binds everyday tdt_stack_remove_apply; the CLI does not '
+        'accept it as an approval token. Apply rechecks current ownership and the complete snapshot. '
         'Empty owned directories may be pruned by removal. Preview does not authorize removal.'),
     'tdt_stack_verify': (StackReadInput, StackVerified, stack_verify,
         'Verify live owned files for one exact installed stack ID through the shared CLI lifecycle checker. '
@@ -156,7 +157,7 @@ CATALOG = {
         'Returns the checked record revision and file count only after complete verification under a shared lock. '
         'No file content is returned or executed. Does not check provider caches, candidates, runtime readiness, '
         'source provenance authenticity or safety of executable code. The revision is not an apply token; '
-        'later lifecycle operations must recheck current ownership. Install/update/remove remain CLI-only. '
+        'later lifecycle operations must recheck current ownership. Install/update remain CLI-only; everyday supports reviewed removal. '
         'Interrupted stack/skill transactions refuse; inspect recovery first.'),
     'tdt_stack_read': (StackReadInput, StackRead, stack_read,
         'Read the complete installed registry record for one exact stack ID from tdt_stack_list. '
@@ -166,7 +167,7 @@ CATALOG = {
         'Does not read bundle files, external sources, fetch, execute, install, update or remove anything. '
         'The revision hashes the record only and is not a lifecycle approval token. '
         'Increase budget_bytes up to 1 MiB for complete output; oversized results refuse without partial content. '
-        'Interrupted stack/skill transactions refuse reads; inspect recovery first. Lifecycle writes remain CLI-only.'),
+        'Interrupted stack/skill transactions refuse reads; inspect recovery first. Install/update remain CLI-only; everyday supports reviewed removal.'),
     'tdt_recovery_preview': (RecoveryPreviewInput, RecoveryPreview, recovery_preview,
         'Inspect one interrupted stack or skill transaction using shared CLI recovery validation. '
         'Returns complete before (rollback destinations) and after (attempted writes) contents; '
@@ -350,6 +351,16 @@ CATALOG = {
 
 
 WRITES = {
+    'tdt_stack_remove_apply': (StackRemovalApplyInput, StackRemoved, stack_remove_apply,
+        'Remove one explicitly authorized installed stack after reviewing its complete removal preview. '
+        'Supply exact id, expected_sha256 from proposal_sha256 and actual user_instruction. '
+        'Shared CLI removal rechecks bounded ownership and complete before/after hash under the exclusive '
+        'workspace lock. Changed previews, absent stacks, conflicts and interrupted transactions refuse. '
+        'Deletes only owned assets/cache and refreshes registry/docs; preserves knowledge and user artifacts. '
+        'Returns a small receipt, not a durable outcome or approval audit. After an uncertain response inspect '
+        'registry, affected paths and recovery preview before any newly authorized retry or CLI fallback. '
+        'Absence does not prove success; reinstalling an identical stack can reproduce the preview hash. '
+        'Never automatically retry. Interrupted transactions require reviewed recovery. No execution or fetch.'),
     'tdt_recovery_apply': (RecoveryApplyInput, RecoveryApplied, recovery_apply,
         'Roll back one explicitly selected stack or skill transaction after complete recovery preview '
         'review and actual user authorization. Supply kind, expected_sha256 from journal_sha256 and '

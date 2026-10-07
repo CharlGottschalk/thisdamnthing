@@ -55,20 +55,30 @@ class StackRemovalPreview(Model):
 
 
 def stack_remove_preview(root, args):
-    from ..recovery import read_bytes
     with brain.locked(root, shared=True):
         stack_read(root, args)  # Exact ID and bounded registry validation.
-        _, changes = stacks.removal_plan(root, args.id, bounded=True)
-        before = {}
-        remaining = 8 * 1048576
-        for relative in changes:
-            raw = read_bytes(root, relative, remaining)
-            before[relative] = None if raw is None else stacks.content_value(raw)
-            remaining -= len(raw) if raw is not None else 0
-        proposal = {'id': args.id, 'before': before, 'after': changes}
-        digest = brain.digest(json.dumps(proposal, ensure_ascii=False, sort_keys=True,
-                                         separators=(',', ':')))
-        return StackRemovalPreview(**proposal, proposal_sha256=digest), []
+        _, preview = stacks.removal_preview(root, args.id)
+        return StackRemovalPreview(**preview), []
+
+
+class StackRemovalApplyInput(ReadInput):
+    id: str = Field(min_length=1, max_length=81)
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=300)
+
+
+class StackRemoved(Model):
+    id: str
+    proposal_sha256: str
+
+
+def stack_remove_apply(root, args):
+    skills.text_checked(args.user_instruction, 'user instruction reference', 300)
+    if not (stacks.ID.fullmatch(args.id) or stacks.LEGACY_ID.fullmatch(args.id)):
+        raise Refused('invalid_input', 'Invalid stack ID')
+    stacks.remove(root, args.id, expected_sha256=args.expected_sha256)
+    # No retained outcome: absence after a lost response is not proof of success.
+    return StackRemoved(id=args.id, proposal_sha256=args.expected_sha256), []
 
 
 def installed_stacks(root):

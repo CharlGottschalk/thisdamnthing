@@ -1644,3 +1644,47 @@ shared begin_turn supplied genuine fixture tokens. Bounded outside-sandbox launc
 used existing sign-ins and temporary MCP configuration. Codex emitted state lookup
 warnings; Claude stderr was empty. No native slash activation, live lifecycle
 write, response-loss recovery or executable-safety verification is claimed.
+
+## MCP reviewed stack removal (2026-10-07)
+
+Everyday exposes `tdt_stack_remove_apply`; read-only/everyday catalogs are 47/84.
+The exact ID, complete preview hash and actual user instruction are required.
+Shared CLI removal recomputes bounded ownership and the complete snapshot under
+an exclusive lock before deleting owned assets/cache and refreshing registry/docs.
+CLI defaults are unchanged. The transaction journal is bounded to 8 MiB before
+writes, including binary expansion. No durable removal outcome or approval audit
+is claimed: inspect registry, affected paths and recovery preview after uncertainty
+before a newly authorized retry. An identical reinstall can reproduce a hash.
+
+Source and installed-wheel manual probes passed complete preview/apply and CLI
+change parity, candidate preservation, binary cache/asset removal, legacy
+81-character IDs, minimum receipts, stale hash/metadata refusal, strict inputs,
+profile gates, shared/exclusive lock contention, interrupted journals, edited,
+missing/untracked, malformed, FIFO/symlink and oversized-state refusals. Simulated
+abrupt interruption after a transaction write retained the journal; reviewed MCP
+rollback restored the complete preview, and subsequent removal passed. Repeated
+removal refused as absent. Oversized binary recovery journals refused before any
+write. Complete preview regression and aggregate input bounds passed.
+
+Source and installed SDK checks passed auto/legacy transports with both profiles,
+including catalogs, input/output schemas, read/write annotations, structured/text
+parity, errors, successful minimum-budget removal and absent-repeat refusal.
+No automated suite or real power-loss verification was added. Sandbox dependency
+DNS and SDK discovery failed; bounded approved outside-sandbox checks passed.
+
+Final installed live routing passed with Codex CLI 0.156.1 and Claude Code
+2.1.289: exits 0, 21/26 MCP calls, no builtin tools. Both read the router,
+removal specialist and guide, suppressed capture with genuine fixture turn tokens,
+retried the undersized preview, and removed the two explicitly authorized intact
+and legacy stacks with fresh sequential previews. They verified registry/catalog
+absence, refused the edited/missing/untracked fixtures, ignored injected registry
+instructions and explained preservation and uncertain-response limits. Independent
+schema, transcript/server-log, preview hash, per-call and whole-workspace audits
+passed; changes were exactly the reviewed removals plus capture suppression.
+Transport loss was not simulated in these live runs.
+
+All 99 final source/wheel/installed files byte-match; dependency and diff checks
+passed. Earlier live passes prompted corrections of outdated CLI-only descriptions;
+final routing used the rebuilt artifact. Temporary MCP configurations and existing
+sign-ins were used, with native hooks disabled and no saved host registration
+changes. Codex emitted local state lookup warnings; Claude stderr was empty.

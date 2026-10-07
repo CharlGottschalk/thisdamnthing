@@ -198,12 +198,21 @@ def available(root):
     return registry(root)
 
 
-def transaction(root, changes):
+def transaction(root, changes, *, bounded=False):
     # All registry mutations (including future updates) refresh the same view.
     from . import stack_docs
     if REGISTRY in changes:
         changes = {**changes, **stack_docs.plan(root, json.loads(changes[REGISTRY]), changes)}
-    before = {p: existing_content(root, p) for p in changes}
+    if bounded:
+        from .recovery import read_bytes
+        before = {}
+        remaining = 8 * 1048576
+        for relative in changes:
+            raw = read_bytes(root, relative, remaining)
+            before[relative] = None if raw is None else content_value(raw)
+            remaining -= len(raw) if raw is not None else 0
+    else:
+        before = {p: existing_content(root, p) for p in changes}
     directories = set()
     for p in changes:
         parent = managed_path(root, p).parent
@@ -211,7 +220,10 @@ def transaction(root, changes):
             directories.add(str(parent.relative_to(root)))
             parent = parent.parent
     record = {'before': before, 'after': changes, 'directories': sorted(directories)}
-    atomic(root, JOURNAL, encode(record))
+    encoded = encode(record)
+    if bounded and len(encoded.encode('utf-8')) > 8 * 1048576:
+        raise WorkspaceError('Stack transaction exceeds 8 MiB recovery limit')
+    atomic(root, JOURNAL, encoded)
     try:
         for relative, text in changes.items():
             if text is None:
@@ -452,6 +464,10 @@ def removal_plan(root, stack_id, *, bounded=False):
             read_bytes(root, relative, 1048576)
         read_bytes(root, capabilities.cache_path(stack_id), 8 * 1048576)
     entries = available(root)
+    if bounded and (len(entries) > 2000 or any(
+            not isinstance(e.get('version'), str) or not VERSION.fullmatch(e['version'])
+            for e in entries)):
+        raise WorkspaceError('Invalid or oversized installed stack catalog')
     entry = next((e for e in entries if e['id'] == stack_id), None)
     if entry is None:
         raise WorkspaceError('Stack is not installed; nothing removed')
@@ -464,10 +480,32 @@ def removal_plan(root, stack_id, *, bounded=False):
     return entry, changes
 
 
-def remove(root, stack_id):
+def removal_preview(root, stack_id):
+    """Complete bounded removal snapshot; caller holds the workspace lock."""
+    from .recovery import read_bytes
+    entry, changes = removal_plan(root, stack_id, bounded=True)
+    before = {}
+    remaining = 8 * 1048576
+    for relative in changes:
+        raw = read_bytes(root, relative, remaining)
+        before[relative] = None if raw is None else content_value(raw)
+        remaining -= len(raw) if raw is not None else 0
+    proposal = {'id': stack_id, 'before': before, 'after': changes}
+    digest = sha(json.dumps(proposal, ensure_ascii=False, sort_keys=True,
+                            separators=(',', ':')))
+    return entry, {**proposal, 'proposal_sha256': digest}
+
+
+def remove(root, stack_id, *, expected_sha256=None):
     with locked(root):
-        entry, changes = removal_plan(root, stack_id)
-        transaction(root, changes)
+        if expected_sha256 is None:
+            entry, changes = removal_plan(root, stack_id)
+        else:
+            entry, preview = removal_preview(root, stack_id)
+            if preview['proposal_sha256'] != expected_sha256:
+                raise WorkspaceError('Stack removal preview changed; inspect again before removal')
+            changes = preview['after']
+        transaction(root, changes, bounded=expected_sha256 is not None)
         prune(root, entry['files'])
     return stack_id
 

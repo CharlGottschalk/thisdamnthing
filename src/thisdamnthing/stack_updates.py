@@ -9,7 +9,7 @@ from .workspace import WorkspaceError, managed_path
 
 
 @contextmanager
-def replacement(entry, source=None, registry_url=None):
+def replacement(entry, source=None, registry_url=None, *, bounded=False):
     origin = entry['origin']
     if origin.get('kind') == 'local':
         if registry_url:
@@ -17,7 +17,7 @@ def replacement(entry, source=None, registry_url=None):
         path = source or origin.get('path')
         if not path:
             raise WorkspaceError('Local source unavailable; select --source PATH')
-        manifest, files, provenance = stacks.validate(path)
+        manifest, files, provenance = stacks.validate(path, bounded=bounded)
         yield path, manifest, files, provenance, None
     elif origin.get('kind') == 'marketplace':
         if source:
@@ -58,19 +58,7 @@ def update(root, sid, *, source=None, registry_url=None, check=False,
                 print(json.dumps({'status': 'current', 'id': sid, 'version': current}))
                 return 'No newer version'
             raise WorkspaceError('Downgrade or same-version replacement refused; installed content preserved')
-        # Inspect new projection collisions before asking for approval.
-        for relative in files:
-            target_path = f'.tdt/stacks/{sid}/{relative}'
-            if target_path not in entry['files'] and stacks.existing_content(root, target_path) is not None:
-                raise WorkspaceError('New bundle path conflict: ' + target_path)
-        for relative in manifest['skills']:
-            name = relative.split('/')[1]
-            for folder in ('.tdt/skills', '.agents/skills', '.claude/skills'):
-                directory_path = f'{folder}/{name}'
-                if managed_path(root, directory_path).exists() and directory_path + '/SKILL.md' not in entry['files']:
-                    raise WorkspaceError('New skill directory conflict: ' + directory_path)
-            if managed_path(root, f'.claude/commands/{name}.md').exists():
-                raise WorkspaceError('Claude command conflict: ' + name)
+        projection_conflicts(root, sid, entry, manifest, files)
         base = f'.tdt/stacks/{sid}/'
         old = {p[len(base):]: digest for p, digest in entry['files'].items() if p.startswith(base)}
         from . import stack_docs
@@ -106,3 +94,54 @@ def update(root, sid, *, source=None, registry_url=None, check=False,
         installed = next(e for e in stacks.available(root) if e['id'] == sid)
         stacks.check_owned(root, installed)
         return f'Updated {sid} to {target}; restart hosts to refresh loaded skills'
+
+
+def projection_conflicts(root, sid, entry, manifest, files, *, bounded=False):
+    """Check CLI update collisions, including disabled host projections."""
+    for relative in files:
+        target_path = f'.tdt/stacks/{sid}/{relative}'
+        if bounded and target_path not in entry['files']:
+            from .recovery import read_bytes
+            read_bytes(root, target_path, 1048576)
+        if target_path not in entry['files'] and stacks.existing_content(root, target_path) is not None:
+            raise WorkspaceError('New bundle path conflict: ' + target_path)
+    for relative in manifest['skills']:
+        name = relative.split('/')[1]
+        for folder in ('.tdt/skills', '.agents/skills', '.claude/skills'):
+            directory_path = f'{folder}/{name}'
+            if managed_path(root, directory_path).exists() and directory_path + '/SKILL.md' not in entry['files']:
+                raise WorkspaceError('New skill directory conflict: ' + directory_path)
+        if managed_path(root, f'.claude/commands/{name}.md').exists():
+            raise WorkspaceError('Claude command conflict: ' + name)
+
+
+def local_preview(root, sid, directory):
+    """Complete local update snapshot; caller holds a shared workspace lock."""
+    from .recovery import read_bytes
+    read_bytes(root, stacks.REGISTRY, 1048576)
+    entries = stacks.available(root)
+    if len(entries) > 2000 or any(not isinstance(e.get('version'), str) or
+                                not stacks.VERSION.fullmatch(e['version']) for e in entries):
+        raise WorkspaceError('Invalid or oversized installed stack catalog')
+    entry = next((e for e in entries if e['id'] == sid), None)
+    if entry is None:
+        raise WorkspaceError('Stack is not installed')
+    if entry['origin'].get('kind') != 'local':
+        raise WorkspaceError('Local preview requires a locally installed stack; source switching refused')
+    with replacement(entry, source=directory, bounded=True) as (_, manifest, files, origin, _):
+        if manifest['id'] != sid:
+            raise WorkspaceError('Replacement stack ID mismatch')
+        projection_conflicts(root, sid, entry, manifest, files, bounded=True)
+        changes = stacks.installation_plan(root, manifest, files, origin,
+                                           replacing=entry, bounded=True)
+    before = {}
+    remaining = 8 * 1048576
+    for relative in changes:
+        raw = read_bytes(root, relative, remaining)
+        before[relative] = None if raw is None else stacks.content_value(raw)
+        remaining -= len(raw) if raw is not None else 0
+    return {'id': sid, 'current_version': entry['version'],
+            'target_version': manifest['version'], 'current_origin': entry['origin'],
+            'target_origin': origin,
+            'requires_executable_trust': bool(manifest['hooks'] or manifest.get('capabilities')),
+            'before': before, 'after': changes}

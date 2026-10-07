@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 from pydantic import Field, ValidationError
-from .. import brain, capabilities, skills, stacks
+from .. import brain, capabilities, skills, stacks, stack_updates
 from .common import Refused, bounded_text, inventory_page, serialized
 from .models import Model, ReadInput, ProviderPage, ProviderSummary, StackPage, StackSummary
 from .maintenance import BinaryContent
@@ -45,6 +45,31 @@ def stack_install_preview(root, args):
     bounded_text(root, '.tdt/config.json', 1048576)  # Lock initialization reads config.
     with brain.locked(root, shared=True):
         return StackInstallationPreview(**stacks.installation_preview(root, args.source)), []
+
+
+class StackUpdatePreviewInput(StackValidateInput):
+    id: str = Field(min_length=1, max_length=81)
+
+
+class StackUpdatePreview(Model):
+    id: str
+    current_version: str
+    target_version: str
+    current_origin: dict
+    target_origin: dict
+    requires_executable_trust: bool
+    before: dict[str, str | BinaryContent | None]
+    after: dict[str, str | BinaryContent | None]
+
+
+def stack_update_preview(root, args):
+    if not Path(args.source).is_absolute():
+        raise Refused('invalid_input', 'Select an absolute local replacement directory')
+    if not (stacks.ID.fullmatch(args.id) or stacks.LEGACY_ID.fullmatch(args.id)):
+        raise Refused('invalid_input', 'Invalid stack ID')
+    bounded_text(root, '.tdt/config.json', 1048576)
+    with brain.locked(root, shared=True):
+        return StackUpdatePreview(**stack_updates.local_preview(root, args.id, args.source)), []
 
 
 class StackReadInput(ReadInput):

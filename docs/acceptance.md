@@ -1814,3 +1814,48 @@ whole-workspace hash audits passed with no file changes. Native hooks were disab
 existing sign-ins and temporary MCP configurations were used without saved host
 registration changes. Codex reported state lookup warnings and an unavailable
 contract guide; Claude stderr was empty. Native host registration was not tested.
+
+## MCP local update previews — 2026-10-07
+
+Both profiles expose `tdt_stack_update_preview` for an exact locally installed ID
+and explicitly selected absolute replacement source. Catalogs contain 50 read-only
+and 87 everyday tools. Complete before/after content comes from the shared CLI
+installation planner and update collision checks, including disabled host skill
+conflicts. Preview checks ownership, matching ID and strictly newer version;
+source-kind switches refuse. Output includes current/target origins and versions,
+new pending candidates, preserved existing knowledge, obsolete owned deletions,
+provider cache invalidation, registry and derived docs. Binary content uses base64.
+No fetching, code execution, writes, trust grant or CLI approval token is added.
+Projected trust is hypothetical; new candidate timestamps remain illustrative.
+
+Focused source and installed-wheel manual checks passed complete CLI update
+check/approval/apply parity with fixed candidate timestamps, both-host projections,
+candidate preservation, binary before contents and cache invalidation. Strict
+inputs/budgets, ID mismatch, non-newer versions, source-kind switching, ownership
+edits/missing/additional files, journals, locks, malformed metadata, FIFO/symlink
+and invalid-UTF-8 sources, disabled host conflicts and metadata/cache limits all
+refused without changing the disposable fixture. Oversized complete binary output
+refused without partial review. Explicit new executable trust remained required
+on actual CLI replacement. Installation-preview regression checks also passed.
+No automated suite was added.
+
+Source and installed SDK auto/legacy transports in both profiles passed discovery,
+exact catalog counts, read annotations, strict schemas, text/structured parity,
+complete preview parity and error envelopes. Sandbox stdio discovery timeout and
+build dependency DNS failure were resolved with bounded outside-sandbox checks.
+The wheel built with the declared isolated build dependency; all 99 shipped files
+match source/wheel/installation, dependency checks and whitespace checks passed.
+
+Live Codex CLI 0.156.1 and Claude Code 2.1.289 exited zero with 20/14 actual
+MCP calls and no builtin calls. Both read the router, update specialist, core and
+stack guides, installed record and complete selected source; retried undersized
+preview budgets; inspected complete destination changes; refused the invalid
+source; ignored injected metadata; and explained trust, timestamp and CLI token
+boundaries. Independent schema, transcript/server-log, complete planner-result,
+per-call and whole-workspace audits passed with no fixture changes. Codex corrected
+three invalid inventory limits, then used valid calls. Native hooks were disabled;
+existing sign-ins and temporary MCP configurations left saved registrations alone.
+Codex emitted state lookup warnings; Claude stderr was empty. A separate intact
+large-bundle/cache probe confirmed the aggregate before-content cap refuses without
+writes. Reviewed install/update apply, marketplace MCP inspection and owned host
+registration remain future work.

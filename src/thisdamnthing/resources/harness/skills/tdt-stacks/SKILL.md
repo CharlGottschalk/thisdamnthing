@@ -45,3 +45,10 @@ For local installation destination review, use `tdt_stack_install_preview` with
 the selected absolute source. Read complete before/after contents and trust
 requirements; no writes or trust are granted. Candidate timestamps are illustrative.
 The snapshot is not an apply token; installation remains CLI-only.
+
+For local update destination review, prefer `tdt_stack_update_preview` with the
+exact locally installed ID and explicitly selected absolute replacement source.
+Read the update specialist, complete source and full before/after preview. It
+requires a strictly newer matching version, checks ownership, preserves existing
+knowledge and reports provider cache invalidation. It does not grant trust or
+return a CLI approval token; update writes remain CLI-only.

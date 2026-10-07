@@ -324,7 +324,8 @@ def installation_plan(root, data, files, origin, *, replacing=None,
     def read_content(root, relative):
         if not bounded:
             return existing_content(root, relative)
-        raw = read_bytes(root, relative, 1048576)
+        limit = 8 * 1048576 if replacing and relative in replacing['files'] else 1048576
+        raw = read_bytes(root, relative, limit)
         return None if raw is None else content_value(raw)
     if bounded:
         from .bootstrap import MANIFEST
@@ -341,7 +342,7 @@ def installation_plan(root, data, files, origin, *, replacing=None,
     if replacing is not None:
         if current != replacing:
             raise WorkspaceError('Installed state changed; inspect and approve again')
-        check_owned(root, current)
+        check_owned(root, current, bounded=bounded)
         if tuple(map(int, data['version'].split('.'))) <= tuple(map(int, current['version'].split('.'))):
             raise WorkspaceError('Update requires a strictly newer version')
     elif current is not None:
@@ -396,7 +397,10 @@ def installation_plan(root, data, files, origin, *, replacing=None,
                     'trusted_hooks': origin['sha256'] if data['hooks'] else None,
                     'trusted_capabilities': origin['sha256'] if data.get('capabilities') else None})
     if replacing:
-        from .capabilities import cache_changes
+        from .capabilities import cache_changes, cache_path, STATE
+        if bounded:
+            read_bytes(root, STATE, 1048576)
+            read_bytes(root, cache_path(data['id']), 8 * 1048576)
         changes.update(cache_changes(root, data['id']))
     changes[REGISTRY] = encode(entries)
     changes.update(stack_docs.plan(root, entries, changes))

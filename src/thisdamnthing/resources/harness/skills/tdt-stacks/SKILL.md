@@ -29,8 +29,8 @@ Use the CLI discovery workflow when MCP is unavailable.
 
 For explicit local source inspection, prefer `tdt_stack_validate` with an absolute
 directory and read complete selected contents before discussing trust. Validation
-does not authorize installation or establish executable safety. Install/update
-writes and marketplace inspection remain CLI-only.
+does not authorize installation or establish executable safety. Update writes and marketplace inspection remain CLI-only; everyday supports
+reviewed local installation.
 
 Read exactly the specialist needed from `.tdt/skills/` and follow it:
 
@@ -43,8 +43,13 @@ inspection and approval steps.
 
 For local installation destination review, use `tdt_stack_install_preview` with
 the selected absolute source. Read complete before/after contents and trust
-requirements; no writes or trust are granted. Candidate timestamps are illustrative.
-The snapshot is not an apply token; installation remains CLI-only.
+requirements; preview grants no trust and writes nothing. For an authorized local
+install, everyday `tdt_stack_install_apply` takes the same source, returned
+candidate_timestamp, proposal_sha256 as expected_sha256 and actual user_instruction.
+Executable content requires separately authorized trust_executable with the exact
+origin digest. Read the install specialist for the complete workflow. After uncertainty
+inspect record, ownership, affected files and recovery before newly authorized retry;
+never automatically retry. The receipt is not a retained outcome. Update remains CLI-only.
 
 For local update destination review, prefer `tdt_stack_update_preview` with the
 exact locally installed ID and explicitly selected absolute replacement source.

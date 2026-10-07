@@ -32,6 +32,8 @@ def stack_validate(root, args):
 
 
 class StackInstallationPreview(Model):
+    proposal_sha256: str
+    candidate_timestamp: str
     id: str
     origin: dict
     requires_executable_trust: bool
@@ -45,6 +47,29 @@ def stack_install_preview(root, args):
     bounded_text(root, '.tdt/config.json', 1048576)  # Lock initialization reads config.
     with brain.locked(root, shared=True):
         return StackInstallationPreview(**stacks.installation_preview(root, args.source)), []
+
+
+class StackInstallationApplyInput(ReadInput):
+    source: str = Field(min_length=1, max_length=4096)
+    candidate_timestamp: str = Field(min_length=1, max_length=40)
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    trust_executable: str | None = Field(default=None, pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=300)
+
+
+class StackInstalled(Model):
+    id: str
+    proposal_sha256: str
+
+
+def stack_install_apply(root, args):
+    if not Path(args.source).is_absolute():
+        raise Refused('invalid_input', 'Select an absolute local stack directory')
+    skills.text_checked(args.user_instruction, 'user instruction reference', 300)
+    stack_id = stacks.installation_apply(
+        root, args.source, candidate_timestamp=args.candidate_timestamp,
+        expected_sha256=args.expected_sha256, trust=args.trust_executable)
+    return StackInstalled(id=stack_id, proposal_sha256=args.expected_sha256), []
 
 
 class StackUpdatePreviewInput(StackValidateInput):

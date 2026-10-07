@@ -317,7 +317,7 @@ def bridge(name, canonical):
 
 
 def installation_plan(root, data, files, origin, *, replacing=None,
-                      prerequisite_release=None, confirmed=(), bounded=False):
+                      prerequisite_release=None, confirmed=(), bounded=False, candidate_timestamp=None):
     """Plan installation without writes; caller holds the workspace lock."""
     from . import stack_docs
     from .recovery import read_bytes
@@ -381,7 +381,8 @@ def installation_plan(root, data, files, origin, *, replacing=None,
                 raise WorkspaceError(f'Stack candidate conflict: {target}')
             continue
         meta = {'format_version': 1, 'id': key, 'status': 'pending', 'title': Path(relative).stem,
-                'kind': 'fact', 'created': now(), 'updated': now(), 'review': [],
+                'kind': 'fact', 'created': candidate_timestamp or now(),
+                'updated': candidate_timestamp or now(), 'review': [],
                 'provenance': {'stack': data['id'], **origin, 'file': relative},
                 'sources': [f"stack:{data['id']}@{data['version']}/{relative} sha256:{origin['sha256']}"],
                 'links': ['index']}
@@ -426,20 +427,46 @@ def install(root, directory, trust=None, *, provenance=None, replacing=None,
     return data['id']
 
 
-def installation_preview(root, directory):
-    """Complete local installation snapshot; no trust grant or apply token."""
+def installation_preview(root, directory, *, candidate_timestamp=None):
+    """Complete local installation snapshot; caller holds the workspace lock."""
     from .recovery import read_bytes
     data, files, origin = validate(directory, bounded=True)
-    changes = installation_plan(root, data, files, origin, bounded=True)
+    candidate_timestamp = candidate_timestamp or now()
+    from datetime import datetime
+    if datetime.fromisoformat(candidate_timestamp).isoformat() != candidate_timestamp:
+        raise WorkspaceError("Invalid candidate timestamp")
+    if not candidate_timestamp.endswith("+00:00"):
+        raise WorkspaceError("Expected UTC candidate timestamp")
+    changes = installation_plan(root, data, files, origin, bounded=True,
+                                candidate_timestamp=candidate_timestamp)
     before = {}
     remaining = 8 * 1048576
     for relative in changes:
         raw = read_bytes(root, relative, remaining)
         before[relative] = None if raw is None else content_value(raw)
         remaining -= len(raw) if raw is not None else 0
-    return {'id': data['id'], 'origin': origin,
-            'requires_executable_trust': bool(data['hooks'] or data.get('capabilities')),
-            'before': before, 'after': changes}
+    proposal = {'id': data['id'], 'origin': origin,
+                'candidate_timestamp': candidate_timestamp,
+                'requires_executable_trust': bool(data['hooks'] or data.get('capabilities')),
+                'before': before, 'after': changes}
+    return {**proposal, 'proposal_sha256': sha(json.dumps(
+        proposal, ensure_ascii=False, sort_keys=True, separators=(',', ':')))}
+
+
+def installation_apply(root, directory, *, candidate_timestamp, expected_sha256, trust=None):
+    """Apply the exact bounded local installation preview; no automatic retry."""
+    from .recovery import read_bytes
+    read_bytes(root, '.tdt/config.json', 1048576)
+    with locked(root):
+        preview = installation_preview(root, directory, candidate_timestamp=candidate_timestamp)
+        if preview['proposal_sha256'] != expected_sha256:
+            raise WorkspaceError('Stack installation preview changed; inspect again')
+        if preview['requires_executable_trust'] and trust != preview['origin']['sha256']:
+            raise WorkspaceError('Executable stack content requires explicit source digest trust')
+        if trust is not None and trust != preview['origin']['sha256']:
+            raise WorkspaceError('Executable trust digest does not match source')
+        transaction(root, preview['after'], bounded=True)
+    return preview['id']
 
 
 def check_owned(root, entry, *, bounded=False):

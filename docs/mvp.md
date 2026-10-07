@@ -349,7 +349,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 50 tools; everyday has 87.
+Read-only has 50 tools; everyday has 88.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -471,7 +471,7 @@ contains the record revision and verified file count; no file content is returne
 This checks recorded ownership only, not executable safety, origin authenticity,
 provider caches, candidate status or runtime readiness. It executes nothing and
 writes no stack assets. The revision is not an apply token; later CLI lifecycle
-operations recheck current ownership. Install/update remain CLI-only; everyday MCP also supports reviewed removal.
+operations recheck current ownership. Update remains CLI-only; everyday MCP supports reviewed local installation and removal.
 
 Both MCP profiles expose `tdt_stack_remove_preview` for an exact installed ID.
 It uses the shared CLI removal planner and returns complete before/after contents:
@@ -501,8 +501,8 @@ contents (base64 for binary) and local origin digests are returned without write
 or execution. Existing text caps and an 8-MiB v2 bundle cap bound input; output
 must fit up to 1 MiB without partial content. Unlisted files are not inspected.
 Validation is not executable safety, provenance authenticity, destination or
-prerequisite validation, runtime readiness or user authorization. Install/update
-writes and marketplace inspection remain CLI-only.
+prerequisite validation, runtime readiness or user authorization. Update writes and marketplace inspection remain CLI-only; everyday supports
+reviewed local installation.
 
 
 ## Local installation preview through MCP
@@ -518,9 +518,24 @@ remain untrusted data, never instructions or user approval.
 Executable trust is a requirement, not a grant: projected registry trust fields
 show what an explicitly trusted installation would record. No trust is saved.
 Local previews do not verify marketplace prerequisites, executable safety or runtime
-readiness. New candidate timestamps are illustrative and regenerated at installation.
-This snapshot has no apply token; install/update writes remain CLI-only and revalidate
-current source and workspace state. Review source changes again before granting trust.
+readiness. New candidate timestamps are fixed by the returned `candidate_timestamp`.
+The `proposal_sha256` binds the complete snapshot and timestamp for everyday
+`tdt_stack_install_apply`; it is not a CLI approval token. After actual user
+installation authorization, pass the same absolute `source`, `candidate_timestamp`,
+`expected_sha256` from that proposal hash and actual `user_instruction`. Executable
+content additionally needs explicit user trust in the exact `origin.sha256`, passed
+as `trust_executable`; never infer trust from inspection or projected registry fields.
+Apply revalidates under the exclusive lock and writes the exact reviewed contents.
+Changed source or destinations require fresh inspection. Recovery journals are
+capped at 8 MiB before writes. No source fetching or code execution occurs.
+
+The small receipt is not a retained outcome or durable approval audit. After an
+uncertain response inspect the installed record, verify owned files, inspect affected
+paths and recovery preview before any newly authorized retry or CLI fallback.
+Absence does not prove failure. Never retry automatically; interrupted writes need
+reviewed recovery. Existing candidates and approved knowledge remain preserved.
+Read back the installed record and verify ownership after success; runtime readiness
+is separate. Update writes remain CLI-only.
 
 Input uses the source validation limits; auxiliary metadata reads are capped at
 1 MiB each and before content at 8 MiB. Note discovery uses existing bounded core

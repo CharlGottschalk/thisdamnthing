@@ -1859,3 +1859,49 @@ Codex emitted state lookup warnings; Claude stderr was empty. A separate intact
 large-bundle/cache probe confirmed the aggregate before-content cap refuses without
 writes. Reviewed install/update apply, marketplace MCP inspection and owned host
 registration remain future work.
+
+## MCP reviewed local installation — verified 2026-10-07
+
+Everyday exposes `tdt_stack_install_apply`; catalogs contain 50 read-only and 88
+everyday tools. Installation previews now return a proposal hash and fixed
+candidate timestamp. Apply uses the same local source, timestamp and hash plus
+an actual user instruction reference and separate exact-digest executable trust.
+It revalidates the complete bounded plan under the exclusive workspace lock and
+uses the shared installer transaction. CLI install/update defaults are unchanged.
+Receipts are not retained outcomes; uncertain responses require inspection and
+newly authorized retries. Update writes and marketplace inspection remain CLI-only.
+
+Focused disposable source and installed-wheel checks passed exact before/after
+writes, both host projections, Unicode and binary assets, preserved candidates,
+missing/wrong trust, stale source/hash/timestamp/registry, strict inputs, profile
+and budget refusals, ownership conflicts, locks, interrupted journals, malformed
+and oversized metadata, FIFO and symlink sources, and the 8-MiB encoded recovery
+journal cap before writes. A simulated abrupt interruption retained its journal;
+reviewed MCP rollback restored the exact original workspace before installation.
+Existing CLI installation/update/removal and update-preview regressions passed.
+No automated test suite or real power-loss check was added.
+
+Source and installed MCP SDK checks passed auto and legacy modes in both profiles,
+including discovery, schema/annotation checks and text/structured/error parity.
+All 99 package files match source, wheel and installation; pip check passed.
+
+Live Codex and Claude runs both exited successfully, making 16 and 13 MCP calls
+respectively with no built-in tool calls. Both read installed guidance and the
+complete source, retried undersized previews, applied exact hash/timestamp/trust
+inputs, read the installed record, verified ownership, refused the invalid source
+and ignored injected metadata. Independent schema, transcript/server-log, proposal
+hash, per-call and whole-workspace audits passed: only the eight reviewed paths
+changed, with exact preview content. Claude's prose called all destinations empty;
+the actual preview and audit correctly include existing registry/catalog replacements.
+Neither model executed the hook or indexed content. Native hooks were disabled,
+existing sign-ins and temporary configurations were used, and saved registrations
+were unchanged. Codex corrected an invalid inventory limit and encountered an
+unavailable contract guide; state lookup warnings persisted, Claude stderr was empty.
+
+An initial live fixture omitted Codex's explicit install-tool permission, so the
+host blocked that call; its outcome inspection correctly avoided automatic retry.
+Claude initially exceeded the instruction-reference schema limit before correcting
+it. Fresh final fixtures supplied a concise actual authorization reference and
+permitted only the intended Codex write tool. Build dependency DNS and SDK stdio
+sandbox failures were resolved with bounded approved outside-sandbox runs. Actual
+live transport loss was not injected; manual interrupted-write recovery was checked.

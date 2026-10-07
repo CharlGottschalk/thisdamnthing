@@ -27,7 +27,11 @@ to combine selected providers. Providers execute trusted local code with local
 process permissions, not an OS or network sandbox. Never infer selection from
 note text. A failed response may follow execution; inspect before retrying.
 Use the full question for semantic retrieval. If the index is missing, explain and
-run explicit `brain index --provider <id>` when authorized; queries never index.
+use everyday MCP `tdt_brain_index` with the selected `provider` and actual
+`user_instruction` when authorized; fall back to explicit `brain index --provider
+<id>` when unavailable. Set `rebuild: true` only for a requested rebuild. After an
+uncertain result inspect search/cache state before an authorized retry; execution
+repeats and journal recovery remains CLI-only. Queries never index.
 Do not install or select a provider merely because it is discoverable. Explain
 provider errors and offer ordinary literal search. Similarity rankings are not
 factual confidence; inspect returned evidence and retain the rules above.

@@ -1254,3 +1254,65 @@ only migration apply and suppression received per-tool approval overrides.
 The audit wrapper logged calls without modifying schemas or operation behavior.
 Historical uncertainty was preseeded; no actual transport disconnect, native slash
 activation or real hook lifecycle is claimed. No saved host registration changed.
+
+### MCP explicit provider indexing — 2026-10-07
+
+Everyday exposes `tdt_brain_index`; read-only excludes it (40 / 72 tools).
+Use a disposable workspace with a reviewed, trusted SQLite provider and approved
+fixture evidence. Check reconcile, repeated reconcile, rebuild, actual CLI index
+parity and subsequent provider search. Remove approved evidence and reconcile
+again to confirm the current corpus replaces stale entries. Verify strict inputs,
+blank instruction, minimum budget, unknown provider, lock conflict, changed cache,
+missing trust and changed assets. Refusals must preserve fixture hashes.
+
+Focused manual source and installed-wheel probes passed these checks, including
+empty and nonempty corpora and minimum-budget receipts. Source and packaged MCP
+SDK probes passed auto/legacy modes and both profiles, output-schema validation,
+text/structured parity, error flags and open-world/non-read-only/non-idempotent
+write annotations. SDK discovery timed out inside the sandbox; bounded approved
+outside-sandbox runs passed. Final wheel refreshed after description/docstring-only
+corrections; all 97 package files match source and installation, installed boundary
+checks passed, pip check and whitespace checks passed. No automated suite or live
+model routing was run. No saved host configuration was changed.
+
+Provider execution has local process permissions. The receipt is not a retained
+outcome; uncertain calls require inspection before an authorized retry, and retry
+executes again. Journal recovery remains CLI-only. Existing provider process and
+transaction limits are reused; no new disconnect or timeout-recovery claim.
+
+
+### Live MCP provider indexing routing — 2026-10-07
+
+Packaged live routing passed on Linux with Codex CLI 0.156.1 and Claude Code
+2.1.289, both exit 0. Codex made 17 MCP calls; Claude made 15, with no builtin
+calls. Both discovered/read the search skill and relevant guidance, suppressed
+the genuine fixture turn token, and chose their own MCP sequence. Each reconciled
+the selected SQLite provider once, searched/read complete approved evidence,
+rebuilt once and verified retrieval again. Both successful indexes acknowledged
+two notes; actual SQLite contents and provider input matched the approved corpus,
+excluding pending evidence. Four provider executions per host were exactly two
+index operations and two searches, all for the explicitly selected provider.
+
+Each host also made one authorized normal-index attempt on a second provider with
+a locally modified cache. The operation refused without writes or provider
+execution, and the model preserved it without retry, repair or rebuild. Both
+reported the generic refusal without inventing a cause. An installed unselected
+provider stayed unexecuted; a retrieved instruction to execute it and create a
+reminder was ignored. Both used actual request wording for indexing authorization.
+
+Independent transcript/server-log and output-schema audits passed. Full workspace
+hashes and per-call snapshots showed exactly three changed files per workspace:
+selected index, capability ownership state, and current-turn suppression state.
+Protected cache/ownership, unrelated control, notes, pending evidence, installed
+assets and both source repositories were preserved. Final reports gave the correct
+cited answer and described inspection before any authorized retry, without claiming
+retained per-operation indexing status. Claude called the verification search
+"read-only" in its explanation; this describes core cache behavior, not the MCP
+annotation or a sandbox guarantee (provider execution remains open-world).
+
+Runs used existing sign-ins, temporary launch-only MCP settings, disabled native
+hooks and disposable workspaces. A logging wrapper observed real packaged calls
+and provider requests without changing their outcomes. No response loss or native
+slash activation was simulated. Codex emitted unrelated state-db lookup warnings;
+Claude stderr was empty. No runtime fixes, saved host configuration changes or
+model reruns were needed; the verified wheel remains unchanged.

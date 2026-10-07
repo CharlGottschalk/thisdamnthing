@@ -1,9 +1,9 @@
-"""Installed stack and search-provider discovery adapters."""
+"""Installed stack discovery and explicit search-provider indexing adapters."""
 import json
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
 from .. import brain, capabilities, skills, stacks
 from .common import Refused, bounded_text, inventory_page, serialized
-from .models import ProviderPage, ProviderSummary, StackPage, StackSummary
+from .models import Model, ReadInput, ProviderPage, ProviderSummary, StackPage, StackSummary
 
 
 def installed_stacks(root):
@@ -37,3 +37,25 @@ def search_providers(root, args):
     revision = brain.digest(serialized([item.model_dump() for item in items]))
     page, cursor = inventory_page(root, args, 'providers', 'all', revision, items)
     return ProviderPage(items=page, next_cursor=cursor, inventory_revision=revision), []
+
+
+class ProviderIndexInput(ReadInput):
+    provider: str = Field(pattern=r"^[a-z][a-z0-9.-]{0,79}$")
+    rebuild: bool = False
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+class ProviderIndexed(Model):
+    provider: str
+    indexed: int
+    rebuild: bool
+
+
+def provider_index(root, args):
+    if not args.user_instruction.strip():
+        raise Refused('invalid_input', 'An actual user instruction is required')
+    # One selected provider keeps the receipt below the minimum result budget
+    # and avoids a partially completed batch across provider transactions.
+    indexed = capabilities.index(root, [args.provider], rebuild=args.rebuild)
+    return ProviderIndexed(provider=args.provider, indexed=indexed[args.provider],
+                           rebuild=args.rebuild), []

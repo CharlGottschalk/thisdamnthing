@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 40 tools; everyday has 71.
+Read-only has 40 tools; everyday has 72.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -397,3 +397,13 @@ retry or CLI fallback. Identical completed retries return historical success eve
 after deleting the removed registration note, preserving later file edits.
 Changed inputs/instruction refuse; old UUID backups remain unindexed. Backups are
 bounded to 8 MiB before writes.
+
+Everyday also exposes `tdt_brain_index` for one explicitly selected installed
+provider and actual user instruction. `rebuild` defaults false; true starts with
+an empty cache. Shared CLI core validates trust/assets/compatibility and cache
+ownership, indexes current approved evidence under its exclusive lock and writes
+cache/ownership together. The small receipt fits the minimum budget. Provider
+code runs with local process permissions. There is no retained operation outcome;
+after uncertainty inspect search/cache state before an authorized retry. Retries
+execute again; interrupted journals require CLI recovery. No batch indexing,
+installation, trust changes or automatic query-time indexing is added.

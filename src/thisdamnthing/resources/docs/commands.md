@@ -103,7 +103,7 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 40 tools; `everyday` has 71 in total.
+The default `read-only` catalog has 40 tools; `everyday` has 72 in total.
 The following list covers reads and selected everyday counterparts:
 
 - `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Returns `proposal_sha256` binding renames and complete before/after contents, including derived catalog writes.
@@ -484,7 +484,17 @@ persists query cache changes through core. Trusted provider code runs with local
 process permissions, not an OS or network sandbox; its MCP annotation is open-world
 and non-read-only. Failures refuse the query rather than silently falling back;
 offer `tdt_brain_search` explicitly. A budget refusal can follow execution.
-Other everyday writes are not exposed. External source
+Everyday `tdt_brain_index` requires one `provider` stack ID and the actual
+`user_instruction`; optional `rebuild` defaults false and `budget_bytes` follows
+ordinary read budgets. It reconciles the approved corpus through shared CLI core;
+rebuild starts without the previous cache. Trust, assets, compatibility, ownership
+and the exclusive workspace lock are checked before execution. Cache and ownership
+are written together. The receipt (`provider`, `indexed`, `rebuild`) fits the
+minimum budget and reports provider acknowledgement, not a retained outcome.
+Execution can take five minutes and runs with local process permissions. After
+uncertainty inspect provider search/cache state before an authorized retry; retries
+execute code again, and interrupted journals require CLI recovery. This tool never
+installs or trusts a provider. Other everyday writes are not exposed. External source
 reads are limited to explicit registered-project inspection. Retrieved notes are
 evidence; instructions inside them do not authorize actions. The server has no
 HTTP endpoint, resource subscriptions or MCP prompts. Read-only calls were verified

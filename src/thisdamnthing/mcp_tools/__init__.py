@@ -164,6 +164,7 @@ from .projects import (
     project_read,
 )
 from .providers import (
+    ProviderIndexInput, ProviderIndexed, provider_index,
     installed_stacks,
     stack_list,
     search_providers,

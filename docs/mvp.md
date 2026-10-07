@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 44 tools; everyday has 80.
+Read-only has 45 tools; everyday has 81.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -450,3 +450,10 @@ files and original operation outcomes before any newly authorized retry; absence
 does not prove success. Interrupted rollback retains its journal. CLI recovery
 remains available without hash binding. Other CLI recovery references above may
 use this reviewed tool for stack/skill journals; no policy-lock recovery is added. An absent selected journal is not a clean-workspace assessment.
+
+Both profiles expose `tdt_stack_read` for complete installed registry metadata by
+exact normalized or legacy dotted ID, using a shared lock and the existing bounded
+registry validation. The record revision is stable across object key ordering;
+complete output must fit its up-to-1-MiB budget. Recorded manifests, provenance,
+owned hashes, trust and candidate paths do not verify live assets or current
+review state. No bundle/source reads, execution or lifecycle writes are added.

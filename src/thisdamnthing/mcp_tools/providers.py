@@ -6,6 +6,31 @@ from .common import Refused, bounded_text, inventory_page, serialized
 from .models import Model, ReadInput, ProviderPage, ProviderSummary, StackPage, StackSummary
 
 
+class StackReadInput(ReadInput):
+    id: str = Field(min_length=1, max_length=81)
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class StackRead(Model):
+    id: str
+    revision: str
+    record: dict
+
+
+def stack_read(root, args):
+    if not (stacks.ID.fullmatch(args.id) or stacks.LEGACY_ID.fullmatch(args.id)):
+        raise Refused('invalid_input', 'Invalid stack ID')
+    with brain.locked(root, shared=True):
+        entry = next((entry for entry in installed_stacks(root) if entry['id'] == args.id), None)
+        if entry is None:
+            raise Refused('not_found', 'Stack is not installed')
+        # Preserve the complete recorded entry, including legacy/extension metadata.
+        # This digest is a read revision, never a lifecycle approval token.
+        revision = brain.digest(json.dumps(entry, ensure_ascii=False, sort_keys=True,
+                                          separators=(',', ':')))
+        return StackRead(id=args.id, revision=revision, record=entry), []
+
+
 def installed_stacks(root):
     skills.ready(root)
     entries = stacks.validate_registry(json.loads(bounded_text(root, stacks.REGISTRY, 1048576)))

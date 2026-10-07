@@ -1522,3 +1522,25 @@ rollback and absent-journal error signaling. All 99 source/wheel/installed files
 byte-match; pip check and git diff --check passed. Sandbox SDK discovery timed out
 and build-dependency DNS failed; bounded approved outside-sandbox runs passed.
 No automated test suite, live-model routing or actual power-loss check was run.
+
+## MCP complete installed stack reads (2026-10-07)
+
+Both profiles expose `tdt_stack_read` for one exact installed ID. Catalog counts
+are 45 read-only / 81 everyday. Complete registry records preserve legacy and
+extension fields; their revision is stable across object key ordering. Reads use
+a shared workspace lock, a 1-MiB registry cap and up-to-1-MiB output budget with
+no partial content. The revision is not a lifecycle approval token. Recorded
+ownership/trust and candidate paths do not verify live files or review state.
+
+Focused source and installed manual checks passed complete shared-core registry
+parity, Unicode, normalized/legacy IDs, unchanged file hashes, strict inputs,
+missing IDs, budget refusal, shared/exclusive locking and recovery-marker refusal.
+Malformed, oversized, FIFO, symlink and escaping ownership records refused.
+Local asset edits did not change the metadata revision, as documented. Final
+boundary review also checked the maximum 81-character legacy dotted ID.
+SDK auto/legacy x read-only/everyday passed catalog counts, input/output schemas,
+read-only annotations, text/structured parity, error signaling and stack-list
+regression. Source/wheel/installed file parity and pip dependency checks passed.
+Sandbox dependency DNS and stdio discovery failed; bounded approved runs outside
+the sandbox passed. No automated suite or live-model routing was run. Stack
+lifecycle writes, host registration, resources and prompts remain future work.

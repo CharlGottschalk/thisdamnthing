@@ -188,7 +188,16 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_work_read`: bounded working text by workspace-relative path or URI.
 - `tdt_search_providers`: installed search provider metadata and recorded trust, without execution.
 - `tdt_stack_list`: installed stack versions and recorded provenance.
+- `tdt_stack_read`: complete recorded metadata for an exact installed stack `id`.
 - `tdt_stack_docs`: declared installed stack guides; read full content with `tdt_guide_read`.
+
+`tdt_stack_read` returns the entire registry record and a stable record revision,
+including manifest, origin, owned-file hashes, trust and candidate references when
+present. It uses a shared read lock and accepts up to 1 MiB `budget_bytes`; output
+that exceeds the budget refuses without partial content. The revision is not an
+apply token. Recorded ownership/trust does not verify live files, and candidate
+paths do not establish current review status. No bundle/source files are read.
+Install, update and remove remain CLI operations.
 
 Stack/provider catalogs accept `limit` (1–50) and inventory-bound `cursor` values.
 They read at most 1 MiB of registry data and refuse interrupted stack/skill

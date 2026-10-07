@@ -202,11 +202,13 @@ def check_targets(root, name, owned):
         raise WorkspaceError(f'Claude command collision: {name}')
 
 
-def recover(root):
+def recovery_plan(root, *, bounded=False):
     path = managed_path(root, JOURNAL)
     if not path.exists():
-        return 'No user skill transaction to recover.'
-    record = read_json(root, JOURNAL)
+        return None
+    from .recovery import read_bytes, read_journal
+    record = (read_journal(root, JOURNAL)
+              if bounded else read_json(root, JOURNAL))
     if (not isinstance(record, dict) or set(record) != {'before', 'after'}
             or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
             or record['before'].keys() != record['after'].keys()):
@@ -219,8 +221,22 @@ def recover(root):
         after = record['after'][relative]
         if any(v is not None and not isinstance(v, str) for v in (before, after)):
             raise WorkspaceError('Invalid user skill recovery content')
-        if existing_text(root, relative) not in (before, after):
+        if bounded:
+            limit = max(len(v.encode('utf-8')) if v is not None else 0 for v in (before, after))
+            raw = read_bytes(root, relative, limit)
+            current = raw.decode('utf-8') if raw is not None else None
+        else:
+            current = existing_text(root, relative)
+        if current not in (before, after):
             raise WorkspaceError(f'Recovery conflict; preserve and inspect {relative}')
+    return record
+
+
+def recover(root):
+    record = recovery_plan(root)
+    if record is None:
+        return 'No user skill transaction to recover.'
+    path = managed_path(root, JOURNAL)
     for relative, before in record['before'].items():
         if before is None:
             target = managed_path(root, relative)

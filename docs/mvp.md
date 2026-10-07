@@ -347,7 +347,7 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 43 tools; everyday has 78.
+Read-only has 44 tools; everyday has 79.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
@@ -434,3 +434,13 @@ Both profiles expose `tdt_skill_inventory` for overlap review across canonical a
 host skill folders using the shared bounded CLI inventory. Paginated content
 prefixes report truncation; owner labels do not verify assets. Retained proposals
 remain a separate inventory. No skill execution or host history access is added.
+
+Both profiles expose `tdt_recovery_preview` with an explicit `stack` or `skill`
+journal selection. Shared CLI recovery validation checks every current file
+against its journal versions under a shared read lock. Complete before/after
+contents include null deletions and base64 binary values; output beyond the
+up-to-1-MiB budget refuses without partial content. Journal input is capped at
+8 MiB; special files, escaping paths and conflicting local edits refuse.
+The semantic journal hash identifies a snapshot, not an apply token. Recovery
+writes remain explicit CLI operations, which revalidate but do not accept the
+preview hash. An absent selected journal is not a clean-workspace assessment.

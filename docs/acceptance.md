@@ -1466,3 +1466,31 @@ state. All 98 packaged files matched source and installation; dependency check
 and diff check passed. Sandbox dependency DNS and SDK discovery failed; bounded
 approved outside-sandbox runs passed. No automated test suite or live-model
 routing was run, and no host registration or source commit was performed.
+
+## MCP transaction recovery previews — 2026-10-07
+
+Added both-profile `tdt_recovery_preview` for explicit stack or skill journal
+selection; catalogs now contain 44/79 tools. Complete before/after contents use
+null for absence and base64 objects for binary bytes. Shared CLI recovery
+validation checks current files under a shared read lock. Journals are bounded
+to 8 MiB and output to the requested budget (maximum 1 MiB); no partial preview.
+The semantic journal hash identifies a snapshot, not an apply token. CLI recovery
+remains separately requested, revalidates files and does not accept that hash.
+
+Focused source and installed manual checks passed absent/present journals,
+Unicode and binary content, creation/removal, minimum and oversized output,
+strict inputs, shared/exclusive locks, conflicts, malformed/oversized/FIFO/symlink
+journals, target FIFO/symlinks, escaping paths and malformed recovery directories.
+Preview file hashes remained unchanged. Actual CLI rollback matched the preview
+for stack and skill journals. Simulated abrupt interruptions after a file write
+retained real transaction journals; preview and shared core recovery restored
+original stack content and the pending skill proposal, then skill approval passed.
+These are simulated interruption checks, not power-loss verification.
+
+Source and packaged SDK auto/legacy modes, each with read-only/everyday profiles,
+passed catalog counts, input/output schemas, read-only annotations, structured/text
+parity and refusal reporting. All 99 source/wheel/installed files byte-matched;
+installed dependency checks passed. Sandbox SDK discovery timed out and isolated
+build dependency fetching failed; bounded approved outside-sandbox runs passed.
+No automated suite or live-model routing was run. No recovery write tool, host
+registration or resource/prompt surface is claimed by this increment.

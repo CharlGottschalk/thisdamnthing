@@ -116,6 +116,19 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
+- `tdt_recovery_preview`: select `kind: stack` or `kind: skill` to inspect a complete
+  validated rollback plan without writes. `before` holds rollback destinations,
+  `after` holds attempted writes; null means absent and base64 objects hold binary
+  bytes. Current files must match either version. `directories` lists stack-created
+  directories considered for empty-directory removal; skill recovery also attempts
+  to remove empty skill directories for newly created files. Journal input is
+  capped at 8 MiB; increase output `budget_bytes` up to 1 MiB if needed. No partial
+  output. `journal_sha256` identifies semantic journal contents, not an apply token.
+  `absent` refers only to the selected journal. On explicit recovery instruction,
+  use `tdt stack recover` or `tdt skill recover`; CLI revalidates current files but
+  does not bind to this hash. Reread retained operation outcomes afterward. A
+  refusal does not identify the specific conflict; preserve the journal and inspect
+  locally. No lock breaking, automatic retry or recovery write tool is provided.
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.

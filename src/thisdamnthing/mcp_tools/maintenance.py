@@ -3,9 +3,40 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .. import brain, brain_maintenance, brain_names
+from .. import brain, brain_maintenance, brain_names, skills, stacks
 from .common import inventory_page, serialized
 from .models import ListInput, Model, ReadInput
+
+
+class RecoveryPreviewInput(ReadInput):
+    kind: Literal['stack', 'skill']
+    budget_bytes: int = Field(default=32768, ge=1024, le=1048576)
+
+
+class BinaryContent(Model):
+    base64: str
+
+
+class RecoveryPreview(Model):
+    kind: Literal['stack', 'skill']
+    status: Literal['absent', 'rollback_available']
+    journal_sha256: str | None
+    before: dict[str, str | BinaryContent | None]
+    after: dict[str, str | BinaryContent | None]
+    directories: list[str]
+
+
+def recovery_preview(root, args):
+    core = stacks if args.kind == 'stack' else skills
+    with brain.locked(root, shared=True):
+        record = core.recovery_plan(root, bounded=True)
+        if record is None:
+            return RecoveryPreview(kind=args.kind, status='absent', journal_sha256=None,
+                                   before={}, after={}, directories=[]), []
+        return RecoveryPreview(kind=args.kind, status='rollback_available',
+                               journal_sha256=brain.digest(serialized(record)),
+                               before=record['before'], after=record['after'],
+                               directories=record.get('directories', [])), []
 
 
 class BrainNamesPreviewInput(ReadInput):

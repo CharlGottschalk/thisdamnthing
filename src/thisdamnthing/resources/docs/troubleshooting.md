@@ -39,6 +39,17 @@ context is still available, or skipped. Follow [brain recovery](brain.md); never
 invent lost facts. Pending candidates can contain sensitive material despite
 heuristic filtering: inspect them before approval or sharing.
 
+When MCP is available, use `tdt_workspace_status` to identify recovery markers,
+then `tdt_recovery_preview` with `kind: stack` or `kind: skill`. Review the complete
+`before` rollback contents and `after` attempted contents. Binary values use
+base64; null means absent. A conflict refuses the preview, preserving local edits.
+The journal is limited to 8 MiB and complete output to 1 MiB. A budget refusal
+is not permission to recover unseen content. The journal hash identifies the
+snapshot; CLI recovery does not accept it as an approval token. Recover only on
+user instruction, keep other sessions idle, and inspect again if anything changes.
+After CLI recovery, reread the original operation status before deciding to retry.
+An absent selected journal says nothing about other journals or workspace health.
+
 ## Back up, upgrade or move
 
 Ask your agent to help with the operation using [workspace care](workspace-care.md),

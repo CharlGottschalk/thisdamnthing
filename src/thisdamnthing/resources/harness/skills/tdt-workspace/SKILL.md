@@ -57,3 +57,11 @@ project and shared-asset locations. Paths are relative to work/. Save preference
 only when requested; preserve unrelated conventions. Do not create work/ or any
 starter folders during onboarding. Explain that convention edits affect future
 placement, not existing project locations.
+
+For interrupted stack/shared or user-skill writes, prefer `tdt_workspace_status`
+and `tdt_recovery_preview` (`kind: stack` or `kind: skill`) when available. Read
+complete before/after contents; null means absent and base64 objects are binary.
+Reading does not authorize recovery. Preserve journals and local edits on refusal.
+Follow docs/troubleshooting.md for explicit CLI recovery, then reread retained
+operation outcomes before retrying. Never bypass locks or assume an absent
+selected journal means the whole workspace is healthy.

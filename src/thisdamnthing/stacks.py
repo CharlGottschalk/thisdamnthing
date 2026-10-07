@@ -224,11 +224,13 @@ def transaction(root, changes):
         raise
 
 
-def recover(root):
+def recovery_plan(root, *, bounded=False):
     path = managed_path(root, JOURNAL)
     if not path.exists():
-        return 'No stack transaction to recover.'
-    record = read_json(root, JOURNAL)
+        return None
+    from .recovery import read_bytes, read_journal
+    record = (read_journal(root, JOURNAL)
+              if bounded else read_json(root, JOURNAL))
     if (not isinstance(record, dict) or set(record) != {'before', 'after', 'directories'}
             or not isinstance(record['before'], dict) or not isinstance(record['after'], dict)
             or record['before'].keys() != record['after'].keys()
@@ -253,13 +255,27 @@ def recover(root):
         for value in (before, after):
             if value is not None:
                 content_bytes(value)
-        if existing_content(root, relative) not in (before, after):
+        if bounded:
+            limit = max(len(content_bytes(v)) if v is not None else 0 for v in (before, after))
+            raw = read_bytes(root, relative, limit)
+            current = content_value(raw) if raw is not None else None
+        else:
+            current = existing_content(root, relative)
+        if current not in (before, after):
             raise WorkspaceError(f'Recovery conflict; preserve and inspect {relative}')
     for relative in record['directories']:
         safe_path(relative)
         if not any(p.startswith(relative + '/') for p in record['before']):
             raise WorkspaceError('Invalid recovery directory')
         managed_path(root, relative)
+    return record
+
+
+def recover(root):
+    record = recovery_plan(root)
+    if record is None:
+        return 'No stack transaction to recover.'
+    path = managed_path(root, JOURNAL)
     for relative, before in record['before'].items():
         if before is None:
             managed_path(root, relative).unlink(missing_ok=True)

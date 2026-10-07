@@ -13,6 +13,7 @@ class BrainNamesPreviewInput(ReadInput):
 
 
 class BrainNamesPreview(Model):
+    proposal_sha256: str
     renames: dict[str, str]
     updated_files: list[str]
     replacements: dict[str, str | None]
@@ -115,5 +116,21 @@ def brain_repair_apply(root, args):
     proposal = {'changes': [change.model_dump() for change in args.changes]}
     result = brain_maintenance.repair(root, proposal, apply=True,
                                      expected=args.expected_sha256, instruction=args.user_instruction)
+    return BrainRepairOutcome(proposal_sha256=result['proposal_sha256'],
+                              status='completed', backup=result['backup']), []
+
+
+class BrainNamesApplyInput(ReadInput):
+    expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')
+    user_instruction: str = Field(min_length=1, max_length=500)
+
+
+def brain_names_status(root, args):
+    return BrainRepairOutcome(**brain_names.migration_status(root, args.proposal_sha256)), []
+
+
+def brain_names_apply(root, args):
+    result = brain_names.migrate(root, apply=True, expected=args.expected_sha256,
+                                 instruction=args.user_instruction)
     return BrainRepairOutcome(proposal_sha256=result['proposal_sha256'],
                               status='completed', backup=result['backup']), []

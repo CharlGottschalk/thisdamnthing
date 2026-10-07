@@ -180,11 +180,14 @@ explicitly migrate them. From the workspace root:
 
 ```sh
 tdt brain migrate-names
-tdt brain migrate-names --apply
+tdt brain migrate-names --apply --expected-sha256 HASH --user-instruction "actual approval reference"
+tdt brain names-status HASH
 ```
 
-The first command previews the renames without writing. The second recomputes and
-applies them under the workspace lock. Migration covers hash-named notes under
+The first command previews complete replacements and their proposal hash without
+writing. The second requires that hash and the actual approval reference, then
+rechecks and applies under the workspace lock. The third reads the retained outcome.
+Migration covers hash-named notes under
 `brain/candidates/`, `brain/knowledge/`, `work/notes/`, `brain/projects/` and
 `brain/sessions/`, updates their current
 link/canonical metadata, wikilinks in those notes and `brain/index.md`, and stack
@@ -196,10 +199,16 @@ On a workspace-bound MCP server, `tdt_brain_names_preview` returns the same
 rename plan plus complete replacement contents; null marks old paths to remove.
 Both profiles support it with a shared read lock and no note or registry writes.
 Read every replacement; increase `budget_bytes` up to 1 MiB if output exceeds
-the budget. Oversized output is refused, never partially presented. This is a
-snapshot of the current plan, not a hash-bound approval or retained outcome.
-Apply remains CLI-only and recomputes current state, so inspect again immediately
-before an explicitly authorized apply.
+the budget. Oversized output is refused, never partially presented. The returned
+`proposal_sha256` binds renames and complete before/after contents, including
+derived stack documentation writes. Everyday `tdt_brain_names_apply` requires this
+hash as `expected_sha256` and the actual `user_instruction`. Both profiles expose
+`tdt_brain_names_status`; read it after uncertainty before retry or CLI fallback.
+Prepared/completed backups are limited to 8 MiB. Completion shares the file
+transaction; identical completed retries return historical success without
+rewriting later edits. Changed approval references refuse. Unknown is not proof
+an operation never ran; legacy migrations have no indexed outcomes. No-op apply
+also records completion without modifying notes.
 
 Close other editors during migration and keep a backup of your workspace.
 Duplicate IDs, unsafe paths or malformed notes refuse the operation; occupied

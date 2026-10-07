@@ -23,7 +23,7 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-constitution` | `tdt constitution show` | Read the current workspace policy and revision hash. |
 | `/tdt-review-brain` | `tdt brain candidates --status all` | Inspect pending, approved and rejected proposals. Default is pending. |
 | Ask your agent to inspect incomplete capture requests | `tdt brain requests` | List incomplete capture requests. |
-| Ask your agent to make older brain filenames readable | `tdt brain migrate-names` / `tdt brain migrate-names --apply` | Preview or apply legacy note renames and current brain link updates. |
+| Ask your agent to make older brain filenames readable | `tdt brain migrate-names` / `tdt brain migrate-names --apply --expected-sha256 HASH --user-instruction REF` | Preview or apply legacy note renames and current brain link updates. |
 | `/tdt-search` | `tdt brain search "query" --limit 10 --depth 1` | Retrieve current eligible notes with bounded links. |
 | `/tdt-search` with a provider request | `tdt brain providers` | List installed search providers without executing them. |
 | `/tdt-search` with an explicit indexing request | `tdt brain index --provider ID --rebuild` | Explicitly rebuild a selected provider index; omit rebuild to reconcile. |
@@ -103,10 +103,12 @@ Replace the workspace path with an initialized workspace. The process stays boun
 to that directory and uses stdin/stdout for MCP. Registration is manual; TDT does
 not edit host configuration. Connecting MCP does not enable automatic capture.
 
-The default `read-only` catalog has 39 tools; `everyday` has 69 in total.
+The default `read-only` catalog has 40 tools; `everyday` has 71 in total.
 The following list covers reads and selected everyday counterparts:
 
-- `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Apply remains CLI-only and recomputes current state; this preview is not a hash-bound approval.
+- `tdt_brain_names_preview`: complete legacy filename migration preview in both profiles, including renames and replacement contents (null removes an old path). Up to 1 MiB output budget; oversized output refuses without partial content. Shared read lock, no note or registry writes. Returns `proposal_sha256` binding renames and complete before/after contents, including derived catalog writes.
+- `tdt_brain_names_apply` (everyday): apply with the preview `expected_sha256` and actual `user_instruction`. Stale plans refuse; identical completed retries preserve later edits. Prepared/completed backups are limited to 8 MiB, including no-op outcomes.
+- `tdt_brain_names_status`: read retained outcome by `proposal_sha256` before retry or CLI fallback. CLI equivalent: `tdt brain names-status HASH`. Journals require CLI recovery and reread; unknown does not prove the operation never ran.
 - `tdt_brain_repair_status`: read the retained outcome by exact `proposal_sha256` in either profile. After an uncertain apply, read this before retry or CLI fallback. CLI equivalent: `tdt brain repair-status <hash>`.
 - `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
 - `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt_brain_repair_apply` (everyday) or `tdt brain repair` with identical changes and the returned hash.

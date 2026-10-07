@@ -347,13 +347,20 @@ completed retries return historical success without overwriting later changes.
 Interrupted transactions require CLI recovery and a fresh outcome read.
 Audit, preview and outcome reads share a read lock so parallel model calls do
 not contend with one another; apply retains the exclusive workspace lock.
-Read-only has 39 tools; everyday has 69.
+Read-only has 40 tools; everyday has 71.
 
 Both profiles expose `tdt_brain_names_preview` through the shared filename
 migration core, returning all renames and complete replacements, including null
 old-path deletions. Preview uses a shared lock and refuses output beyond its
-up-to-1-MiB budget without partial content. Apply remains CLI-only and recomputes
-current state; the preview does not bind approval to a hash or retain an outcome.
+up-to-1-MiB budget without partial content. The proposal hash binds renames and complete
+before/after contents, including derived stack catalog writes. Everyday exposes
+`tdt_brain_names_apply` with the preview hash and actual user instruction; both
+profiles expose `tdt_brain_names_status`. CLI apply requires the same hash and
+instruction. Prepared/completed backups are bounded to 8 MiB; completion shares
+the file transaction. Identical completed retries preserve later edits. After an
+uncertain result read status before retry or CLI fallback; journals require CLI
+recovery and a fresh status read. Unknown is not proof an operation never ran.
+A no-op apply retains a completion record without changing notes.
 
 Both MCP profiles expose `tdt_project_references` for explicit project IDs through
 the shared lifecycle scanner, including retained removed registrations. Reference

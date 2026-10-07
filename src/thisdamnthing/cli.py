@@ -55,6 +55,9 @@ def main(argv=None):
     actions.add_parser("repair-status", help="read retained outcome by exact proposal hash").add_argument("proposal_sha256")
     names = actions.add_parser("migrate-names", help="preview readable brain filenames and link updates")
     names.add_argument("--apply", action="store_true", help="apply the migration with recoverable writes")
+    names.add_argument("--expected-sha256")
+    names.add_argument("--user-instruction")
+    actions.add_parser("names-status", help="read retained filename migration outcome").add_argument("proposal_sha256")
     review = actions.add_parser("review", help="apply an explicitly instructed user review")
     review.add_argument("id")
     review.add_argument("--decision", choices=("approve", "reject", "edit"), required=True)
@@ -348,9 +351,14 @@ def main(argv=None):
                           brain_maintenance.repair(root, input_json(524288), args.apply,
                                                    args.expected_sha256, args.user_instruction))
                 print(json.dumps(result, indent=2, ensure_ascii=False))
+            elif args.action == "names-status":
+                from .brain_names import migration_status
+                print(json.dumps(migration_status(root, args.proposal_sha256), indent=2))
             elif args.action == "migrate-names":
                 from .brain_names import migrate
-                print(json.dumps(migrate(root, args.apply), indent=2, ensure_ascii=False))
+                result = migrate(root, args.apply, include_replacements=not args.apply,
+                                 expected=args.expected_sha256, instruction=args.user_instruction)
+                print(json.dumps(result, indent=2, ensure_ascii=False))
             elif args.action in ("providers", "index"):
                 from . import capabilities
                 if args.action == "providers":

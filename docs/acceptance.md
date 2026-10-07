@@ -1182,3 +1182,75 @@ Initial stack fixture omitted its required top-level version; correcting the
 fixture passed without runtime changes. Sandbox dependency DNS and SDK discovery
 failed; bounded outside-sandbox build/probes passed. No automated test suite or
 live-model routing was run; no saved host configuration changed.
+
+### MCP filename migration apply and outcomes — 2026-10-07
+
+Both profiles expose `tdt_brain_names_status`; everyday exposes
+`tdt_brain_names_apply`. Preview hashes bind renames and complete before/after
+contents, including derived stack catalog/ownership writes. Apply requires the
+preview hash and actual user instruction in MCP and CLI. Check stale no-write
+refusal, shared-read/exclusive-write locks, minimum receipt budgets, historical
+retries after later edits, changed-instruction refusal and no-op completion.
+Inspect exact prepared/completed backups and interrupt after completion before
+journal removal: status must require recovery, rollback must restore prepared,
+and an identical retry must succeed. Unknown never establishes that a migration
+has not run. Older migrations have no indexed outcomes.
+
+Focused manual probes passed against source and the installed wheel: preview
+no-write checks, strict inputs/profile exclusion, stale refusal, lock exclusion,
+1024-byte apply receipts, Unicode/alias replacement parity, CLI status/no-op apply,
+historical retries, interrupted completion/recovery/retry, malformed records,
+FIFO/oversized outcome refusal, and a real backup above 8 MiB refused before
+writes. Stack fixtures passed exact derived before/after parity, forbidden
+retained-path refusal and outcome-symlink/outside-control preservation. Additional
+packaged checks passed preview budget refusal, handled write-failure rollback,
+actual CLI rename with the preview hash and skill-journal status precedence.
+
+Source and installed-wheel MCP SDK checks passed auto/legacy modes with both
+profiles (20 calls each across four sessions), catalog counts 40/71, annotations,
+output schemas, matching text/structured results, apply/status/retry and changed
+instruction refusal. All 97 package files byte-matched source, wheel and installed
+files; dependency and whitespace checks passed. Sandbox discovery timed out;
+bounded outside-sandbox SDK runs passed. Initial probe fixes corrected SDK API
+usage and fixture expectations; an early catalog tuple wiring error was fixed
+before final checks. No automated test suite or live-model routing was run.
+
+### Live filename migration routing — 2026-10-07
+
+Codex CLI 0.156.1 passed against the unchanged packaged wheel: exit 0 with
+17 actual MCP calls and no builtin tool calls. The model discovered/read the
+maintenance skill and brain guide, confirmed suppression with a genuine fixture
+turn token, inspected historical completed and unknown outcomes, preserved a later
+edit, declined to use stale approval and applied exactly the current approved
+migration. It read completion/current notes and previewed again with no remaining
+renames. No semantic repairs, candidate review, reminders or no-op applies ran.
+
+Independent transcript/server-log schema comparison and complete file-hash audit
+passed. Exactly ten paths changed (including old/new rename paths), comprising
+the approved replacements, completed backup and turn-suppression state. The
+backup retained exact before/after contents, including derived stack catalog and
+ownership files. Historical content, unrelated control files and source stayed
+unchanged. Embedded instructions caused no unrelated actions.
+
+Claude Code 2.1.289 passed after sign-in was renewed: exit 0 with 20 actual MCP
+calls and no builtin tool calls. Its initial authentication failure made zero
+calls and left the fixture unchanged. The resumed run used that same fixture and
+unchanged wheel. It discovered/read the maintenance skill and brain guide,
+confirmed suppression before note reads, reconciled completed/unknown outcomes,
+left stale approval unused and applied the exact current approved migration.
+It read completion and current notes, then confirmed an empty migration preview.
+The existing brain/index.md reader restriction returned a refusal; Claude used
+structural audit reads and accurately reported the remaining inspection limits.
+
+Claude transcript/server-log comparison, schemas and whole-workspace file hashes
+passed with the same ten expected changed paths. The historical later edit,
+unrelated files and source were preserved, backups matched complete before/after
+contents and embedded instructions were ignored. Both hosts now pass this live
+routing slice; no runtime changes were needed.
+
+Runs used disposable workspaces, temporary launch-only MCP configuration and
+existing sign-ins. Codex ran ephemeral/ignore-user-config with read-only shell;
+only migration apply and suppression received per-tool approval overrides.
+The audit wrapper logged calls without modifying schemas or operation behavior.
+Historical uncertainty was preseeded; no actual transport disconnect, native slash
+activation or real hook lifecycle is claimed. No saved host registration changed.

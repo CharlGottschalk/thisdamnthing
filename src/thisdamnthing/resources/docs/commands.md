@@ -134,6 +134,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
 - `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt_brain_repair_apply` (everyday) or `tdt brain repair` with identical changes and the returned hash.
 - `tdt_brain_audit`: paginated structural findings and canonical note hashes, with scan limitations and unreadable-note omissions.
+- `tdt_brain_graph`: the complete brain as nodes and typed links, for a graph view. Nodes include the index, projects, knowledge, pending candidates, sessions, scratchpad notes and tags. The tool returns titles and metadata, not note bodies. Follow `next_cursor` until it is null. The `revision` changes when a node or link changes.
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.

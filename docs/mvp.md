@@ -343,6 +343,10 @@ functions. Structured pages, complete paginated events with original prompts,
 bounded waits, explicit acknowledgements, retained close and authorized cleanup
 follow the [UI guide](ui.md).
 
+Both profiles expose `tdt_brain_graph`: every brain record, pending candidate,
+scratchpad note and tag as nodes with typed links, metadata only, paged by node
+with a revision-bound cursor. Helm uses it for its brain graph.
+
 Both profiles expose `tdt_brain_audit` through the shared structural scanner.
 Findings and note hashes are separately paginated, with report-bound cursors,
 totals, limitations and unreadable-note omissions. Audits do not repair notes or

@@ -122,6 +122,55 @@ def brain_audit(root, args):
                          limitations=report['limitations']), omissions
 
 
+class BrainGraphInput(ListInput):
+    limit: int = Field(default=500, ge=1, le=2000)
+    budget_bytes: int = Field(default=1048576, ge=1024, le=1048576)
+
+
+class GraphNode(Model):
+    id: str
+    kind: str
+    record: Literal['index', 'project', 'knowledge', 'candidate', 'session', 'note', 'tag']
+    path: str | None
+    title: str
+    status: str | None
+    project: str | None
+    tags: list[str]
+    updated_at: str | None
+    sha256: str | None
+
+
+class GraphLink(Model):
+    source: str
+    target: str
+    type: Literal['wikilink', 'project', 'tag', 'index']
+
+
+class BrainGraphPage(Model):
+    revision: str
+    nodes: list[GraphNode]
+    links: list[GraphLink]
+    next_cursor: str | None
+    nodes_total: int
+    links_total: int
+    unresolved_links_total: int
+    unresolved_links: list[str]
+
+
+def brain_graph(root, args):
+    graph = brain_maintenance.graph(root)
+    revision = brain.digest(serialized([graph['nodes'], graph['links']]))
+    page, cursor = inventory_page(root, args, 'brain-graph', 'nodes', revision, graph['nodes'])
+    # Each link travels with its source node, so a full page walk returns every link once.
+    ids = {node['id'] for node in page}
+    return BrainGraphPage(revision=revision, nodes=[GraphNode(**node) for node in page],
+                          links=[GraphLink(**link) for link in graph['links'] if link['source'] in ids],
+                          next_cursor=cursor, nodes_total=len(graph['nodes']),
+                          links_total=len(graph['links']),
+                          unresolved_links_total=len(graph['unresolved']),
+                          unresolved_links=graph['unresolved'][:10]), graph['omissions']
+
+
 class RepairChange(Model):
     path: str = Field(min_length=1, max_length=512)
     expected_sha256: str = Field(pattern='^[a-f0-9]{64}$')

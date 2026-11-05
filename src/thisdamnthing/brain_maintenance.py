@@ -122,6 +122,64 @@ def scan(root):
                                 'An agent must inspect note contents for duplicates, conflicts and stale relationships.']}
 
 
+GRAPH_RECORDS = {'brain/projects/': 'project', 'brain/knowledge/': 'knowledge',
+                 'brain/candidates/': 'candidate', 'brain/sessions/': 'session', 'work/notes/': 'note'}
+
+
+def graph(root):
+    """Whole brain as nodes and typed links; metadata only, never note bodies."""
+    with brain.locked(root, shared=True):
+        files = brain.note_files(root)
+        nodes, bodies, omissions = {}, {}, []
+        for path in ['brain/index.md', *files]:
+            try:
+                text = read_text(root, path)
+                meta, body = ({}, text) if path == 'brain/index.md' else brain.read_note(root, path)
+            except (WorkspaceError, UnicodeError):
+                omissions.append(path)
+                continue
+            record = 'index' if path == 'brain/index.md' else next(
+                value for prefix, value in GRAPH_RECORDS.items() if path.startswith(prefix))
+            if record == 'candidate' and meta['status'] != 'pending':
+                continue
+            kind = meta.get('kind') if record in ('knowledge', 'candidate') else record
+            tags = meta.get('tags') if record == 'note' else None
+            node_id = brain.note_link(path)
+            nodes[node_id] = {
+                'id': node_id, 'kind': kind if isinstance(kind, str) else 'fact', 'record': record,
+                'path': path, 'title': meta.get('title', 'Brain index'), 'status': meta.get('status'),
+                'project': meta.get('project'), 'updated_at': meta.get('updated'),
+                'tags': sorted({t for t in tags if isinstance(t, str) and t}) if isinstance(tags, list) else [],
+                'sha256': brain.digest(text)}
+            bodies[node_id] = (meta, body)
+        projects = {meta['id']: node_id for node_id, (meta, _) in bodies.items()
+                    if nodes[node_id]['record'] == 'project'}
+        links, unresolved = set(), []
+        for node_id, (meta, body) in bodies.items():
+            node = nodes[node_id]
+            raw = meta.get('links', [])
+            raw = [x for x in raw if isinstance(x, str)] if isinstance(raw, list) else []
+            for value in sorted(set(raw + body_links(body))):
+                link = target(value).strip()
+                if link in nodes and link != node_id:
+                    links.add((node_id, link, 'index' if node['record'] == 'index' else 'wikilink'))
+                elif link not in nodes:
+                    unresolved.append(f'{node_id} -> {value}')
+            # Note metadata stores the project id; resolve it to the registration node.
+            node['project'] = projects.get(node['project'])
+            if node['project'] and node['project'] != node_id:
+                links.add((node_id, node['project'], 'project'))
+            for tag in node['tags']:
+                tag_id = 'tag/' + tag
+                nodes.setdefault(tag_id, {
+                    'id': tag_id, 'kind': 'tag', 'record': 'tag', 'path': None, 'title': tag,
+                    'status': None, 'project': None, 'tags': [], 'updated_at': None, 'sha256': None})
+                links.add((node_id, tag_id, 'tag'))
+        return {'nodes': sorted(nodes.values(), key=lambda n: n['id']),
+                'links': [{'source': s, 'target': t, 'type': k} for s, t, k in sorted(links)],
+                'unresolved': unresolved, 'omissions': omissions}
+
+
 def outcome_path(fingerprint):
     return '.tdt/state/brain-maintenance/' + brain.identifier(fingerprint) + '.json'
 

@@ -213,6 +213,13 @@ verified external scheduler; core has no daemon. Shared expiring delivery claims
 coordinate channels/hosts. Rendering is host-dependent and not transactional
 with acknowledgement. See the [reminder guide](../src/thisdamnthing/resources/docs/reminders.md).
 
+## Relays
+
+Relays record that one registered project needs work from another, under
+`work/relays/`, as operational data outside capture and review. The workspace
+request hook shows a project's open relays when the prompt names it, once per
+session. See [relay](relay.md).
+
 ## Stack contracts
 
 Both v1 workflow and v2 capability bundles are supported. The packaged
@@ -342,6 +349,10 @@ Everyday MCP also exposes the eight UI lifecycle tools through shared CLI core
 functions. Structured pages, complete paginated events with original prompts,
 bounded waits, explicit acknowledgements, retained close and authorized cleanup
 follow the [UI guide](ui.md).
+
+Both profiles expose `tdt_brain_graph`: every brain record, pending candidate,
+scratchpad note and tag as nodes with typed links, metadata only, paged by node
+with a revision-bound cursor. Helm uses it for its brain graph.
 
 Both profiles expose `tdt_brain_audit` through the shared structural scanner.
 Findings and note hashes are separately paginated, with report-bound cursors,

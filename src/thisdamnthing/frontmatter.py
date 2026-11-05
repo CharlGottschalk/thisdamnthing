@@ -57,7 +57,7 @@ def loads(text):
     result = value(node)
     if isinstance(result, dict) and result.get('format_version') == '1':
         result['format_version'] = 1
-    if isinstance(result, dict) and result.get('kind') == 'reminder':
+    if isinstance(result, dict) and result.get('kind') in ('reminder', 'relay'):
         # These are schema integers, never inferred types for arbitrary properties.
         for record in (result, result.get('claim')):
             if isinstance(record, dict):

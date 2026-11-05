@@ -63,6 +63,13 @@ def session_start(root):
             raise ValueError("Workspace context exceeds 10000 characters; nothing loaded")
         from .stacks import notify_hooks
         notify_hooks(root, event)
+        from .relays import summary
+        try:
+            relay_line = summary(root)
+        except (OSError, ValueError, WorkspaceError) as exc:
+            relay_line = f"ThisDamnThing relays could not be checked: {exc}"
+        if relay_line:
+            context += "\n\n" + relay_line
         print(json.dumps({"hookSpecificOutput": {
             "hookEventName": "SessionStart", "additionalContext": context}}))
         return 0

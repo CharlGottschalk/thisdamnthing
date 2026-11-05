@@ -26,7 +26,7 @@ def begin_turn(root, event):
     command = shlex.join(["tdt", "--workspace", str(root.resolve()),
                           "brain", "review-turn", token])
     return ("For a user request not to save brain notes or capture knowledge, "
-            "tdt-review-brain, tdt-capture, tdt-note or explicit reminder "
+            "tdt-review-brain, tdt-capture, tdt-note or explicit reminder or relay "
             "management/checking, project lifecycle changes or reference cleanup in this "
             "turn, first suppress automatic capture. "
             "Prefer tdt_capture_suppress on the MCP server bound to workspace " +
@@ -113,7 +113,7 @@ def stop(root, host, payload):
         'brain notes or knowledge capture for this work, submit skip as described below; '
         "do not save a candidate. Otherwise use your active conversation context to summarize durable facts, "
         "decisions or open questions from the user turn just completed. "
-        "Exclude reminder records, notifications and reminder management; these are operational data, not knowledge. "
+        "Exclude reminder and relay records, notifications and their management; these are operational data, not knowledge. "
         "Prefer tdt_capture_submit on the MCP server bound to workspace " + str(root.resolve()) +
         " with request_id " + key + ' and payload {"action":"summary","summary":<summary object>} '
         'or {"action":"skip"}. If that tool is unavailable, use your shell tool: ' + command + ". "

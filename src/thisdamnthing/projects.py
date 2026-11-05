@@ -386,7 +386,7 @@ def search_work(root, query, limit=50):
         for name in sorted(names):
             if limit_reached:
                 return
-            if name.startswith('.') or (not prefix and name in ('notes', 'reminders')):
+            if name.startswith('.') or (not prefix and name in ('notes', 'reminders', 'relays')):
                 omit('hidden entry or dedicated store')
                 continue
             relative = '/'.join((*prefix, name))

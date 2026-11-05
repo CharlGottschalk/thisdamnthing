@@ -76,6 +76,16 @@ snooze accept JSON on stdin. `check --channel manual|chat|scheduled [--limit N]`
 claims due items; `ack ID --token TOKEN` records notification, not completion.
 See [reminders](reminders.md) for the schema, setup and delivery recovery.
 
+## Relays
+
+`tdt relay add --from PROJECT --to PROJECT --title TEXT --user-instruction TEXT`
+saves a request from one project to another. Put the request text on stdin.
+`--origin TEXT` records where the request came from. `list [--project PROJECT]
+[--status open|done|cancelled|all]` shows relays in both directions. `show ID`
+shows one relay. `done` and `cancel` require an ID, the current `--revision` and
+`--user-instruction`. `done` also requires `--resolution TEXT`. See
+[relays](projects.md#relays-between-projects).
+
 ## Working files
 
 - `tdt project create <relative-folder>` creates below work/ and registers the project.
@@ -134,6 +144,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_brain_repair_apply` (everyday): supply identical `changes`, preview `expected_sha256` and actual `user_instruction`. Returns a small completion receipt and backup path. Identical completed retries preserve later edits.
 - `tdt_brain_repair_preview`: validate 1–20 changes against current audit hashes and return complete replacements plus a proposal hash, without writing notes or backups. Increase the result budget (up to 1 MiB) or reduce the batch if needed. Apply explicitly authorized changes through `tdt_brain_repair_apply` (everyday) or `tdt brain repair` with identical changes and the returned hash.
 - `tdt_brain_audit`: paginated structural findings and canonical note hashes, with scan limitations and unreadable-note omissions.
+- `tdt_brain_graph`: the complete brain as nodes and typed links, for a graph view. Nodes include the index, projects, knowledge, pending candidates, sessions, scratchpad notes and tags. The tool returns titles and metadata, not note bodies. Follow `next_cursor` until it is null. The `revision` changes when a node or link changes.
 - `tdt_capture_requests` / `tdt_capture_request_read`: bounded hook request inventory and exact status/provenance, without transcript reads.
 - `tdt_workspace_context`: current complete constitution, WORK.md and tool names.
 - `tdt_workspace_status`: bounded operational counts and recovery markers.
@@ -162,6 +173,7 @@ The following list covers reads and selected everyday counterparts:
   for stack/skill journals; policy locks and other recovery mechanisms are excluded.
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
+- `tdt_relay_list` / `tdt_relay_read`: relay summaries and one relay with its request text. Everyday adds `tdt_relay_add`, `tdt_relay_done` and `tdt_relay_cancel`.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
 - `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.

@@ -213,6 +213,13 @@ verified external scheduler; core has no daemon. Shared expiring delivery claims
 coordinate channels/hosts. Rendering is host-dependent and not transactional
 with acknowledgement. See the [reminder guide](../src/thisdamnthing/resources/docs/reminders.md).
 
+## Relays
+
+Relays record that one registered project needs work from another, under
+`work/relays/`, as operational data outside capture and review. The workspace
+request hook shows a project's open relays when the prompt names it, once per
+session. See [relay](relay.md).
+
 ## Stack contracts
 
 Both v1 workflow and v2 capability bundles are supported. The packaged

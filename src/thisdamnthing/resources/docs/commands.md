@@ -76,6 +76,16 @@ snooze accept JSON on stdin. `check --channel manual|chat|scheduled [--limit N]`
 claims due items; `ack ID --token TOKEN` records notification, not completion.
 See [reminders](reminders.md) for the schema, setup and delivery recovery.
 
+## Relays
+
+`tdt relay add --from PROJECT --to PROJECT --title TEXT --user-instruction TEXT`
+saves a request from one project to another. Put the request text on stdin.
+`--origin TEXT` records where the request came from. `list [--project PROJECT]
+[--status open|done|cancelled|all]` shows relays in both directions. `show ID`
+shows one relay. `done` and `cancel` require an ID, the current `--revision` and
+`--user-instruction`. `done` also requires `--resolution TEXT`. See
+[relays](projects.md#relays-between-projects).
+
 ## Working files
 
 - `tdt project create <relative-folder>` creates below work/ and registers the project.
@@ -163,6 +173,7 @@ The following list covers reads and selected everyday counterparts:
   for stack/skill journals; policy locks and other recovery mechanisms are excluded.
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
+- `tdt_relay_list` / `tdt_relay_read`: relay summaries and one relay with its request text. Everyday adds `tdt_relay_add`, `tdt_relay_done` and `tdt_relay_cancel`.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
 - `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.

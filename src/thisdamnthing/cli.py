@@ -138,6 +138,8 @@ def main(argv=None):
     market_search.add_argument("--browse", choices=("new", "featured", "popular"), default="new")
     from . import reminders
     reminders.add_parser(commands)
+    from . import relays
+    relays.add_parser(commands)
     from . import skills
     skills.add_parser(commands)
     from . import ui
@@ -276,6 +278,14 @@ def main(argv=None):
         if args.command == "reminder":
             data = input_json() if args.action in ("add", "edit", "snooze") else None
             print(json.dumps(reminders.cli(root, args, data), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "relay":
+            body = None
+            if args.action == "add":
+                body = sys.stdin.read(16001)
+                if len(body) > 16000:
+                    raise ValueError("Relay text exceeds 16000 characters")
+            print(json.dumps(relays.cli(root, args, body), ensure_ascii=False, indent=2))
             return 0
         if args.command == "skill":
             print(json.dumps(skills.cli(root, args, input_json() if args.action in ("propose", "history") else None), indent=2, ensure_ascii=False))

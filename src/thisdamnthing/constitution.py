@@ -125,7 +125,8 @@ def request_hook(root):
         raw = sys.stdin.read(65537)
         if len(raw) > 65536:
             raise ValueError('Hook input exceeds 64 KiB')
-        event = normalize_event(sys.argv[1], json.loads(raw))
+        payload = json.loads(raw)
+        event = normalize_event(sys.argv[1], payload)
         if event['event'] != 'user_request':
             raise ValueError('Expected UserPromptSubmit')
         if not in_scope(root, event['cwd']):
@@ -140,6 +141,14 @@ def request_hook(root):
             reminder_context = f"ThisDamnThing reminders could not be checked: {exc}. Report the issue; do not claim delivery."
         if reminder_context:
             value += "\n\n" + reminder_context
+        from .relays import hook_context as relay_context
+        try:
+            # The prompt is matched in memory only; it is never stored.
+            relay_text = relay_context(root, event['session_id'], payload.get('prompt'))
+        except (OSError, ValueError, WorkspaceError) as exc:
+            relay_text = f"ThisDamnThing relays could not be checked: {exc}. Use tdt relay list."
+        if relay_text:
+            value += "\n\n" + relay_text
         print(json.dumps({'hookSpecificOutput': {
             'hookEventName': 'UserPromptSubmit', 'additionalContext': value}}))
         return 0

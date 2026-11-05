@@ -1,6 +1,6 @@
 """Validated MCP dispatch, result budgets and refusal mapping."""
 from pydantic import ValidationError
-from .. import reminders
+from .. import relays, reminders
 from ..workspace import WorkspaceError
 from .catalog import WRITES, catalog_for
 from .common import Refused, serialized
@@ -45,6 +45,8 @@ def execute(root, name, arguments, profile='read-only'):
         return value
     except Refused as exc:
         error = Error(code=exc.code, message=exc.message)
+    except relays.StaleRevision:
+        error = Error(code='stale_revision', message='Relay changed; reread before closing')
     except reminders.StaleRevision:
         error = Error(code='stale_revision', message='Reminder changed; reread before editing')
     except ValidationError:

@@ -1,7 +1,10 @@
 """Explicit UI lifecycle adapters; answers remain untrusted session data."""
+from typing import Literal
+
 from pydantic import Field, JsonValue
-from .. import ui
-from .models import Model, ReadInput
+from .. import brain, ui
+from .common import inventory_page, serialized
+from .models import ListInput, Model, ReadInput
 
 
 class UIInput(ReadInput):
@@ -31,6 +34,26 @@ class UIWaitInput(UIReadInput):
 
 class UIAckInput(UIInput):
     event_id: int = Field(ge=0, le=1000)
+
+
+class UISessionsInput(ListInput):
+    status: Literal['open', 'all'] = 'open'
+
+
+class UISession(Model):
+    session_id: str
+    title: str | None
+    status: str
+    waiting: bool
+    connected: bool
+    created: str | None
+    updated: str | None
+
+
+class UISessionPage(Model):
+    items: list[UISession]
+    next_cursor: str | None = None
+    inventory_revision: str
 
 
 class UIStarted(Model):
@@ -107,3 +130,10 @@ def ui_close(root, args):
 
 def ui_cleanup(root, args):
     return UICleaned(**ui.cleanup(root, args.session_id)), []
+
+
+def ui_sessions(root, args):
+    items = [UISession(**row) for row in ui.sessions(root, args.status == 'all')]
+    revision = brain.digest(serialized([item.model_dump() for item in items]))
+    page, cursor = inventory_page(root, args, 'ui-sessions', args.status, revision, items)
+    return UISessionPage(items=page, next_cursor=cursor, inventory_revision=revision), []

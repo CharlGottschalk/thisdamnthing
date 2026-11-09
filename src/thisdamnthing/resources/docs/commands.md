@@ -45,6 +45,7 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-install-stack` | `tdt marketplace search "query"` | Search the selected HTTPS registry; requires network access. |
 | `/tdt-add-skill` to author a workflow | `tdt skill propose` / `tdt skill propose --update` | Propose a named skill or intentionally update a user-owned skill; review before saving. |
 | `/tdt-find-skills` for inventory; ask your agent for recovery | `tdt skill list` / `tdt skill recover` | Inspect skills/proposals or recover an interrupted user-skill save. |
+| `/tdt-ui` | `tdt ui list` / `tdt ui list --all` | List open interview sessions, or all retained sessions. |
 | `/tdt-ui` | `tdt ui read SESSION --after 0` | Read retained interview responses. |
 | `/tdt-ui` | `tdt ui close SESSION` / `tdt ui cleanup SESSION` | Stop the service, or delete retained session data. |
 

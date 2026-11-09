@@ -122,3 +122,12 @@ cancel the interview. After uncertain start/present responses inspect retained
 state/current round before retrying; present always creates a new round.
 Close retains answers; cleanup deletes them and requires explicit user instruction.
 These tools do not submit answers on the user's behalf or promote them to knowledge.
+
+Both profiles expose `tdt_ui_sessions`. This tool lists retained sessions, with
+open sessions only by default. Set `status` to `all` to include finished and
+cancelled sessions. Each item shows the session ID, page title, status, created
+and updated times, `waiting` and `connected`. `waiting` is true when a page
+waits for an answer. `connected` is true when the session server runs. The list
+does not include URLs, credentials, prompts or answers. To get the private URL,
+resume the session with `tdt_ui_start`. The CLI equivalent is
+`tdt ui list`; add `--all` to include closed sessions.

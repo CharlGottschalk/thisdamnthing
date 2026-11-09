@@ -183,6 +183,8 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_reminder_settings`: timezone, chat preference and external scheduler reference.
 - `tdt_reminder_list` / `tdt_reminder_read`: reminder summaries and complete Markdown.
 - `tdt_relay_list` / `tdt_relay_read`: relay summaries and one relay with its request text. Everyday adds `tdt_relay_add`, `tdt_relay_done` and `tdt_relay_cancel`.
+- `tdt_todo_list` / `tdt_todo_read`: personal to-do summaries and one to-do with its detail text. Everyday adds `tdt_todo_add`, `tdt_todo_done`, `tdt_todo_reopen` and `tdt_todo_remove`.
+- `tdt_ui_sessions`: retained UI interview sessions, open by default, without URLs, credentials, prompts or answers.
 - `tdt_project_list`: paginated registered projects, including archived/missing state.
 - `tdt_project_read`: registry details and complete retained registration Markdown.
 - `tdt_project_operation_status`: exact proposal hash; historical outcome reconciliation before retry or CLI fallback.
@@ -659,6 +661,8 @@ cancel the interview. After uncertain start/present responses inspect retained
 state/current round before retrying; present always creates a new round.
 Close retains answers; cleanup deletes them and requires explicit user instruction.
 These tools do not submit answers on the user's behalf or promote them to knowledge.
+Both profiles expose `tdt_ui_sessions` to list retained sessions. To get the
+private URL of a listed session, resume it with `tdt_ui_start`.
 
 ### MCP project reference review
 

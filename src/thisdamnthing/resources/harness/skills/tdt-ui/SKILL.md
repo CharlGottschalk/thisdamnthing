@@ -11,7 +11,8 @@ Read docs/ui.md and .tdt/contracts/ui.md (MCP `tdt_guide_read` references
 `core/ui` and `core/contracts/ui`). Prefer workspace-bound everyday MCP
 `tdt_ui_start` (browser opening defaults off) and `tdt_ui_present` with the
 version 1 page object directly. Use `tdt_ui_status`, `tdt_ui_read`, `tdt_ui_wait`,
-`tdt_ui_ack` and `tdt_ui_close` for the same lifecycle below. MCP inputs use
+`tdt_ui_ack` and `tdt_ui_close` for the same lifecycle below. To find a session to
+resume, use `tdt_ui_sessions` or `tdt ui list`; the list has no URLs. MCP inputs use
 session_id, after, timeout and event_id. Read/wait return next_after and has_more;
 page through complete events and original prompts before acting. If an event
 exceeds budget_bytes, increase it (up to 1 MiB); never infer omitted answers.

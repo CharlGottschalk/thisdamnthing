@@ -16,8 +16,9 @@ For external projects, ask for the directory; keep existing projects in place.
 
 ## Notes and reminders
 
-Core scratchpad notes use `notes/` and reminders use `reminders/`. These folders
-are created on first save. Keep project files in separate locations.
+Core scratchpad notes use `notes/`, reminders use `reminders/`, relays use
+`relays/` and personal to-do items use `todos/`. These folders are created on
+first save. Keep project files in separate locations.
 
 ## Other working files
 

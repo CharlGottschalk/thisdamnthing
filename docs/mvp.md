@@ -85,6 +85,7 @@ domain adapters call the same core functions as the CLI.
   work/                      user-owned work; created on demand
     notes/                   tagged scratchpad ideas; created on first save
     reminders/               one-time reminders; created on first save
+    todos/                   personal to-do items; created on first save
   brain/
     index.md
     projects/
@@ -219,6 +220,15 @@ Relays record that one registered project needs work from another, under
 `work/relays/`, as operational data outside capture and review. The workspace
 request hook shows a project's open relays when the prompt names it, once per
 session. See [relay](relay.md).
+
+## To-do items
+
+`/tdt-todo` keeps a personal, project-independent to-do list under `work/todos/`,
+as operational data outside capture and review. Items are open or done, with no
+due dates, priorities or project links; reminders cover dates. Add, list, done,
+reopen and remove use `tdt todo` and `tdt_todo_*` with revision checks. Remove
+deletes the file. The name avoids confusion with software-production tasks. See
+the [to-do guide](../src/thisdamnthing/resources/docs/todos.md).
 
 ## Stack contracts
 

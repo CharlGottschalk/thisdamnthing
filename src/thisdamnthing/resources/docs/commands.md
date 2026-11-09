@@ -77,6 +77,14 @@ snooze accept JSON on stdin. `check --channel manual|chat|scheduled [--limit N]`
 claims due items; `ack ID --token TOKEN` records notification, not completion.
 See [reminders](reminders.md) for the schema, setup and delivery recovery.
 
+## To-do items
+
+`tdt todo add TITLE [--detail TEXT] --user-instruction TEXT` saves a personal
+to-do. `list [--status open|done|all]` shows items and
+`show ID` shows one. `done`, `reopen` and `remove` require an ID, the current
+`--revision` and `--user-instruction`. Remove deletes the file.
+See [to-do list](todos.md).
+
 ## Relays
 
 `tdt relay add --from PROJECT --to PROJECT --title TEXT --user-instruction TEXT`

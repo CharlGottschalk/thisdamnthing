@@ -67,8 +67,8 @@ def project_path(root, directory):
         relative = path.relative_to(root)
         if relative.parts[0] != 'work' or len(relative.parts) < 2:
             raise WorkspaceError('Internal projects must be below work/')
-        if relative.parts[1] in ('notes', 'reminders'):
-            raise WorkspaceError('work/notes and work/reminders are reserved for core stores')
+        if relative.parts[1] in ('notes', 'reminders', 'relays', 'todos'):
+            raise WorkspaceError('work/notes, work/reminders, work/relays and work/todos are reserved for core stores')
         managed_path(root, relative)
     if path == root or path in root.parents:
         raise WorkspaceError('Project cannot be the workspace or its ancestor')
@@ -281,8 +281,8 @@ def create(root, relative):
     if (not relative or relative.startswith('/') or '\\' in relative
             or any(p in ('', '.', '..') or p.startswith('.') for p in parts)):
         raise WorkspaceError('Use a relative folder below work/, without dot or hidden components')
-    if parts[0] in ('notes', 'reminders'):
-        raise WorkspaceError('work/notes and work/reminders are reserved for core stores')
+    if parts[0] in ('notes', 'reminders', 'relays', 'todos'):
+        raise WorkspaceError('work/notes, work/reminders, work/relays and work/todos are reserved for core stores')
     target = managed_path(root, 'work/' + relative)
     for parent in (target, *target.parents):
         if parent == root:
@@ -334,7 +334,7 @@ def read_work(root, relative):
     parts = relative.split('/')
     if (len(parts) < 2 or parts[0] != 'work' or '\\' in relative
             or any(not p or p.startswith('.') for p in parts)
-            or parts[1] in ('notes', 'reminders')
+            or parts[1] in ('notes', 'reminders', 'relays', 'todos')
             or len(parts) > 34 or Path(parts[-1]).suffix.lower() not in WORK_TEXT_SUFFIXES):
         raise WorkspaceError('Use an eligible workspace-relative working text file')
     with directory_handle(root / 'work') as work:
@@ -386,7 +386,7 @@ def search_work(root, query, limit=50):
         for name in sorted(names):
             if limit_reached:
                 return
-            if name.startswith('.') or (not prefix and name in ('notes', 'reminders', 'relays')):
+            if name.startswith('.') or (not prefix and name in ('notes', 'reminders', 'relays', 'todos')):
                 omit('hidden entry or dedicated store')
                 continue
             relative = '/'.join((*prefix, name))

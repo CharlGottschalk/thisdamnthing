@@ -19,6 +19,7 @@ Load the relevant installed skill for details instead of guessing:
 - `/tdt-remind` and `/tdt-check-reminders` handle one-time reminders as
   operational data, separate from knowledge.
 - `/tdt-relay` records work that one linked project needs from another.
+- `/tdt-todo` keeps a personal to-do list, separate from project tasks.
 - `/tdt-install-stack`, `/tdt-update-stack` and `/tdt-remove-stack` manage
   optional capabilities and preserve user work.
 - `/tdt-mcp` helps choose a host and preset for workspace MCP registration.

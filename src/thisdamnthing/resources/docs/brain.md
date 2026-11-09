@@ -91,6 +91,10 @@ excluded from knowledge/candidate capture and all brain search scopes. Use
 `/tdt-check-reminders` for due items. See [reminders](reminders.md) for opt-in
 chat delivery and external scheduler setup.
 
+Personal to-do items in `work/todos/` and relays in `work/relays/` are also
+operational data. TDT excludes them from capture and from all brain search scopes.
+See [to-do list](todos.md).
+
 ## Review proposals
 
 Use `/tdt-review-brain` in Claude or `$tdt-review-brain` (or `/skills`) in Codex.

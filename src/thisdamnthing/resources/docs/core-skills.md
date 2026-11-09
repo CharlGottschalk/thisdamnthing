@@ -5,7 +5,7 @@ Use them to manage your workspace, knowledge, projects and workflows through you
 agent. Select a skill below to read its usage guide. In Claude, invoke it with
 `/` before its name; in Codex, use `$` or the skill picker.
 
-Claude and Codex group automatic discovery under `tdt-brain`, `tdt-reminders`, `tdt-relay`,
+Claude and Codex group automatic discovery under `tdt-brain`, `tdt-reminders`, `tdt-relay`, `tdt-todo`,
 `tdt-stacks`, `tdt-skills`, `tdt-workspace` and `tdt-mcp`. You can also invoke the specialist skills below directly. Stack and approved user skills remain individually
 discoverable.
 
@@ -28,5 +28,6 @@ discoverable.
 - **[tdt-workspace](agent-bootstrap.md#open-the-workspace-and-review-trust)** — Get oriented in your workspace, check its setup and find installed stacks, skills and usage guides.
 
 - **[tdt-relay](projects.md#relays-between-projects)** — Ask another linked project for work, list open relays, or close a relay.
+- **[tdt-todo](todos.md)** — Add, list, tick off, reopen or remove personal to-do items.
 - **[tdt-remind](reminders.md)** — Save, list, edit, snooze, complete or cancel one-time reminders.
 - **[tdt-check-reminders](reminders.md)** — Display newly due and overdue reminders manually, in chat or through a configured scheduler.

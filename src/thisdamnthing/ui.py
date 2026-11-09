@@ -13,6 +13,7 @@ import secrets
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from urllib.request import Request, build_opener, ProxyHandler
 from urllib.error import URLError, HTTPError
 import webbrowser
@@ -199,7 +200,8 @@ def start(root, sid=None, idle=1800, no_open=False):
         folder.mkdir(parents=True, mode=0o700)
         save(root, {'version': 1, 'session_id': sid, 'token': secrets.token_urlsafe(32),
                     'port': None, 'status': 'waiting', 'round_id': None, 'page': None,
-                    'events': [], 'rounds': {}, 'ack': 0, 'idle': idle, 'activity': time.time()})
+                    'events': [], 'rounds': {}, 'ack': 0, 'idle': idle, 'activity': time.time(),
+                    'created': time.time()})
     state = read(root, sid)
     require(state['status'] not in ('finished', 'cancelled'), 'Closed session; start a new one')
     try:
@@ -408,6 +410,50 @@ def status(root, sid):
                 'round_id': state['round_id'], 'ack': state['ack']}
 
 
+def running(root, sid):
+    """Read-only server probe: never creates the lock file or holds it beyond a shared check."""
+    try:
+        fd = os.open(managed_path(root, relative(sid, 'server.lock')), os.O_RDONLY)
+    except FileNotFoundError:
+        return False
+    try:
+        # ponytail: a start() racing this microsecond check can see a false "busy"; retrying start recovers.
+        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        return False
+    except BlockingIOError:
+        return True
+    finally:
+        os.close(fd)
+
+
+def stamp(value):
+    return None if value is None else datetime.fromtimestamp(value, timezone.utc).isoformat()
+
+
+def sessions(root, include_closed=False):
+    """Retained sessions, newest activity first, without tokens, ports, prompts or answers."""
+    folder = managed_path(root, '.tdt/state/ui')
+    rows = []
+    for path in sorted(folder.iterdir()) if folder.is_dir() else []:
+        if not re.fullmatch('[a-f0-9]{32}', path.name) or not (path / 'session.json').is_file():
+            continue
+        try:
+            state = read(root, path.name)
+        except (WorkspaceError, ValueError, OSError):
+            continue  # Unreadable sessions are skipped; tdt_ui_status reports the exact one.
+        closed = state.get('status') in ('finished', 'cancelled')
+        if closed and not include_closed:
+            continue
+        page = state.get('page') or {}
+        connected = not closed and type(state.get('port')) is int and running(root, path.name)
+        rows.append({'session_id': path.name, 'title': page.get('title'), 'status': state.get('status'),
+                     'waiting': state.get('status') == 'waiting' and bool(page),
+                     'connected': connected, 'created': stamp(state.get('created')),
+                     'updated': stamp(state.get('activity'))})
+    return sorted(rows, key=lambda row: row['updated'] or '', reverse=True)
+
+
 def read_events(root, sid, after=0, seconds=0):
     require(0 <= after <= 1000, 'Invalid event cursor')
     require(0 <= seconds <= 30, 'Wait timeout must be 0–30 seconds')
@@ -457,6 +503,8 @@ def change_session(root, sid, action, event_id=None):
 
 
 def cli(root, args):
+    if args.action == 'list':
+        return sessions(root, args.all)
     if args.action == 'start':
         return start(root, args.session, args.idle, args.no_open)
     if args.action == 'cleanup':
@@ -479,6 +527,7 @@ def add_parser(commands):
     start_cmd.add_argument('--session')
     start_cmd.add_argument('--no-open', action='store_true')
     start_cmd.add_argument('--idle', type=int, default=1800)
+    actions.add_parser('list', help='retained sessions, open only unless --all').add_argument('--all', action='store_true')
     for name in ('present', 'status', 'read', 'wait', 'ack', 'close', 'cleanup'):
         command = actions.add_parser(name)
         command.add_argument('session')

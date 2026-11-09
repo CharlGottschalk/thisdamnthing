@@ -140,6 +140,8 @@ def main(argv=None):
     reminders.add_parser(commands)
     from . import relays
     relays.add_parser(commands)
+    from . import todos
+    todos.add_parser(commands)
     from . import skills
     skills.add_parser(commands)
     from . import ui
@@ -286,6 +288,9 @@ def main(argv=None):
                 if len(body) > 16000:
                     raise ValueError("Relay text exceeds 16000 characters")
             print(json.dumps(relays.cli(root, args, body), ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "todo":
+            print(json.dumps(todos.cli(root, args), ensure_ascii=False, indent=2))
             return 0
         if args.command == "skill":
             print(json.dumps(skills.cli(root, args, input_json() if args.action in ("propose", "history") else None), indent=2, ensure_ascii=False))

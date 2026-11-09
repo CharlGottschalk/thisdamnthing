@@ -131,9 +131,9 @@ def scan_notes(root, categories, *, omissions=None):
 
 
 def category_path(category):
-    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders", "relays"):
+    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders", "relays", "todos"):
         raise WorkspaceError("Invalid note category")
-    base = "work" if category in ("notes", "reminders", "relays") else "brain"
+    base = "work" if category in ("notes", "reminders", "relays", "todos") else "brain"
     return f"{base}/{category}"
 
 
@@ -152,7 +152,7 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
         raise WorkspaceError(f"Cannot scan notes: {error}")
     for category in categories:
         directory = managed_path(root, category_path(category))
-        if category in ("sessions", "notes", "reminders", "relays") and not directory.exists():
+        if category in ("sessions", "notes", "reminders", "relays", "todos") and not directory.exists():
             continue  # Optional stores are created on first write.
         if not directory.is_dir():
             raise WorkspaceError(f"Expected a note directory: {directory}")
@@ -181,7 +181,7 @@ def find_note(root, category, key):
 def named_path(root, category, key, title, reserved=()):
     """Allocate once; extend the ID suffix on collisions without overwriting."""
     identifier(key)
-    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders", "relays"):
+    if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders", "relays", "todos"):
         raise WorkspaceError("Invalid note category")
     normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode()
     slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"

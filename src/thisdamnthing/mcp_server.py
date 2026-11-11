@@ -46,7 +46,12 @@ def serve(root, profile='read-only'):
         from mcp.shared.exceptions import MCPError
         from .mcp_tools import WRITES, Error, Result, catalog_for, execute, serialized
     except ImportError as exc:
-        raise WorkspaceError('MCP requires the optional extra: install thisdamnthing[mcp]') from exc
+        # Only a truly absent package means the extra is missing. Anything else
+        # (a native extension built for another architecture, a version clash)
+        # must show the real cause.
+        if isinstance(exc, ModuleNotFoundError) and exc.name in ('anyio', 'mcp', 'mcp_types'):
+            raise WorkspaceError('MCP requires the optional extra: install thisdamnthing[mcp]') from exc
+        raise WorkspaceError(f'MCP dependencies failed to load: {exc}') from exc
 
     entries = catalog_for(profile)
     mutation_lock = None
@@ -166,4 +171,7 @@ def serve(root, profile='read-only'):
         if stdin.exceeded:
             raise WorkspaceError("MCP incoming message exceeds 8 MiB; connection closed")
 
-    anyio.run(run)
+    try:
+        anyio.run(run)
+    except KeyboardInterrupt:
+        pass

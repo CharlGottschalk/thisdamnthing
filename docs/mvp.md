@@ -364,6 +364,15 @@ Both profiles expose `tdt_brain_graph`: every brain record, pending candidate,
 scratchpad note and tag as nodes with typed links, metadata only, paged by node
 with a revision-bound cursor. Helm uses it for its brain graph.
 
+Both profiles expose `tdt_project_graph`: a registered project's
+`graphify-out/graph.json` folded to one node per file (kind, up to 50 symbols) and
+deduplicated file-to-file links, plus schema/graphify versions, build time, commit,
+`code_only` and `hook_installed`; `no_graph` when absent, unknown schema refused,
+paged like `tdt_brain_graph`. It never runs graphify. The `/tdt-project-graph`
+skill builds graphs on request (code pass by default, docs pass only when the user
+answers yes) and installs graphify's code-only git hook; it never runs
+`graphify install`.
+
 Both profiles expose `tdt_brain_audit` through the shared structural scanner.
 Findings and note hashes are separately paginated, with report-bound cursors,
 totals, limitations and unreadable-note omissions. Audits do not repair notes or

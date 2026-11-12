@@ -13,6 +13,7 @@ containing .tdt/config.json):
 - Create, register or resume projects; find working files or templates:
   `.tdt/skills/tdt-add-project/SKILL.md`.
 - Relink a renamed or moved project: `.tdt/skills/tdt-relink-project/SKILL.md`.
+- Build or refresh a project's file graph: `.tdt/skills/tdt-project-graph/SKILL.md`.
 - Archive, restore or permanently unregister a project; review reference cleanup:
   `.tdt/skills/tdt-remove-project/SKILL.md`.
 - “Use UI”, browser questions or interactive pages: `.tdt/skills/tdt-ui/SKILL.md`.

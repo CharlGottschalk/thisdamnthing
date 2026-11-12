@@ -27,6 +27,8 @@ Load the relevant installed skill for details instead of guessing:
   setup, policy, projects, working files and local browser interaction.
 - `/tdt-relink-project` reconnects moved projects; `/tdt-remove-project` archives,
   restores or unregisters projects and reviews optional reference cleanup.
+- `/tdt-project-graph` builds a graphify file graph of a linked project on request;
+  agents query it with the graphify CLI before broad file searches.
 - `/tdt-find-skills` inspects or proposes reusable workspace skills; saving a
   skill requires user approval and does not connect accounts or execute it.
 

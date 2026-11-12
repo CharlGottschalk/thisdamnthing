@@ -14,6 +14,7 @@ discoverable.
 - **[tdt-search-notes](brain.md#scratchpad-notes)** — Recall saved ideas and intentions through note content and subject tags.
 - **[tdt-add-project](projects.md)** — Register an existing project without changing its files. Get an explanation of its purpose, structure and entry points.
 - **[tdt-relink-project](projects.md#project-lifecycle)** — Reconnect a renamed or moved project and update its path-based identity and references.
+- **[tdt-project-graph](projects.md#project-graph)** — Build a file graph of a linked project with graphify, so agents can find code without reading every file.
 - **[tdt-remove-project](projects.md#project-lifecycle)** — Archive, restore or permanently unregister a project, with optional reviewed reference cleanup.
 - **[tdt-constitution](constitution.md)** — Define or update your workspace's working rules and permission preferences, with review before saving changes.
 - **[tdt-add-skill](skills.md)** — Create a skill from your own workflow with a chosen, duplicate-checked name.

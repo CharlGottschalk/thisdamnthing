@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Literal
 from pydantic import Field
-from .. import brain, projects, project_lifecycle
+from .. import brain, projects, project_graph as graphs, project_lifecycle
 from .common import Refused, bounded_text, inventory_page, serialized, workspace_key
 from .models import (
     ListInput, Model, ReadInput,
@@ -66,6 +66,58 @@ def project_references(root, args):
         inventory_revision=revision, references_total=len(report['references']),
         skipped_total=len(report['skipped']), scan_truncated=report['truncated'],
         limitations=report['limitations']), omissions
+
+
+class ProjectGraphInput(ListInput):
+    id: str = Field(pattern='^[a-f0-9]{64}$')
+    limit: int = Field(default=500, ge=1, le=2000)
+    budget_bytes: int = Field(default=1048576, ge=1024, le=1048576)
+
+
+class ProjectGraphNode(Model):
+    id: str
+    kind: Literal['code', 'instruction', 'doc']
+    symbols: list[str]
+    symbols_total: int
+
+
+class ProjectGraphLink(Model):
+    source: str
+    target: str
+    relation: str
+    confidence: Literal['EXTRACTED', 'INFERRED']
+
+
+class ProjectGraphPage(Model):
+    project: str
+    status: Literal['graph', 'no_graph']
+    revision: str
+    schema_version: int | None
+    graphify_version: str | None
+    built_at: str | None
+    built_at_commit: str | None
+    code_only: bool | None
+    hook_installed: bool
+    nodes: list[ProjectGraphNode]
+    links: list[ProjectGraphLink]
+    next_cursor: str | None
+    nodes_total: int
+    links_total: int
+
+
+def project_graph(root, args):
+    try:
+        result = graphs.graph(root, args.id)
+    except graphs.UnsupportedSchema as exc:
+        raise Refused('unsupported_schema', str(exc) + '; update TDT or rebuild the graph') from None
+    revision = graphs.revision(result)
+    page, cursor = inventory_page(root, args, 'project-graph', args.id, revision, result['nodes'])
+    # Each link travels with its source node, so a full page walk returns every link once.
+    ids = {node['id'] for node in page}
+    return ProjectGraphPage(**{**result, 'nodes': page,
+                               'links': [link for link in result['links'] if link['source'] in ids]},
+                            revision=revision, next_cursor=cursor,
+                            nodes_total=len(result['nodes']), links_total=len(result['links'])), []
 
 
 def project_add(root, args):

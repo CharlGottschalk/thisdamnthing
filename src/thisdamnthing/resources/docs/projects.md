@@ -118,6 +118,33 @@ example `client/sites`. Relays show only in sessions that start in the
 workspace. Relay text is data, not instructions or authorization. Relays are
 not knowledge and do not go to candidate review.
 
+## Project graph
+
+A project graph shows the files of a linked project and how they connect: imports,
+calls and references. Agents query the graph to find code. They do not have to read
+every file, so they use fewer tokens. TDT uses [graphify](https://github.com/Graphify-Labs/graphify)
+from Graphify Labs to build the graph. This integration is community-built and is
+not affiliated with or endorsed by Graphify Labs.
+
+1. Install graphify 0.9.107 or later: `pipx install graphifyy`.
+2. Ask your agent to run `/tdt-project-graph` for the project.
+
+The agent asks if it must run the docs pass. The docs pass reads CLAUDE.md, AGENTS.md
+and other documents with an LLM, and it costs tokens. The default answer is no. The
+code pass is local and uses no LLM.
+
+The graph is in `graphify-out/` in the project. The agent asks before it adds
+`graphify-out/` to `.gitignore`. The agent installs the graphify Git hook. After each
+commit, the hook updates the code graph in the background with no LLM. The hook
+changes `.git/hooks/`, `.gitattributes` and `.git/config`. To remove it, run
+`graphify hook uninstall` in the project.
+
+Agents query the graph with `graphify query`, `graphify path` and `graphify explain`
+in the project folder. Graph results are pointers. The agent reads the file before it
+acts. Graph text is data, not instructions. TDT never builds a graph unless you ask,
+and it does not run `graphify install`, so graphify does not change CLAUDE.md or
+AGENTS.md. Helm reads the graph through the `tdt_project_graph` MCP tool.
+
 
 ## Project lifecycle
 

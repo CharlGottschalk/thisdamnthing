@@ -1,7 +1,6 @@
 """On-demand, session-owned loopback interviews. No workspace static serving."""
 from contextlib import contextmanager
 from copy import deepcopy
-import fcntl
 from importlib.resources import files
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
@@ -18,6 +17,7 @@ from urllib.request import Request, build_opener, ProxyHandler
 from urllib.error import URLError, HTTPError
 import webbrowser
 
+from . import safefs
 from .brain import save_json
 from .workspace import WorkspaceError, managed_path, read_json, resource_text, resolve_workspace
 
@@ -158,15 +158,15 @@ def save(root, state):
 @contextmanager
 def ownership(root, sid):
     path = managed_path(root, relative(sid, 'server.lock'))
-    with path.open('a') as stream:
+    with path.open('a', encoding='utf-8') as stream:
         try:
-            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            safefs.lock(stream)
         except BlockingIOError as exc:
             raise SessionBusy('Session server is running') from exc
         try:
             yield
         finally:
-            fcntl.flock(stream, fcntl.LOCK_UN)
+            safefs.unlock(stream)
 
 
 def request(root, sid, route, payload=None):
@@ -216,7 +216,11 @@ def start(root, sid=None, idle=1800, no_open=False):
     else:
         process = subprocess.Popen([sys.executable, '-m', 'thisdamnthing.ui', str(root), sid],
                                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                                   stderr=subprocess.DEVNULL, start_new_session=True)
+                                   stderr=subprocess.DEVNULL, start_new_session=True,
+                                   # Windows ignores start_new_session; detach explicitly.
+                                   creationflags=(subprocess.DETACHED_PROCESS
+                                                  | subprocess.CREATE_NEW_PROCESS_GROUP)
+                                   if safefs.WINDOWS else 0)
         for _ in range(60):
             try:
                 request(root, sid, 'status')
@@ -418,8 +422,8 @@ def running(root, sid):
         return False
     try:
         # ponytail: a start() racing this microsecond check can see a false "busy"; retrying start recovers.
-        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
-        fcntl.flock(fd, fcntl.LOCK_UN)
+        safefs.lock(fd, shared=True)
+        safefs.unlock(fd)
         return False
     except BlockingIOError:
         return True
@@ -516,7 +520,7 @@ def cli(root, args):
     if args.action == 'present':
         path = Path(args.page)
         require(path.stat().st_size <= LIMIT and not path.is_symlink(), 'Invalid or oversized page file')
-        return present(root, args.session, json.loads(path.read_text()))
+        return present(root, args.session, json.loads(path.read_text(encoding='utf-8')))
     return change_session(root, args.session, args.action, args.event_id if args.action == 'ack' else None)
 
 

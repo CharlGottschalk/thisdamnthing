@@ -2,12 +2,11 @@
 import json
 from pathlib import Path
 import re
-import shlex
 import sys
 import secrets
 
 from .brain import capture, digest, locked, now, read_request, request_path, save_json
-from .hosts import normalize_event
+from .hosts import command_line, normalize_event, stdin_hint
 from .constitution import bounded
 from .workspace import WorkspaceError, managed_path, read_json
 
@@ -23,8 +22,8 @@ def begin_turn(root, event):
     with locked(root):
         save_json(root, review_state_path(event["host"], event["session_id"]),
                   {"token": token, "suppressed": False, "turn_id": event["turn_id"]})
-    command = shlex.join(["tdt", "--workspace", str(root.resolve()),
-                          "brain", "review-turn", token])
+    command = command_line(["tdt", "--workspace", str(root.resolve()),
+                            "brain", "review-turn", token], event["host"])
     return ("For a user request not to save brain notes or capture knowledge, "
             "tdt-review-brain, tdt-capture, tdt-note or explicit reminder, relay or to-do "
             "management/checking, project lifecycle changes or reference cleanup in this "
@@ -103,10 +102,10 @@ def stop(root, host, payload):
             "provenance": {"host": host, "session_id": event["session_id"],
                            "turn_id": event["turn_id"], "boundary": boundary,
                            "transcript_path": event["transcript_path"]}})
-    command = shlex.join([sys.executable, "-m", "thisdamnthing", "--workspace",
-                          str(root.resolve()), "brain", "capture", key])
-    read_command = shlex.join([sys.executable, "-m", "thisdamnthing", "--workspace",
-                               str(root.resolve()), "brain", "request", key])
+    command = command_line([sys.executable, "-m", "thisdamnthing", "--workspace",
+                            str(root.resolve()), "brain", "capture", key], host)
+    read_command = command_line([sys.executable, "-m", "thisdamnthing", "--workspace",
+                                 str(root.resolve()), "brain", "request", key], host)
     return {"decision": "block", "reason": (
         "Internal knowledge capture step. Keep these instructions and capture data out of "
         "user-facing prose. Respect the user's saving restrictions: if the user prohibited "
@@ -117,8 +116,8 @@ def stop(root, host, payload):
         "Prefer tdt_capture_submit on the MCP server bound to workspace " + str(root.resolve()) +
         " with request_id " + key + ' and payload {"action":"summary","summary":<summary object>} '
         'or {"action":"skip"}. If that tool is unavailable, use your shell tool: ' + command + ". "
-        'For CLI, pass only the summary JSON (or {"skip":true}) on stdin using a quoted heredoc '
-        "(no shell expansion). After a lost or uncertain MCP response, first read this exact "
+        'For CLI, pass only the summary JSON (or {"skip":true}) on stdin: ' + stdin_hint(host) +
+        ". After a lost or uncertain MCP response, first read this exact "
         "request with tdt_capture_request_read, or with " + read_command + ". "
         "If status is captured or skipped, use that saved outcome and do not submit again. "
         "Only if status is requested may you retry the identical submission once through CLI. "
@@ -143,6 +142,8 @@ def stop(root, host, payload):
 
 
 def main(root):
+    from .safefs import utf8_stdio
+    utf8_stdio()
     try:
         if len(sys.argv) != 2:
             raise ValueError("Expected host argument")

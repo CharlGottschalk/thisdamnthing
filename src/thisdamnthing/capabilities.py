@@ -113,6 +113,9 @@ def selected(root, ids):
 
 def run(argv, request, cwd, timeout):
     """Bound all three pipes and kill the process group on every exit path."""
+    if os.name == 'nt':
+        # ponytail: pipe selectors and process groups are POSIX-only; port when a provider needs Windows.
+        raise WorkspaceError('Search providers are not supported on native Windows; omit --provider for literal search')
     raw = json.dumps(request, ensure_ascii=False).encode()
     if len(raw) > MAX_INPUT:
         raise WorkspaceError('Provider request exceeds 16 MiB; reduce corpus size')

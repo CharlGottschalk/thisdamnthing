@@ -1,13 +1,58 @@
 """Small host payload boundary; never parse host transcripts in core code."""
 
 import json
+import os
 from pathlib import Path
+import re
+import shlex
 import sys
 
 from .workspace import WorkspaceError, managed_path
 
 EVENTS = {"UserPromptSubmit": "user_request", "SessionStart": "session_start", "Stop": "turn_complete",
           "PreCompact": "pre_compact"}
+
+
+# PowerShell treats typographic single quotes as quote characters too.
+QUOTES = "'‘’‚‛"
+QUOTED = re.compile(f"'((?:[^{QUOTES}]|([{QUOTES}])\\2)*)'(?: |\\Z)")
+
+
+def powershell(host):
+    """On Windows, Codex runs hooks and its shell tool in Windows PowerShell; Claude uses Git Bash."""
+    return os.name == "nt" and host == "codex"
+
+
+def command_line(argv, host):
+    """Quote argv for the shell this host uses for hook and agent commands."""
+    if not powershell(host):
+        return shlex.join(argv)
+    return "& " + " ".join("'" + re.sub(f"([{QUOTES}])", r"\1\1", value) + "'" for value in argv)
+
+
+def split_command(command, host):
+    """Inverse of command_line; PowerShell form accepts only what command_line produces."""
+    if not powershell(host):
+        return shlex.split(command)
+    if not command.startswith("& "):
+        raise ValueError("Expected a PowerShell call command")
+    argv, position = [], 2
+    while position < len(command):
+        match = QUOTED.match(command, position)
+        if not match:
+            raise ValueError("Unexpected PowerShell command syntax")
+        argv.append(re.sub(f"([{QUOTES}])\\1", r"\1", match.group(1)))
+        position = match.end()
+    return argv
+
+
+def stdin_hint(host):
+    """How the agent passes JSON on stdin with its shell tool, without shell expansion."""
+    if powershell(host):
+        return ("pipe a single-quoted here-string (@' on its own line, then the JSON, then '@ "
+                "at the start of a line) into the command, after setting "
+                "$OutputEncoding = [System.Text.UTF8Encoding]::new($false) so text stays UTF-8")
+    return "use a quoted heredoc (no shell expansion)"
 
 
 def normalize_event(host, payload):
@@ -38,6 +83,8 @@ def normalize_event(host, payload):
 
 
 def session_start(root):
+    from .safefs import utf8_stdio
+    utf8_stdio()
     try:
         if len(sys.argv) != 2:
             raise ValueError("Expected host argument: claude or codex")

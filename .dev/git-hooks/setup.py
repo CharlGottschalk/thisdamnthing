@@ -15,7 +15,9 @@ def git(*args):
 def main():
     if sys.argv[1:] not in ([], ['--check']):
         raise ValueError('Usage: python3 .dev/git-hooks/setup.py [--check]')
-    if git('rev-parse', '--show-toplevel').stdout.strip() != str(ROOT):
+    toplevel = git('rev-parse', '--show-toplevel').stdout.strip()
+    # Git reports forward slashes on Windows; compare paths, not strings.
+    if not toplevel or Path(toplevel).resolve() != ROOT:
         raise ValueError('Run this setup from a ThisDamnThing source checkout.')
     current = git('config', '--get', 'core.hooksPath')
     if current.returncode not in (0, 1):

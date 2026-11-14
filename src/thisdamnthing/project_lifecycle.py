@@ -2,9 +2,8 @@
 import json
 import os
 from pathlib import Path
-import stat
 
-from . import brain, constitution, frontmatter, projects, stacks
+from . import brain, constitution, frontmatter, projects, safefs, stacks
 from .workspace import WorkspaceError, managed_path
 
 LIMIT = 262144
@@ -12,12 +11,10 @@ OUTCOME_LIMIT = 8 * 1024 * 1024
 
 
 def text_file(root, relative):
-    path = managed_path(root, relative)
-    fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
-    with os.fdopen(fd, 'rb') as stream:
-        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-            raise WorkspaceError(f'Not a regular file: {relative}')
-        raw = stream.read(LIMIT + 1)
+    try:
+        raw = safefs.read_file(managed_path(root, relative), LIMIT + 1)
+    except safefs.NotRegular as exc:
+        raise WorkspaceError(f'Not a regular file: {relative}') from exc
     if len(raw) > LIMIT or b'\0' in raw:
         raise WorkspaceError(f'Not bounded text (maximum 256 KiB): {relative}')
     return raw.decode('utf-8')
@@ -273,12 +270,12 @@ def references_unlocked(root, key):
                 break
             for name in list(directories):
                 child = Path(current) / name
-                if name.startswith('.') or child.is_symlink():
-                    skipped.append({'path': str(child.relative_to(root)), 'reason': 'hidden directory or symlink'})
+                if name.startswith('.') or safefs.is_link_path(child):
+                    skipped.append({'path': child.relative_to(root).as_posix(), 'reason': 'hidden directory or symlink'})
                     directories.remove(name)
             directories.sort()
             for name in sorted(filenames):
-                relative = str((Path(current) / name).relative_to(root))
+                relative = (Path(current) / name).relative_to(root).as_posix()
                 if name.startswith('.') or Path(relative).suffix.lower() not in ('.md', '.txt', '.json', '.csv', '.yaml', '.yml', '.toml', '.rst'):
                     skipped.append({'path': relative, 'reason': 'hidden or unsupported file'})
                     continue

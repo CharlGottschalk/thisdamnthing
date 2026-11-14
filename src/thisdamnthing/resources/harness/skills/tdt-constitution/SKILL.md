@@ -28,7 +28,7 @@ symlinks/junctions and existing ancestors of new files; Python
 `tdt.constitution.within(target, allowed, tree=True)` provides a boundary check
 only. Separately evaluate action, scope and expiry. Unresolvable paths require
 clarification, not guessed permission. Recheck targets before acting; this is not
-a race-proof sandbox. Native Windows execution remains unverified.
+a race-proof sandbox. Native Windows support is still in testing.
 
 Draft concise Markdown stating allow, deny and ask-first rules, scope, exceptions,
 and default handling for unspecified actions. Choose defaults with the user or

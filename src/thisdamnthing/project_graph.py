@@ -3,12 +3,10 @@
 Reads <project>/graphify-out/graph.json; never runs graphify or returns file contents.
 """
 import json
-import os
-import stat
 from datetime import datetime, timezone
 from pathlib import PurePosixPath
 
-from . import brain, projects
+from . import brain, projects, safefs
 from .workspace import WorkspaceError
 
 GRAPH = ('graphify-out', 'graph.json')
@@ -29,22 +27,15 @@ class UnsupportedSchema(WorkspaceError):
 
 def read_file(directory, parts, limit):
     """Read a regular file below an open directory without following symlinks."""
-    parent = os.dup(directory)
     try:
-        for part in parts[:-1]:
-            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-            os.close(parent)
-            parent = child
-        fd = os.open(parts[-1], os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW, dir_fd=parent)
-        with os.fdopen(fd, 'rb') as stream:
-            info = os.fstat(stream.fileno())
-            if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
-                raise WorkspaceError('Graph file is not a regular file or is too large')
-            return stream.read(limit + 1), info.st_mtime
+        raw, info = directory.read(parts, limit + 1)
     except (FileNotFoundError, NotADirectoryError):
         return None, None
-    finally:
-        os.close(parent)
+    except safefs.NotRegular as exc:
+        raise WorkspaceError('Graph file is not a regular file or is too large') from exc
+    if info.st_size > limit:
+        raise WorkspaceError('Graph file is not a regular file or is too large')
+    return raw, info.st_mtime
 
 
 def safe_path(value):

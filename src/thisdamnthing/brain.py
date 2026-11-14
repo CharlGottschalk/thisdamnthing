@@ -1,7 +1,6 @@
 """Small Markdown candidate store. All mutations share a workspace lock."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
-import fcntl
 import hashlib
 import json
 import os
@@ -12,7 +11,7 @@ import tempfile
 import sys
 import unicodedata
 
-from . import frontmatter
+from . import frontmatter, safefs
 from .workspace import WorkspaceError, managed_path, read_config, read_json
 
 IDENTIFIER = re.compile(r"[a-f0-9]{64}\Z")
@@ -40,14 +39,13 @@ def locked(root, *, shared=False):
     path = managed_path(root, ".tdt/state/brain.lock")
     with path.open("a", encoding="utf-8") as stream:
         try:
-            mode = fcntl.LOCK_SH if shared else fcntl.LOCK_EX
-            fcntl.flock(stream, mode | fcntl.LOCK_NB)
+            safefs.lock(stream, shared=shared)
         except BlockingIOError as exc:
             raise WorkspaceError("Brain is busy; retry this operation") from exc
         try:
             yield
         finally:
-            fcntl.flock(stream, fcntl.LOCK_UN)
+            safefs.unlock(stream)
 
 
 def atomic(root, relative, content):
@@ -55,11 +53,12 @@ def atomic(root, relative, content):
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix=".tdt-", dir=path.parent)
     try:
-        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+        # newline="": keep LF on Windows so owned-file digests match.
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as stream:
             stream.write(content)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(temporary, path)
+        safefs.replace(temporary, path)
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
@@ -162,7 +161,7 @@ def note_files(root, categories=("candidates", "knowledge", "projects", "session
             if count > 2000:
                 raise WorkspaceError("Note scan exceeds 2000 entries")
             for name in directories + sorted(filenames):
-                relative = str((Path(current) / name).relative_to(root))
+                relative = (Path(current) / name).relative_to(root).as_posix()
                 managed_path(root, relative)
                 if name in filenames and name.endswith(".md"):
                     result.append(relative)

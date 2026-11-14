@@ -8,6 +8,7 @@ import stat
 import sys
 import tempfile
 
+from . import safefs
 from .workspace import WorkspaceError, managed_path, read_config
 
 POLICY = '.tdt/CONSTITUTION.md'
@@ -86,7 +87,7 @@ def save(root, text, expected, instruction):
             raise WorkspaceError('Constitution changed since review; reread and reconcile user edits')
         marker = policy_path(root, EXPECTED)
         if not marker.exists():
-            with marker.open('x', encoding='utf-8') as stream:
+            with marker.open('x', encoding='utf-8', newline='') as stream:
                 stream.write('expected\n')
                 stream.flush()
                 os.fsync(stream.fileno())
@@ -102,7 +103,7 @@ def save(root, text, expected, instruction):
                    if path.exists() else 'missing')
         if current != expected:
             raise WorkspaceError('Constitution changed during write; user edits preserved')
-        os.replace(temporary, path)
+        safefs.replace(temporary, path)
         temporary = None
     finally:
         if temporary is not None:
@@ -119,6 +120,8 @@ def within(target, allowed, tree=False):
 
 def request_hook(root):
     from .hosts import normalize_event
+    from .safefs import utf8_stdio
+    utf8_stdio()
     try:
         if len(sys.argv) != 2:
             raise ValueError('Expected host argument')

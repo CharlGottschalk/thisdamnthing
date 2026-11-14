@@ -4,13 +4,14 @@ import hashlib
 import os
 import tempfile
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
 import time
 import unicodedata
 
+from . import safefs
 from .workspace import WorkspaceError, managed_path, read_json
 from .bootstrap import existing_text, parse_settings, encode, SKILLS, LEGACY_SKILLS
 from .brain import atomic, locked, now, note_text, clean_text
@@ -63,7 +64,7 @@ def write_content(root, relative, value):
             stream.write(content_bytes(value))
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(temporary, path)
+        safefs.replace(temporary, path)
     finally:
         Path(temporary).unlink(missing_ok=True)
 
@@ -219,7 +220,7 @@ def transaction(root, changes, *, bounded=False):
     for p in changes:
         parent = managed_path(root, p).parent
         while parent != root and not parent.exists():
-            directories.add(str(parent.relative_to(root)))
+            directories.add(parent.relative_to(root).as_posix())
             parent = parent.parent
     record = {'before': before, 'after': changes, 'directories': sorted(directories)}
     encoded = encode(record)
@@ -493,7 +494,7 @@ def check_owned(root, entry, *, bounded=False):
     directories = {f".tdt/stacks/{entry['id']}"}
     directories.update(str(Path(p).parent) for p in entry['files']
                        if not p.startswith('.tdt/stacks/'))
-    allowed_dirs = {str(parent) for p in entry['files'] for parent in Path(p).parents}
+    allowed_dirs = {parent.as_posix() for p in entry['files'] for parent in PurePosixPath(p).parents}
     scanned = 0
     def inspect(directory):
         nonlocal scanned
@@ -505,7 +506,7 @@ def check_owned(root, entry, *, bounded=False):
                     raise WorkspaceError('Stack ownership scan exceeds 10000 entries')
                 inspect_child(Path(child.path))
     def inspect_child(path):
-        relative = str(path.relative_to(root))
+        relative = path.relative_to(root).as_posix()
         if path.is_symlink():
             raise WorkspaceError(f'Untracked stack symlink; preserve/move before retry: {relative}')
         if path.is_dir() and relative in allowed_dirs:
@@ -614,7 +615,8 @@ def dispatch(root, event):
             payload = {**event, 'workspace': str(root), 'stack_id': entry['id']}
             try:
                 subprocess.run([sys.executable, str(managed_path(root, base + '/' + hook['path']))],
-                               input=encode(payload), text=True, cwd=root, timeout=min(2, remaining),
+                               input=encode(payload), text=True, encoding='utf-8',
+                               cwd=root, timeout=min(2, remaining),
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             except (OSError, subprocess.SubprocessError) as exc:
                 print(f"tdt stack hook failed: {entry['id']} {hook['path']}: {exc}", file=sys.stderr)

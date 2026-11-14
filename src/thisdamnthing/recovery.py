@@ -1,9 +1,8 @@
 """Bounded journal reads and preview binding for transaction recovery."""
 import hashlib
 import json
-import os
-import stat
 
+from . import safefs
 from .workspace import WorkspaceError, managed_path
 
 
@@ -26,15 +25,12 @@ def read_journal(root, relative):
 
 
 def read_bytes(root, relative, limit):
-    path = managed_path(root, relative)
     try:
-        fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
+        value = safefs.read_file(managed_path(root, relative), limit + 1)
     except FileNotFoundError:
         return None
-    with os.fdopen(fd, 'rb') as stream:
-        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-            raise WorkspaceError('Recovery requires regular files')
-        value = stream.read(limit + 1)
+    except safefs.NotRegular as exc:
+        raise WorkspaceError('Recovery requires regular files') from exc
     if len(value) > limit:
         raise WorkspaceError('Recovery inspection exceeds file limit or conflicts with journal')
     return value

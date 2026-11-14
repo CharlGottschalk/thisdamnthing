@@ -4,9 +4,9 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
-import shlex
 import sys
 
+from .hosts import command_line, split_command
 from .workspace import WorkspaceError, managed_path, read_json, resource_text
 
 MANIFEST = ".tdt/state/bootstrap.json"
@@ -226,7 +226,7 @@ def plan_bootstrap(root, agent, config, owned):
             entries = hooks.setdefault(event, [])
             if not isinstance(entries, list) or any(not isinstance(e, dict) for e in entries):
                 raise WorkspaceError(f"Expected {event} object list: {settings}")
-            command = shlex.join([sys.executable, str(root / f".tdt/hooks/{script}"), host])
+            command = command_line([sys.executable, str(root / f".tdt/hooks/{script}"), host], host)
             entry = {"hooks": [{"type": "command", "command": command, "timeout": 10}]}
             if host == "codex" and event in ("UserPromptSubmit", "SessionStart"):
                 entry["hooks"][0]["additionalContextLimit"] = 10000
@@ -331,8 +331,9 @@ def diagnose_adapters(root, config):
                 raise WorkspaceError(f"{event} hook missing or changed: {relative}")
             try:
                 handler = entry["hooks"][0]
-                argv = shlex.split(handler["command"])
-                if (len(argv) != 3 or not Path(argv[0]).is_file()
+                host = "codex" if relative.startswith(".codex/") else "claude"
+                argv = split_command(handler["command"], host)
+                if (len(argv) != 3 or argv[2] != host or not Path(argv[0]).is_file()
                         or argv[1] != str(root / f".tdt/hooks/{script}")):
                     raise ValueError("stale Python or workspace path")
             except (KeyError, IndexError, TypeError, ValueError) as exc:

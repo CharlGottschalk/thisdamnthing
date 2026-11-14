@@ -23,6 +23,8 @@ recurrence: explain one-time support and resolve a single occurrence if wanted.
 Save JSON on stdin via a quoted heredoc to `tdt reminder add --user-instruction
 <actual-request-or-reference>`. Fields: title, body, due_at (ISO datetime with
 matching explicit offset), timezone (IANA name; may omit when configured).
+In Windows PowerShell, set `$OutputEncoding = [System.Text.UTF8Encoding]::new($false)`.
+Then pipe a single-quoted here-string (`@'` ... `'@`) into the command instead of a heredoc.
 Keep the user's intent intact; do not add inferred tasks. Confirm the saved date,
 time and timezone, and the available delivery mode. A saved reminder does not
 mean timed delivery is configured. Mention overdue timing when deliberately

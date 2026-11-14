@@ -1,12 +1,11 @@
 """Working directory identities and bounded, read-only onboarding evidence."""
 import json
 import codecs
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import stat
 import os
-from contextlib import contextmanager
 
-from . import brain, constitution
+from . import brain, constitution, safefs
 from .workspace import WorkspaceError, managed_path
 
 REGISTRY = '.tdt/state/projects.json'
@@ -140,7 +139,7 @@ def register(root, path, records, known):
 def resolve(root, key):
     entries = registry(root)
     matches = [e for e in entries if key in (e['id'], e['path'], Path(e['path']).name)
-               or (root in Path(e['path']).parents and key == str(Path(e['path']).relative_to(root / 'work')))]
+               or (root in Path(e['path']).parents and key == Path(e['path']).relative_to(root / 'work').as_posix())]
     if len(matches) > 1:
         raise WorkspaceError('Ambiguous project name; choose a path or id from project list')
     entry = matches[0] if matches else None
@@ -158,19 +157,9 @@ def find(root, key):
     return entry
 
 
-@contextmanager
 def directory_handle(path):
     """Open each directory without following symlinks, retaining the final handle."""
-    fd = os.open('/', os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        for part in Path(path).parts[1:]:
-            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                            dir_fd=fd)
-            os.close(fd)
-            fd = child
-        yield fd
-    finally:
-        os.close(fd)
+    return safefs.directory(path)
 
 
 def inspect(root, key):
@@ -186,7 +175,7 @@ def inspect(root, key):
     with directory_handle(path) as directory:
         # No recursive inventory; stop after 101 entries even in a large folder.
         names = []
-        with os.scandir(directory) as entries:
+        with directory.scandir() as entries:
             for item in entries:
                 names.append(item.name)
                 if len(names) == 101:
@@ -195,34 +184,21 @@ def inspect(root, key):
         result['inventory_truncated'] = len(names) > 100
         for relative in DOCUMENTS:
             document = {'source': str(path / relative)}
-            parent = os.dup(directory)
             try:
-                parts = Path(relative).parts
-                for part in parts[:-1]:
-                    child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
-                                    dir_fd=parent)
-                    os.close(parent)
-                    parent = child
-                fd = os.open(parts[-1], os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW,
-                             dir_fd=parent)
-                with os.fdopen(fd, 'rb') as stream:
-                    if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                        document['omitted'] = 'not a regular file'
-                    else:
-                        raw = stream.read(4097)
-                        # Do not discard valid UTF-8 merely split at the byte bound.
-                        content = codecs.getincrementaldecoder('utf-8')().decode(
-                            raw[:4096], final=len(raw) <= 4096)
-                        if brain.SECRET.search(content):
-                            document['omitted'] = 'possible secret'
-                        else:
-                            document.update(text=content, truncated=len(raw) > 4096)
+                raw, _ = directory.read(PurePosixPath(relative).parts, 4097)
+                # Do not discard valid UTF-8 merely split at the byte bound.
+                content = codecs.getincrementaldecoder('utf-8')().decode(
+                    raw[:4096], final=len(raw) <= 4096)
+                if brain.SECRET.search(content):
+                    document['omitted'] = 'possible secret'
+                else:
+                    document.update(text=content, truncated=len(raw) > 4096)
+            except safefs.NotRegular:
+                document['omitted'] = 'not a regular file'
             except FileNotFoundError:
                 document['omitted'] = 'missing'
             except (OSError, UnicodeError):
                 document['omitted'] = 'unreadable or unsafe'
-            finally:
-                os.close(parent)
             result['documents'].append(document)
     return result
 
@@ -309,7 +285,7 @@ def work_boundary(directory):
     """A nested workspace is never part of ordinary working-file discovery."""
     for marker in ('.tdt', '.dryft'):
         try:
-            os.stat(marker, dir_fd=directory, follow_symlinks=False)
+            directory.lstat(marker)
             return True
         except FileNotFoundError:
             pass
@@ -318,11 +294,10 @@ def work_boundary(directory):
 
 def work_text(directory, name):
     """Read one bounded text prefix through its already-open parent directory."""
-    fd = os.open(name, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW, dir_fd=directory)
-    with os.fdopen(fd, 'rb') as stream:
-        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-            raise WorkspaceError('Working file must be regular')
-        raw = stream.read(32769)
+    try:
+        raw, _ = directory.read((name,), 32769)
+    except safefs.NotRegular as exc:
+        raise WorkspaceError('Working file must be regular') from exc
     text = codecs.getincrementaldecoder('utf-8')().decode(raw[:32768], final=len(raw) <= 32768)
     if '\x00' in text or brain.SECRET.search(text):
         raise WorkspaceError('Working file contains binary data or a possible secret')
@@ -338,19 +313,19 @@ def read_work(root, relative):
             or len(parts) > 34 or Path(parts[-1]).suffix.lower() not in WORK_TEXT_SUFFIXES):
         raise WorkspaceError('Use an eligible workspace-relative working text file')
     with directory_handle(root / 'work') as work:
-        parent = os.dup(work)
+        parent = work.dup()
         try:
             for component in parts[1:-1]:
                 if work_boundary(parent):
                     raise WorkspaceError('Nested workspace is excluded')
-                child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-                os.close(parent)
+                child = parent.child(component)
+                parent.close()
                 parent = child
             if work_boundary(parent):
                 raise WorkspaceError('Nested workspace is excluded')
             text, truncated = work_text(parent, parts[-1])
         finally:
-            os.close(parent)
+            parent.close()
     return {'path': relative, 'content': text, 'content_truncated': truncated,
             'revision': brain.digest(text)}
 
@@ -376,7 +351,7 @@ def search_work(root, query, limit=50):
             omit('directory depth limit')
             return
         names = []
-        with os.scandir(directory) as entries:
+        with directory.scandir() as entries:
             for entry in entries:
                 if count == 2000:
                     scan_truncated = True
@@ -391,15 +366,13 @@ def search_work(root, query, limit=50):
                 continue
             relative = '/'.join((*prefix, name))
             try:
-                mode = os.stat(name, dir_fd=directory, follow_symlinks=False).st_mode
-                if stat.S_ISDIR(mode):
-                    child = os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
-                    try:
+                info = directory.lstat(name)
+                mode = info.st_mode
+                if stat.S_ISDIR(mode) and not safefs.is_link(info):
+                    with directory.child(name) as child:
                         walk(child, (*prefix, name), depth + 1)
-                    finally:
-                        os.close(child)
                     continue
-                if not stat.S_ISREG(mode):
+                if not stat.S_ISREG(mode) or safefs.is_link(info):
                     omit('symlink or special file')
                     continue
                 text, truncated = '', False

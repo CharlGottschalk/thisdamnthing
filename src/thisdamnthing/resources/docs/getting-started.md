@@ -12,8 +12,12 @@ add optional stacks when you need additional capabilities.
 
 You need Python 3.11 or later and pipx in your shell. Install Claude Code or Codex
 separately if you want an agent integration, including its account access and
-subscription. Installation has been verified on Linux and macOS. Native Windows
-installation remains unverified.
+subscription. Installation has been verified on Linux, macOS and native Windows 10.
+
+On Windows, Claude Code runs TDT hooks in Git Bash. Install Git for Windows before
+you use Claude Code. Codex runs TDT hooks in Windows PowerShell. Local search
+providers from stacks do not run on native Windows. Use `tdt brain search QUERY`
+without `--provider` there.
 
 Ask your agent to handle setup:
 

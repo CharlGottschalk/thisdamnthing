@@ -9,6 +9,8 @@ from .workspace import WorkspaceError, diagnose, initialize, resolve_workspace
 
 
 def main(argv=None):
+    from .safefs import utf8_stdio
+    utf8_stdio()
     parser = argparse.ArgumentParser(prog="tdt", description="A local knowledge workspace.")
     parser.add_argument("--version", action="version", version=f"tdt {__version__}")
     parser.add_argument("--workspace", metavar="PATH", help="explicit workspace directory")

@@ -42,6 +42,8 @@ returned ID with `tdt_note_read` for the saved path and content; use the note
 inventory to identify shared tags. If MCP is unavailable, submit the identical
 JSON on stdin via a quoted heredoc to
 `tdt --workspace <root> brain note --user-instruction <actual-request-or-reference>`.
+In Windows PowerShell, set `$OutputEncoding = [System.Text.UTF8Encoding]::new($false)`.
+Then pipe a single-quoted here-string (`@'` ... `'@`) into the command instead of a heredoc.
 After an uncertain response, inspect the note inventory before an identical retry
 through either transport. Normalized title, kind, body, sources, project and sorted
 unique tags determine identity; links and audit references do not. An existing

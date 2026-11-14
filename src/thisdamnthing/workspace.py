@@ -4,6 +4,8 @@ import json
 from importlib.resources import files
 from pathlib import Path
 
+from .safefs import is_link_path
+
 
 class WorkspaceError(Exception):
     """An actionable workspace problem."""
@@ -35,7 +37,7 @@ def managed_path(root, relative):
     path = root
     for part in Path(relative).parts:
         path = path / part
-        if path.is_symlink():
+        if is_link_path(path):
             raise WorkspaceError(f"Refusing symlink in workspace-owned path: {path}")
     return path
 
@@ -169,7 +171,7 @@ def initialize(directory, agent=None):
         # Provider settings/instructions were preflighted as merge targets.
         mode = "w" if relative in ("README.md", "AGENTS.md", "CLAUDE.md",
                                    ".codex/hooks.json", ".claude/settings.json") else "x"
-        with path.open(mode, encoding="utf-8") as stream:
+        with path.open(mode, encoding="utf-8", newline="") as stream:
             stream.write(text)
     return root, True
 

@@ -31,7 +31,9 @@ saved Markdown; this observational reader also accepts direct knowledge IDs.
 
 If MCP is unavailable, submit the same summary JSON on stdin to
 `tdt --workspace <root> brain save --user-instruction <actual-request-or-reference>`
-using a quoted heredoc and safe shell arguments. After an uncertain response,
+using a quoted heredoc and safe shell arguments. In Windows PowerShell, set
+`$OutputEncoding = [System.Text.UTF8Encoding]::new($false)`. Then pipe a
+single-quoted here-string (`@'` ... `'@`) into the command. After an uncertain response,
 inspect existing knowledge before retrying the identical summary through either
 transport. Never change content to force a retry: normalized title, kind, body,
 sources and project determine identity; links and audit references do not.

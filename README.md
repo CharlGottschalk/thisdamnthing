@@ -20,8 +20,9 @@ Use either agent, or both, with the same workspace. Your knowledge stays in
 readable Markdown files on your machine.
 
 > [!NOTE]
-> **TDT** installation has been verified on Linux and macOS. Native Windows
-> installation remains unverified. Report what works or any issues through [GitHub Issues](https://github.com/CharlGottschalk/thisdamnthing/issues).
+> **TDT** installation has been verified on Linux, macOS and native Windows 10.
+> On Windows, Claude Code needs Git for Windows. Stack search providers do not run
+> on native Windows. Report what works or any issues through [GitHub Issues](https://github.com/CharlGottschalk/thisdamnthing/issues).
 
 ## Make your workspace your own
 

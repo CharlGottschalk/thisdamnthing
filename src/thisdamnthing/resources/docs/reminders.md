@@ -75,7 +75,10 @@ delete the external job. Update this reference if the job is replaced.
 Run these commands within the workspace. Elsewhere, use `tdt --workspace <root> reminder ...` with your workspace path.
 Replace `ID`, revisions and `CLAIM_TOKEN` with current values returned by the commands.
 Choose future dates with offsets that match the selected timezone.
-These examples show alternative operations; do not run the whole block as a sequence:
+These examples show alternative operations; do not run the whole block as a sequence.
+In Windows PowerShell, set `$OutputEncoding = [System.Text.UTF8Encoding]::new($false)`,
+then pipe a single-quoted here-string (`@'` ... `'@`) into the command instead of
+a heredoc:
 
 ```sh
 tdt reminder configure

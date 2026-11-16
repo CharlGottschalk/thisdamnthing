@@ -74,6 +74,48 @@ workspace to update unchanged owned core skills; edits and name collisions are
 preserved with an error. Use the approved stack update workflow to change an installed stack's skills.
 
 
+## Share a private stack with your team
+
+The marketplace lists public stacks only. To share a stack with your team only,
+keep it in a private Git repository. Each team member clones the repository and
+installs the clone as a local stack.
+
+ThisDamnThing does not read the repository. Git does the download and uses your
+usual Git sign-in, such as SSH keys or a credential helper. ThisDamnThing never
+receives or stores your Git credentials.
+
+To install a private stack:
+
+1. Clone the repository. Replace the URL and destination with your own values.
+2. Install the clone from the workspace root.
+3. Run `stack list` to confirm the installed ID and version.
+
+```sh
+git clone https://github.com/example-org/example-team-stack.git ../example-team-stack
+tdt --workspace . stack install ../example-team-stack
+tdt --workspace . stack list
+```
+
+ThisDamnThing records the clone path as the stack source. Keep the clone in that
+location. If you move the clone, pass `--source PATH` when you update.
+
+To install a newer version:
+
+1. Pull the new commits into the clone.
+2. Inspect the update plan. The `version` in `stack.json` must be higher than the installed version.
+3. After you approve the plan, apply it with its `approval_sha256`.
+
+```sh
+git -C ../example-team-stack pull
+tdt --workspace . stack update example-team-stack --check
+tdt --workspace . stack update example-team-stack --approve APPROVAL_SHA256
+```
+
+Local installs do not check marketplace status. If the stack has hooks or
+capabilities, inspect the source and pass `--trust-executable SHA256` as usual.
+`/tdt-install-stack` and `/tdt-update-stack` can run these steps for you after
+you clone the repository.
+
 ## Marketplace discovery and installation
 
 Use `/tdt-install-stack` to search a registry and inspect a selection before

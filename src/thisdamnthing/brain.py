@@ -182,18 +182,29 @@ def named_path(root, category, key, title, reserved=()):
     identifier(key)
     if category not in ("candidates", "knowledge", "projects", "sessions", "notes", "reminders", "relays", "todos"):
         raise WorkspaceError("Invalid note category")
+    return free_path(root, category_path(category), key, title,
+                     note_files(root, (category,)), reserved)
+
+
+def slug(title):
     normalized = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode()
-    slug = re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"
-    occupied = {p.casefold() for p in note_files(root, (category,))} | {p.casefold() for p in reserved}
+    return re.sub(r"[^a-z0-9]+", "-", normalized.lower()).strip("-")[:72].rstrip("-") or "note"
+
+
+def free_path(root, directory, key, title, existing, reserved=()):
+    occupied = {p.casefold() for p in existing} | {p.casefold() for p in reserved}
     for length in range(8, 65, 4):
-        relative = f"{category_path(category)}/{slug}-{key[:length]}.md"
+        relative = f"{directory}/{slug(title)}-{key[:length]}.md"
         if relative.casefold() not in occupied and not managed_path(root, relative).exists():
             return relative
     raise WorkspaceError("Note filename conflict; existing content preserved")
 
 
 def canonical_path(root, meta):
-    return (find_note(root, "knowledge", meta["id"])
+    """Project-tagged approvals live with their project; others in knowledge/."""
+    from .project_context import routed_path
+    return (find_note(root, "knowledge", meta["id"]) or find_note(root, "projects", meta["id"])
+            or routed_path(root, meta)
             or named_path(root, "knowledge", meta["id"], meta["title"]))
 
 
@@ -316,7 +327,7 @@ def review(root, key, decision, instruction, expected, edited=None):
             raise WorkspaceError("Candidate changed; show it again before review")
         if meta.get("id") != key or meta.get("status") != "pending":
             raise WorkspaceError("Only pending candidates can be reviewed")
-        if decision != "approve" and find_note(root, "knowledge", key) is not None:
+        if decision != "approve" and (find_note(root, "knowledge", key) or find_note(root, "projects", key)):
             raise WorkspaceError("Canonical note already exists; inspect interrupted approval before review")
         record = {"at": now(), "decision": decision, "user_instruction": instruction,
                   "proposal_sha256": expected}
@@ -350,6 +361,9 @@ def review(root, key, decision, instruction, expected, edited=None):
                 meta = prior
             else:
                 atomic(root, target, content)
+            if target.count("/") > 2 and target.startswith("brain/projects/"):
+                from .project_context import refresh
+                refresh(root, meta["project"])
             # Keep the pending proposal until canonical persistence succeeds. If
             # deletion fails, the same approval can recover using the record above.
             path.unlink()
@@ -369,7 +383,8 @@ def eligible_notes(root, *, omissions=None):
         category = relative.split("/")[1]
         if (meta["status"] == "approved"
                 and (not meta.get("project") or meta["project"] in project_ids)
-                and (category != "projects" or meta["id"] in project_ids)):
+                # Registration notes sit at the top level; context notes below carry their project.
+                and (category != "projects" or relative.count("/") > 2 or meta["id"] in project_ids)):
             notes[relative[6:-3]] = (relative, meta["title"], body + "\n\nSources: " + json.dumps(meta.get("sources", []), ensure_ascii=False))
     return notes
 

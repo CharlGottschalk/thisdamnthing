@@ -140,6 +140,8 @@ def graph(root):
                 continue
             record = 'index' if path == 'brain/index.md' else next(
                 value for prefix, value in GRAPH_RECORDS.items() if path.startswith(prefix))
+            if record == 'project' and path.count('/') > 2:
+                record = 'knowledge'  # Project context notes, not registrations.
             if record == 'candidate' and meta['status'] != 'pending':
                 continue
             kind = meta.get('kind') if record in ('knowledge', 'candidate') else record

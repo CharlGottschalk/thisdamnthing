@@ -101,6 +101,8 @@ def main(argv=None):
     for action in ("inspect", "propose"):
         command = project_actions.add_parser(action)
         command.add_argument("id")
+    from . import project_context
+    project_context.add_parser(project_actions)
     stack = commands.add_parser("stack", help="validate and manage local workflow stacks")
     stack_actions = stack.add_subparsers(dest="action", required=True)
     for action in ("validate", "install"):
@@ -303,11 +305,13 @@ def main(argv=None):
             return 0
         if args.command == "project":
             from . import projects
-            if args.action in ("add", "create"):
+            if args.action in project_context.ACTIONS:
+                print(json.dumps(project_context.cli(root, args), indent=2, ensure_ascii=False))
+            elif args.action in ("add", "create"):
                 entry, created = (projects.create if args.action == "create" else projects.add)(root, args.path)
                 print(("Registered: " if created else "Already registered: ") + entry["id"])
                 print(json.dumps(projects.inspect(root, entry["id"]), indent=2, ensure_ascii=False))
-                print("Onboarding available: use /tdt-add-project. Interpretations require candidate review.")
+                print("Onboarding available: use /tdt-add-project to gather project context.")
             elif args.action == "list":
                 for entry in projects.registry(root):
                     print(f"{entry['id']}  {projects.status(entry)}  {entry['path']}")

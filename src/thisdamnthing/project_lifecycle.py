@@ -188,6 +188,9 @@ def relink(root, key, directory, *, apply=False, expected=None, instruction=None
                         break
             if meta.get('project') == entry['id']:
                 meta['project'] = new_id
+            if isinstance(meta.get('related'), list):
+                meta['related'] = [{**r, 'project': new_id} if isinstance(r, dict) and r.get('project') == entry['id']
+                                   else r for r in meta['related']]
             sources = meta.get('sources')
             if isinstance(sources, list):
                 meta['sources'] = [moved_source(s, entry['path'], str(path)) for s in sources]

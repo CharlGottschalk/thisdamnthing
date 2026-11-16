@@ -86,6 +86,8 @@ def registration_state(root):
     records = registry(root)
     known = {}
     for relative in brain.note_files(root, ('projects',)):
+        if relative.count('/') > 2:
+            continue  # Project context notes live in a folder beside the registration note.
         meta, _ = brain.read_note(root, relative)
         key = meta['id']
         if key in known or meta['status'] != 'approved' or meta.get('project') != key:

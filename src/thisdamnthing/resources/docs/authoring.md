@@ -110,6 +110,9 @@ belong in the marketplace object in stack.json.
 Submissions require review before approval. Use the website's submission flow
 when available; creating a local bundle or draft submission does not publish it.
 
+To share a stack with your team only, do not publish it. Keep it in a private
+Git repository and follow [Share a private stack with your team](stacks.md#share-a-private-stack-with-your-team).
+
 ## Capability stacks
 
 Use stack contract v2 for executable `brain.search` providers; see

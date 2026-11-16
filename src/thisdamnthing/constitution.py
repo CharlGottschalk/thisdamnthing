@@ -152,6 +152,13 @@ def request_hook(root):
             relay_text = f"ThisDamnThing relays could not be checked: {exc}. Use tdt relay list."
         if relay_text:
             value += "\n\n" + relay_text
+        from .project_context import hook_context as project_context
+        try:
+            project_text = project_context(root, event['session_id'], payload.get('prompt'))
+        except (OSError, ValueError, WorkspaceError) as exc:
+            project_text = f"ThisDamnThing project context could not load: {exc}. Use tdt project context."
+        if project_text:
+            value += "\n\n" + project_text
         print(json.dumps({'hookSpecificOutput': {
             'hookEventName': 'UserPromptSubmit', 'additionalContext': value}}))
         return 0

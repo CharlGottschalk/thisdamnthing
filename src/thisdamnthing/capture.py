@@ -69,8 +69,13 @@ def stop(root, host, payload):
         raise ValueError("Capture handles Stop only")
     if not Path(event["cwd"]).resolve().is_relative_to(root.resolve()):
         raise ValueError("Hook cwd is outside this workspace")
+    from .project_context import history_reason
     if review_turn_suppressed(root, event):
-        return {}
+        # Suppression covers knowledge capture only; file changes still get history.
+        if event["stop_hook_active"]:
+            return {}
+        return {"decision": "block", "reason": history_reason(root, host, event["session_id"]) +
+                " Afterwards return the complete substantive answer to the user's original request."}
     message = payload.get("last_assistant_message")
     if isinstance(message, str):
         match = re.fullmatch(r"\s*```tdt-capture\s*\n(.*?)\n```\s*", message, re.S)
@@ -138,7 +143,8 @@ def stop(root, host, payload):
         "Only if submission or saved status confirms captured, append one line: "
         "'Knowledge captured for review; you can check it with tdt-review-brain.' "
         "If skipped, add no capture notice. If submission fails or is unavailable, preserve "
-        "the answer without claiming capture succeeded; do not retry in a Stop loop.")}
+        "the answer without claiming capture succeeded; do not retry in a Stop loop. " +
+        history_reason(root, host, event["session_id"]))}
 
 
 def main(root):

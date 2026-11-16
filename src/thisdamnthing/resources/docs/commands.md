@@ -31,6 +31,11 @@ values returned by inspection; a placeholder is never approval.
 | `/tdt-search` with the selected provider | `tdt brain search "query" --provider ID` | Select a provider for this query; repeat the option to combine rankings. |
 | `/tdt-add-project` | `tdt project add PATH` / `tdt project list` | Register an external directory unchanged, or list registrations. |
 | `/tdt-add-project` | `tdt project inspect ID` | Reread bounded onboarding evidence. |
+| `/tdt-add-project` | `tdt project context ID` | Show the project index and the summaries of related projects. |
+| `/tdt-add-project` | `tdt project summary ID --user-instruction REF` | Replace the index summary from stdin. |
+| "Add this to project context" | `tdt project note ID --title TITLE --user-instruction REF` | Save a project note from stdin; the same title replaces it. |
+| The Stop hook asks your agent | `tdt project history ID --title TITLE --author NAME [--session S] [--file PATH]` | Record what changed from stdin. |
+| `/tdt-add-project` | `tdt project relate ID OTHER --kind KIND --user-instruction REF [--remove]` | Relate two projects, for example `exports-to`. |
 | `/tdt-relink-project` | `tdt project relink OLD NEW_PATH` | Preview a moved project's registration and reference updates. |
 | `/tdt-remove-project` | `tdt project remove ID [--permanent]` / `tdt project restore ID` | Preview archive, unregister or restore. |
 | Project lifecycle skills | `tdt project references ID` / `tdt project cleanup ID` | Scan references or preview exact cleanup JSON from stdin. |
@@ -195,6 +200,7 @@ The following list covers reads and selected everyday counterparts:
 - `tdt_project_relink_preview`: exact registered `id` and absolute existing destination `path`; complete mechanical updates, new identity and preserved brain link. Source files and historical provenance remain intact. All lifecycle previews allow up to 1 MiB `budget_bytes`; oversized results refuse without partial output. Everyday apply tools use identical inputs, preview hash and the actual user instruction; reference cleanup is separate.
 - `tdt_project_references`: paginated literal references and skipped entries for an exact project ID.
 - `tdt_project_inspect`: bounded source evidence from an explicitly selected registered project.
+- `tdt_project_context`: the project index and the summaries of related projects. Everyday adds `tdt_project_note_save`, `tdt_project_history_add`, `tdt_project_summary_save` and `tdt_project_relate`.
 - `tdt_guides_list` / `tdt_guide_read`: installed core and declared stack guides.
 - `tdt_skill_list` / `tdt_skill_read`: canonical core, user and stack skills.
 - `tdt_skill_inventory`: paginated live skill content prefixes across canonical and

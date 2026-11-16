@@ -156,8 +156,10 @@ knowledge, approval deletes its candidate file. The knowledge note retains sourc
 provenance and the complete review history. If saving fails, the candidate stays
 available; if deletion fails, retry the same approval to finish cleanup.
 Previously approved candidate files are not automatically removed. Rejected candidates
-remain for audit. `tdt brain search QUERY` searches approved canonical notes
-and project registration notes, plus bounded outgoing approved links.
+remain for audit. A candidate with a project ID goes to that project's `notes/`
+folder when you approve it. Other candidates go to `knowledge/`.
+`tdt brain search QUERY` searches approved canonical notes
+and project notes, plus bounded outgoing approved links.
 Use `--limit 10 --depth 1` (limit 1–50, depth 0–3). Literal case-insensitive
 matching seeds retrieval; direct matches precede linked notes and cycles are
 deduplicated. Pending/rejected notes never become link targets. Brain scans are

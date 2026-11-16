@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Literal
 from pydantic import Field
-from .. import brain, projects, project_graph as graphs, project_lifecycle
+from .. import brain, projects, project_context, project_graph as graphs, project_lifecycle
 from .common import Refused, bounded_text, inventory_page, serialized, workspace_key
 from .models import (
     ListInput, Model, ReadInput,
@@ -339,3 +339,93 @@ def project_cleanup_apply(root, args):
     return lifecycle_receipt(project_lifecycle.cleanup(
         root, args.id, proposal, apply=True,
         expected=args.expected_sha256, instruction=args.user_instruction))
+
+
+ProjectId = Field(pattern='^[a-f0-9]{64}$')
+Instruction = Field(min_length=1, max_length=500)
+
+
+class ProjectContextInput(ReadInput):
+    id: str = ProjectId
+
+
+class RelatedContext(Model):
+    project: str
+    title: str
+    kind: str
+    direction: Literal['forward', 'reverse']
+    path: str
+    summary: str
+
+
+class ProjectContext(Model):
+    project: str
+    title: str
+    path: str
+    folder: str
+    index: str
+    related: list[RelatedContext]
+
+
+class ProjectNoteInput(ReadInput):
+    id: str = ProjectId
+    title: str = Field(min_length=1, max_length=160)
+    body: str = Field(min_length=1, max_length=16000)
+    sources: list[str] = Field(default_factory=list, max_length=8)
+    user_instruction: str = Instruction
+
+
+class ProjectHistoryInput(ReadInput):
+    id: str = ProjectId
+    title: str = Field(min_length=1, max_length=160)
+    body: str = Field(min_length=1, max_length=4000)
+    author: str = Field(min_length=1, max_length=160)
+    session: str | None = Field(default=None, pattern='^[A-Za-z0-9:._-]{1,200}$')
+    files: list[str] = Field(default_factory=list, max_length=50)
+
+
+class ProjectSummaryInput(ReadInput):
+    id: str = ProjectId
+    summary: str = Field(min_length=1, max_length=8000)
+    user_instruction: str = Instruction
+
+
+class ProjectRelateInput(ReadInput):
+    id: str = ProjectId
+    other: str = ProjectId
+    kind: str = Field(pattern='^[a-z][a-z-]{1,30}$')
+    remove: bool = False
+    user_instruction: str = Instruction
+
+
+class ProjectContextSaved(Model):
+    project: str
+    path: str
+    result: Literal['saved', 'updated', 'added', 'removed']
+
+
+def saved(value):
+    return ProjectContextSaved(project=value['project'], path=value['path'], result=value['result']), []
+
+
+def project_context_read(root, args):
+    return ProjectContext(**project_context.context(root, args.id)), []
+
+
+def project_note_save(root, args):
+    return saved(project_context.save_note(root, args.id, args.title, args.body,
+                                           args.user_instruction, args.sources))
+
+
+def project_history_add(root, args):
+    return saved(project_context.add_history(root, args.id, args.title, args.body, args.author,
+                                             args.files, args.session))
+
+
+def project_summary_save(root, args):
+    return saved(project_context.save_summary(root, args.id, args.summary, args.user_instruction))
+
+
+def project_relate(root, args):
+    return saved(project_context.relate(root, args.id, args.other, args.kind,
+                                        args.user_instruction, args.remove))

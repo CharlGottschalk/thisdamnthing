@@ -10,7 +10,8 @@ containing .tdt/config.json):
 - Connect workspace MCP, choose its host/preset, inspect or disconnect it:
   `.tdt/skills/tdt-mcp/SKILL.md`.
 - Workspace permission rules: `.tdt/skills/tdt-constitution/SKILL.md`.
-- Create, register or resume projects; find working files or templates:
+- Create, register or resume projects; gather or add project context; find
+  working files or templates:
   `.tdt/skills/tdt-add-project/SKILL.md`.
 - Relink a renamed or moved project: `.tdt/skills/tdt-relink-project/SKILL.md`.
 - Build or refresh a project's file graph: `.tdt/skills/tdt-project-graph/SKILL.md`.

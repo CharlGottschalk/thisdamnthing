@@ -11,8 +11,8 @@ In Codex, use `$tdt-add-project` or the skill picker.
 
 Terminal alternative: `tdt project add ../project` prints its stable ID and
 bounded onboarding evidence. No project files are changed or copied into the
-workspace. The project note records the directory registration. Interpretations need
-approval.
+workspace. The project note records the directory registration. The skill then
+gathers project context; see [Project context](#project-context).
 Its filename combines the project directory name and a short ID suffix, such as
 `brain/projects/sites-a31f29c8.md`. Inspection returns its actual `brain_link` for
 use in proposals. Full project IDs are used in commands and remain stable until an explicit relink.
@@ -99,6 +99,53 @@ Normal capture still proposes durable knowledge; explicit saves use tdt-capture.
 Use exact file sources and the registered project ID to relate decisions to work.
 No automatic mirroring, project relocation or fixed progress-file layout occurs.
 Use the lifecycle skills below for explicit registration changes.
+
+## Project context
+
+Each registered project has an index note and a folder with the same name, for
+example `brain/projects/site-a31f29c8.md` and `brain/projects/site-a31f29c8/`.
+
+- The index note starts with a summary: purpose, stack, commands, structure,
+  entry points, workflow and unknowns.
+- Below the summary, TDT keeps a registry. The registry links related projects,
+  project notes and recent history. TDT updates it after each change.
+- `notes/` holds the notes that you add and the approved candidates for the project.
+- `history/` holds one file for each day with changes. Each entry tells what
+  changed, who changed it, and which files changed.
+
+When you register a project, `/tdt-add-project` reads the project's instructions,
+README, manifests and entry points. The agent then writes the summary and asks
+about workflow that the files do not show. To refresh the summary later, ask
+the agent to gather project context again.
+
+When a request names a project, TDT adds its index to the agent context. TDT does
+this one time in each session. TDT also adds the summaries of related projects.
+The agent reads a linked note only when the work needs it.
+
+To save a note, tell the agent, for example: "Add to site-dev context: never reset
+the dev database." A note with the same title replaces the earlier note.
+
+To relate two projects, tell the agent the relation. For example, development
+happens in site-dev, and the agent exports finished work to site. The agent records
+`site-dev exports-to site`. When a request names site or site-dev, the agent
+sees both summaries.
+
+At the end of each turn, the Stop hook asks the agent to record history when
+project files changed. One entry records each session for each day. Later turns
+in the same session update that entry. The hook asks for history also when
+automatic capture is suppressed. To record your own changes, describe them to the agent.
+
+Terminal alternatives:
+
+```sh
+tdt project context site-dev
+echo "Never reset the dev database." | tdt project note site-dev --title "Dev database" --user-instruction "Add to site-dev context"
+tdt project relate site-dev site --kind exports-to --user-instruction "site-dev exports to site"
+echo "Added the export script." | tdt project history site-dev --title "Export script" --author "Claude Opus 5.5"
+```
+
+Project context is workspace data, not instructions or authorization. The project's
+own instructions still apply. A relink keeps the folder name and updates relations.
 
 ## Relays between projects
 
